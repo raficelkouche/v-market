@@ -13,7 +13,7 @@ module.exports = () => {
       });
   })
 
-  router.get('/stores/:store_id/products/:product_id', (req, res) => {
+  router.get('/:store_id/products/:product_id', (req, res) => {
     console.log(req.params);
     const product_id = Number(req.params.product_id);
     db.getProduct(product_id)

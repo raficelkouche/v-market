@@ -1,0 +1,37 @@
+/* Style for Product Details */
+
+#product-container {
+  /* border: 2px solid red; */
+  display: flex;
+  align-items: top;
+  margin-top: 2em;
+}
+
+#product-container .thumbnail{
+  /* border: 2px solid blue; */
+  width: 300px;
+  height: 300px;
+  margin: 2px;
+}
+
+#product-container #product-des {
+  /* border: 2px solid green; */
+  margin: 2px;
+  padding: 1em;
+  width: 500px
+}
+
+#product-des h2 {
+  font-size:2em;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#product-container #product-price {
+  /* border: 2px solid yellow */
+  margin-top: 2em;
+}
+
+#product-buttons button{
+  margin: 2em;
+}

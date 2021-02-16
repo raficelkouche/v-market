@@ -248,12 +248,17 @@ class Game extends Phaser.Scene {
               <img class="thumbnail" src=${result.thumbnail};/>
             </div>
             <div id='product-des'>
-              ${result.name}
-              ${result.description}
-            </div>
-            <div id='product-price'>
-              ${result.price}
-              Only ${result.quantity} left
+              <h2>${result.name}</h2>
+              <p>Description</p>
+              <p>${result.description}</p>
+              <div id='product-price'>
+                <p>Price: $${result.price}</p>
+                <p>Only ${result.quantity} left</p>
+              </div>
+              <div id='product-buttons'>
+                <button class='btn btn-outline-success'> Add to Cart </button>
+                <button class='btn btn-outline-warning'> Go back </button>
+              </div>
             </div>
           </div>
           `;
