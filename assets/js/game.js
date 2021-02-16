@@ -8,8 +8,8 @@ class Game extends Phaser.Scene {
   static storeId;
 
   preload() {
-    this.load.tilemapTiledJSON("map", "maps/temp.json")
-    this.load.image('tile', 'maps/season.png')
+    this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
+    this.load.image('tile', 'maps/vMarketTiles.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -19,7 +19,7 @@ class Game extends Phaser.Scene {
   create() {
     this.map = this.make.tilemap({ key: "map" });
     //add object layer first. 
-    let storesArea = this.map.getObjectLayer('Object Layer 1')['objects'];
+    let storesArea = this.map.getObjectLayer('StoreObj')['objects'];
     let storeAreaGroup = this.physics.add.staticGroup({});
     storesArea.forEach(area => {
       let a = storeAreaGroup.create(area.x, area.y);
@@ -35,10 +35,14 @@ class Game extends Phaser.Scene {
     console.log(storeAreaGroup.children.entries[0].name);//example of storeArea's store_id path
 
     //add other layer to overwrite obj layer
-    this.tileset = this.map.addTilesetImage('b2a48f88a662593f2ed0ae2f609906a1_a20e10b34f8b9f083be0f1faf36b6f5d', 'tile')
-    this.worldLayer = this.map.createLayer("world", this.tileset, 0, 0)
-    this.wallLayer = this.map.createLayer("wall", this.tileset, 0, 0)
-    this.wallLayer.setCollisionByProperty({ collides: true });
+    this.tileset = this.map.addTilesetImage('vMarketTiles', 'tile')
+    this.groundLayer = this.map.createLayer("Ground", this.tileset, 0, 0)
+    this.cityObjLayer = this.map.createLayer("CityObj", this.tileset, 0, 0)
+
+
+    this.groundLayer.setCollisionByProperty({ collides: true });
+    this.cityObjLayer.setCollisionByProperty({ collides: true });
+
 
     //make sprite anime
     this.anims.create({
@@ -86,14 +90,17 @@ class Game extends Phaser.Scene {
     this.player.play('idle-d') // play idle-d as default 
 
     //add camera
-    this.cameras.main.setBounds(0, 0, 1280, 960); //set camera to size of map
+    this.cameras.main.setBounds(0, 0, 1920, 1920); //set camera to size of map
     this.cameras.main.setZoom(3); //zoom in
 
     //add overlapArea detect
     this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { this.storeId = y.name; this.overlap = true; }, undefined, this); //check overlap with store area, change overlap to true
 
     //add collider with player
-    this.physics.add.collider(this.player, this.wallLayer);
+    // this.physics.add.collider(this.player, this.wallLayer);
+    this.physics.add.collider(this.player, this.groundLayer)
+    this.physics.add.collider(this.player, this.cityObjLayer)
+
   }
 
   update() {
@@ -114,7 +121,7 @@ class Game extends Phaser.Scene {
       if ($("#store-data").length === 0) { // allow user to open 1 window only
         this.inshop = true //set inshop true, to 'pause' game
         this.cameras.main.setZoom(1); //zoom out cause phaser dom is weird
-        this.add.dom(640, 480).createFromCache('store_window'); //place dom in center
+        this.add.dom(this.player.x, this.player.y).createFromCache('store_window'); //place dom in center
       }
       $("#close-button").on("click", () => {
         $("canvas").prev().children().remove() //remove the added dom
