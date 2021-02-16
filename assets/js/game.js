@@ -8,6 +8,8 @@ class Game extends Phaser.Scene {
   static storeId;
   static camX;
   static camY;
+  static miniMapBorder;
+  static graphics;
 
   preload() {
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
@@ -19,6 +21,7 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+    this.graphics = this.add.graphics();
     this.map = this.make.tilemap({ key: "map" });
     //add object layer first. 
     let storesArea = this.map.getObjectLayer('StoreObj')['objects'];
@@ -94,6 +97,11 @@ class Game extends Phaser.Scene {
     //add camera
     this.cameras.main.setBounds(0, 0, 1920, 1920); //set camera to size of map
     this.cameras.main.setZoom(3); //zoom in
+    this.miniCam = this.cameras.add(1030, 0, 250, 250);
+    this.miniCam.setBounds(0, 0, 1920, 1920)
+    this.miniCam.zoom = 0.35;
+    this.graphics.lineStyle(200, 0x000000, 1);
+    this.graphics.strokeRect(1030, 0, 250, 250);
 
     //add overlapArea detect
     this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
@@ -112,15 +120,18 @@ class Game extends Phaser.Scene {
     this.physics.world.bounds.width = this.map.widthInPixels;
     this.physics.world.bounds.height = this.map.heightInPixels;
     this.player.body.setCollideWorldBounds(true); 
-
   }
 
   update() {
     this.cameras.main.centerOn(this.player.x, this.player.y); //set camera to the player
+    if (this.miniCam) {
+      this.miniCam.centerOn(this.player.x, this.player.y)
+    }
     if (this.inshop) { //when in shop stop
       if (this.key.ESC.isDown) {
         $("canvas").prev().children().remove()
         this.inshop = false;
+        this.miniCam.setVisible(true);
       }
       this.cameras.main.setZoom(1); //while in shop, stay zoom out
       this.player.setVelocity(0); //no player movement allow
@@ -138,6 +149,7 @@ class Game extends Phaser.Scene {
       this.player.play("idle-" + newAnim[1])
       console.log(this.storeId)
       if ($("#store-data").length === 0) { // allow user to open 1 window only
+        this.miniCam.setVisible(false);
         this.inshop = true //set inshop true, to 'pause' game
         this.cameras.main.setZoom(1); //zoom out cause phaser dom is weird
         if (this.player.x < 640){
@@ -156,17 +168,26 @@ class Game extends Phaser.Scene {
         }
         this.add.dom(this.camX, this.camY).createFromCache('store_window'); //place dom in center
       }
+      if ($("#customer-support")) {
+        $("#backdrop").css('visibility', 'visible');
+      }
       $("#close-button").on("click", () => {
         $("canvas").prev().children().remove() //remove the added dom
         this.inshop = false; //'unpause' game
+        this.miniCam.setVisible(true);
       })
-      $("#request-data").on("click", () => {
-        $("canvas").prev().children().remove() //remove the added dom
-        this.inshop = false; //'unpause' game
+      $("#request-data").on("click", () => { //need to replace
+        $("canvas").prev().children().remove() 
+        this.inshop = false; 
+        this.miniCam.setVisible(true);
       })
-      $("#customer-support").on("click", () => {
-        $("canvas").prev().children().remove() //remove the added dom
-        this.inshop = false; //'unpause' game
+      $("#customer-support").on("click", () => { //need to replace
+        $("canvas").prev().children().remove() 
+        this.inshop = false; 
+        this.miniCam.setVisible(true);
+      })
+      $("td").on("click", (x) => {
+        $("#products").remove() //remove products and load detail
       })
     }
     this.player.setVelocity(0);

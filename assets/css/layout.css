@@ -3,6 +3,7 @@
 }
 /* this have to change to inline style from phase to*/
 #backdrop {
+  visibility: hidden;
   display: flex;
   justify-content: center;
   background: rgba(0, 0, 0, 0.2);
