@@ -13,28 +13,18 @@ app.use(express.static("assets"));
 
 app.set("view engine", "ejs");
 
+//define mount the routes
+const userRoutes = require("./routes/users");
+const storeRoutes = require("./routes/stores");
+app.use("/users", userRoutes());
+app.use("/stores", storeRoutes());
+
+//app entry point
 app.get('/', (req, res) => {
   db.getAllUsers().then(res => console.log(res))
   res.render('index')
 })
 
-app.get('/stores/:store_id/:call_count', (req, res) => {
-  const store_id = Number(req.params.store_id);
-  const call_count = Number(req.params.call_count);
-  db.getMoreProducts(store_id, call_count)
-    .then(products => {
-      res.json(products);
-    });
-})
-
-app.get('/stores/:store_id/products/:product_id', (req, res) => {
-  console.log(req.params);
-  const product_id = Number(req.params.product_id);
-  db.getProduct(product_id)
-    .then(product => {
-      res.json(product);
-    });
-})
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)
