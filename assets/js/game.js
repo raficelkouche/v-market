@@ -129,7 +129,21 @@ class Game extends Phaser.Scene {
       if ($("#store-data").length === 0) { // allow user to open 1 window only
         this.inshop = true //set inshop true, to 'pause' game
         this.cameras.main.setZoom(1); //zoom out cause phaser dom is weird
-        this.add.dom(this.player.x, this.player.y).createFromCache('store_window'); //place dom in center
+        if (this.player.x < 640){
+          this.camX = 640
+        } else if (this.player.x > 1280){
+          this.camX = 1280
+        } else {
+          this.camX = this.player.x
+        }
+        if (this.player.y < 480){
+          this.camY = 480
+        } else if (this.player.y > 1440){
+          this.camY = 1440
+        } else {
+          this.camY = this.player.y
+        }
+        this.add.dom(this.camX, this.camY).createFromCache('store_window'); //place dom in center
       }
       $("#close-button").on("click", () => {
         $("canvas").prev().children().remove() //remove the added dom
