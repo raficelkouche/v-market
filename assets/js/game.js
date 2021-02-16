@@ -108,8 +108,16 @@ class Game extends Phaser.Scene {
     this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
       this.storeId = y.name;
       // if have access to db then can assign it here, or hardcode it?
-      this.storeName = y.name;
-      this.add.text(y.x, y.y - 32*3 , `Store #: ${this.storeName}`);
+      // let storeNameCall = null;
+      $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
+      .then( res => {
+        // console.log(res)
+        if (res.length){
+          this.add.text(y.x, y.y - 32*3 , `${res[0].s_name}`);
+        } else {
+          this.add.text(y.x, y.y - 32*3, "Store Closed")
+        }
+      });
       this.overlap = true;
     }, undefined, this); //check overlap with store area, change overlap to true
 
@@ -171,6 +179,7 @@ class Game extends Phaser.Scene {
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
       .then(function (result) {
+        // console.log(result)
         if (result[0]) { //need to add helper to check if store exist but no product and rewrite
           $("table").append(addMoreItem(result))
           $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
