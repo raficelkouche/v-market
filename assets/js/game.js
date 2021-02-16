@@ -173,12 +173,12 @@ class Game extends Phaser.Scene {
       .then(function (result) {
         if (result[0]) { //need to add helper to check if store exist but no product and rewrite
           $("table").append(addMoreItem(result))
-          $('#store_banner').css('background-image', `url(${result[0].banner_image})`)
+          $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
           $('h1').text(`${result[0].s_name}`)
         } else {
           $('#customer-support').remove();
           $("#request-data").parent().html('');
-          $('h1').text(`There does not seems to be any product here atm!`)
+          $('h1').text(`Sorry! This store is currently closed. Come back again later.`)
           $('h1').css(`color`, 'black')
         }
       });
