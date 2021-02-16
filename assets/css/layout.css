@@ -107,7 +107,7 @@
 }
 
 #products-grid > table {
-  margin-top: 2rem;
+  margin-top: 1rem;
   width: 100%;
   border-collapse: separate;
   border-spacing: 1rem 2rem;
@@ -119,19 +119,60 @@
 }
 
 td {
-  height:15rem;
-  width:18%;
+  height:18rem;
+  width:24%;
 }
 
-td > .thumbnail{
+.thumbnail{
+  width: 90%;
+  height: 65%;
+  margin-top: 10%;
+  margin-left: 5%;
+  margin-right: 5%;
+  border:0;
+}
+
+.thumbnail:hover{
+  cursor: pointer;
+}
+
+.description{
   align-self: center;
   justify-self: center;
-  margin: 1rem;
   width: 90%;
-  height: 70%;
-  background-image: url(https://i.imgur.com/8CIyTeh.gif);
-  background-size: contain;
-  background-repeat: no-repeat;
+  height: 25%;
+  margin: 5%;
+}
+
+.product-name {
+  width: 100%;
+  height: 60%;
+  font-family: Arial;
+  text-align: center;
+  overflow: hidden;
+}
+
+.price {
+  width: 100%;
+  height: 40%;
+  text-align: center;
+  font-family: Arial;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#products-grid > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  align-content: center;
+  justify-content: center;
+  padding-bottom: 2rem;
+}
+
+#request-data {
+
 }
 
 #customer-support {
