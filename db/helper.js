@@ -16,7 +16,7 @@ exports.getAllUsers = getAllUsers;
 
 const getMoreProducts = function(store_id, called) {
   return pool.query(`
-  select s.name, s.banner_img, p.id, p.name, p.description, p.price, p.discount, p.thumbnail
+  select s.name as s_name, s.banner_img, s.description as s_des, p.id, p.name, p.description, p.price, p.discount, p.thumbnail
   from stores s 
   join products p on store_id = s.id
   where s.id = $1

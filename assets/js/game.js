@@ -124,8 +124,6 @@ class Game extends Phaser.Scene {
   }
 
   update() {
-
-
     const addMoreItem = function(result) {
       let outOfItem = `<p>There is no more listing from this vendor at the moment...</p>
       <p>Thanks for your support!</p>`;
@@ -173,7 +171,16 @@ class Game extends Phaser.Scene {
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
       .then(function (result) {
-        $("table").append(addMoreItem(result))
+        if (result[0]) { //need to add helper to check if store exist but no product and rewrite
+          $("table").append(addMoreItem(result))
+          $('#store_banner').css('background-image', `url(${result[0].banner_image})`)
+          $('h1').text(`${result[0].s_name}`)
+        } else {
+          $('#customer-support').remove();
+          $("#request-data").parent().html('');
+          $('h1').text(`There does not seems to be any product here atm!`)
+          $('h1').css(`color`, 'black')
+        }
       });
       this.storeLoadCount++;
       let newAnim = this.player.anims.currentAnim.key.split('-') // change anime to idle
