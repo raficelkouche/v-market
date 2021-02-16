@@ -29,7 +29,7 @@ class Game extends Phaser.Scene {
       a.body.height = area.height;
       a.name = area.properties[0].value //add store_id as name to do ajax call, 
       //please note, this store_id must be set as first custom_property in tile
-      //overlap cb does not return id for some reason, so use name
+      //overlap cb does not return id for some reason, so use name     
     });
     storeAreaGroup.refresh(); //physics body needs to refresh
     console.log(storeAreaGroup.children.entries[0].name);//example of storeArea's store_id path
@@ -94,12 +94,24 @@ class Game extends Phaser.Scene {
     this.cameras.main.setZoom(3); //zoom in
 
     //add overlapArea detect
-    this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { this.storeId = y.name; this.overlap = true; }, undefined, this); //check overlap with store area, change overlap to true
+    this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
+      this.storeId = y.name;
+      // if have access to db then can assign it here, or hardcode it?
+      this.storeName = y.name;
+      this.storeX = y.x;
+      this.storeY = y.y;
+      this.add.text(y.x, y.y - 32*3 , `Store #: ${this.storeName}`);
+      this.overlap = true;
+    }, undefined, this); //check overlap with store area, change overlap to true
 
     //add collider with player
     // this.physics.add.collider(this.player, this.wallLayer);
     this.physics.add.collider(this.player, this.groundLayer)
     this.physics.add.collider(this.player, this.cityObjLayer)
+
+    this.physics.world.bounds.width = this.map.widthInPixels;
+    this.physics.world.bounds.height = this.map.heightInPixels;
+    this.player.body.setCollideWorldBounds(true); 
 
   }
 
@@ -114,6 +126,14 @@ class Game extends Phaser.Scene {
       this.player.setVelocity(0); //no player movement allow
       return; //end update
     }
+    if (this.overlap === true) {
+      const storeName = this.add.text(this.storeX, this.storeY - 32*3 , 'Hello World');
+      // console.log(this.storeName)
+    } 
+    if (this.overlap === false && storeName) {
+      storeName.destroy()
+    }
+
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
       let newAnim = this.player.anims.currentAnim.key.split('-') // change anime to idle
       this.player.play("idle-" + newAnim[1])
