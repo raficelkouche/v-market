@@ -98,8 +98,6 @@ class Game extends Phaser.Scene {
       this.storeId = y.name;
       // if have access to db then can assign it here, or hardcode it?
       this.storeName = y.name;
-      this.storeX = y.x;
-      this.storeY = y.y;
       this.add.text(y.x, y.y - 32*3 , `Store #: ${this.storeName}`);
       this.overlap = true;
     }, undefined, this); //check overlap with store area, change overlap to true
