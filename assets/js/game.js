@@ -160,6 +160,14 @@ class Game extends Phaser.Scene {
         $("canvas").prev().children().remove() //remove the added dom
         this.inshop = false; //'unpause' game
       })
+      $("#request-data").on("click", () => {
+        $("canvas").prev().children().remove() //remove the added dom
+        this.inshop = false; //'unpause' game
+      })
+      $("#customer-support").on("click", () => {
+        $("canvas").prev().children().remove() //remove the added dom
+        this.inshop = false; //'unpause' game
+      })
     }
     this.player.setVelocity(0);
     if (this.cursors.left.isDown || this.key.A.isDown) {
