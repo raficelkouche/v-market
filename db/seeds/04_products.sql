@@ -1,0 +1,1 @@
+INSERT INTO products (category_id, store_id, name, description, price, quantity, discount) VALUES ()
