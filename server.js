@@ -4,12 +4,16 @@ const PORT = 3000;
 const ENV = process.env.ENV || "development";
 const express = require('express')
 const app = express()
+const server = require('http').createServer(app)
+const io = require('socket.io')(server)
 const morgan = require('morgan'); //HTTP request logger
 const path = require('path');
 
 
 app.use(morgan('dev'));
 app.use(express.static("assets"));
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 app.set("view engine", "ejs");
 
@@ -21,11 +25,25 @@ app.use("/stores", storeRoutes());
 
 //app entry point
 app.get('/', (req, res) => {
-  db.getAllUsers().then(res => console.log(res))
   res.render('index')
 })
 
+//chat testing route
+app.get('/chat', (req, res) => {
+  res.sendFile(__dirname + '/temp/chat.html')
+})
+let counter = 1;
+//socket configuration
+io.on('connection', (socket) => {
+  socket.on('send message', (message) => {
+    socket.broadcast.emit('receive message', message)
+  })
 
-app.listen(PORT, () => {
+  socket.on('disconnect', () => {
+    console.log('user disconnected')
+  })
+})
+
+server.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)
 })
