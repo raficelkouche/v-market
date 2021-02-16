@@ -21,7 +21,6 @@ app.use("/stores", storeRoutes());
 
 //app entry point
 app.get('/', (req, res) => {
-  db.getAllUsers().then(res => console.log(res))
   res.render('index')
 })
 
