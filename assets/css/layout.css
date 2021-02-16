@@ -170,6 +170,8 @@ td {
   align-content: center;
   justify-content: center;
   padding-bottom: 2rem;
+  font-weight: bold;
+  font-family: Arial;
 }
 
 #request-data {

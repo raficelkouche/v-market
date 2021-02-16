@@ -10,5 +10,6 @@ CREATE TABLE products
   description VARCHAR(255),
   price NUMERIC(10, 2) NOT NULL,
   quantity INTEGER NOT NULL,
-  discount INTEGER
+  discount INTEGER,
+  thumbnail TEXT NOT NULL
 );

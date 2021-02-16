@@ -1,1 +1,6 @@
-INSERT INTO products (category_id, store_id, name, description, price, quantity, discount) VALUES ()
+INSERT INTO products (category_id, store_id, name, description, price, quantity, discount, thumbnail) VALUES (1, 1, 'wonder bread', 'Merica!', '999.99', '12', 70, 'https://i.imgur.com/8CIyTeh.gif');
+INSERT INTO products (category_id, store_id, name, description, price, quantity, discount, thumbnail) VALUES (2, 1, 'bread', 'Merica!', '999.99', '12', 70, 'https://i.imgur.com/8CIyTeh.gif');
+INSERT INTO products (category_id, store_id, name, description, price, quantity, discount, thumbnail) VALUES (1, 1, 'wonder', 'Merica!', '999.99', '12', 70, 'https://i.imgur.com/8CIyTeh.gif');
+INSERT INTO products (category_id, store_id, name, description, price, quantity, discount, thumbnail) VALUES (3, 1, 'wonderbread', 'Merica!', '999.99', '12', 70, 'https://i.imgur.com/PGXEqCr.gif');
+INSERT INTO products (category_id, store_id, name, description, price, quantity, discount, thumbnail) VALUES (1, 1, 'wobread', 'Merica!', '999.99', '12', 70, 'https://i.imgur.com/PGXEqCr.gif');
+INSERT INTO products (category_id, store_id, name, description, price, quantity, discount, thumbnail) VALUES (1, 2, 'wobread', 'Merica!', '999.99', '12', 70, 'https://i.imgur.com/8CIyTeh.gif');

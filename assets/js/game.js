@@ -6,10 +6,10 @@ class Game extends Phaser.Scene {
   static overlap = true;
   static inshop = false;
   static storeId;
+  static storeLoadCount;
   static camX;
   static camY;
   static miniMapBorder;
-  static graphics;
 
   preload() {
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
@@ -21,7 +21,6 @@ class Game extends Phaser.Scene {
   }
 
   create() {
-    this.graphics = this.add.graphics();
     this.map = this.make.tilemap({ key: "map" });
     //add object layer first. 
     let storesArea = this.map.getObjectLayer('StoreObj')['objects'];
@@ -36,6 +35,7 @@ class Game extends Phaser.Scene {
       //please note, this store_id must be set as first custom_property in tile
       //overlap cb does not return id for some reason, so use name     
     });
+    this.storeLoadCount = 0; //init
     storeAreaGroup.refresh(); //physics body needs to refresh
     console.log(storeAreaGroup.children.entries[0].name);//example of storeArea's store_id path
 
@@ -97,12 +97,13 @@ class Game extends Phaser.Scene {
     //add camera
     this.cameras.main.setBounds(0, 0, 1920, 1920); //set camera to size of map
     this.cameras.main.setZoom(3); //zoom in
+    this.cameras.main.startFollow(this.player, true)
     this.miniCam = this.cameras.add(1030, 0, 250, 250);
     this.miniCam.setBounds(0, 0, 1920, 1920)
     this.miniCam.zoom = 0.35;
-    this.graphics.lineStyle(200, 0x000000, 1);
-    this.graphics.strokeRect(1030, 0, 250, 250);
-
+    this.miniCam.startFollow(this.player, true)
+    
+    
     //add overlapArea detect
     this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
       this.storeId = y.name;
@@ -123,15 +124,39 @@ class Game extends Phaser.Scene {
   }
 
   update() {
-    this.cameras.main.centerOn(this.player.x, this.player.y); //set camera to the player
-    if (this.miniCam) {
-      this.miniCam.centerOn(this.player.x, this.player.y)
+
+    const addMoreItem = function(result) {
+      let outOfItem = `<p>There is no more listing from this vendor at the moment...</p>
+      <p>Thanks for your support!</p>`;
+      let pendingHTML = `<tr>`;
+      for (let i = 0; i < 4; i++) {
+        if(result[i]) { // assign product_id to td as value for later calling 
+          pendingHTML += `
+          <td class="single-product" value=${result[i].id}>
+            <img class="thumbnail" src="${result[i].thumbnail};"/>
+            <div class="description">
+              <div class="product-name">
+                ${result[i].description}
+              </div>
+              <div class="price">
+                $${result[i].price}
+              </div>
+            </div>
+          </td>`
+        } else  {
+          pendingHTML += `<td></td>`;
+          if ($("#request-data")) $("#request-data").parent().html(outOfItem);
+        }
+      }
+      return pendingHTML
     }
+
     if (this.inshop) { //when in shop stop
       if (this.key.ESC.isDown) {
         $("canvas").prev().children().remove()
         this.inshop = false;
         this.miniCam.setVisible(true);
+        this.storeLoadCount = 0;
       }
       this.cameras.main.setZoom(1); //while in shop, stay zoom out
       this.player.setVelocity(0); //no player movement allow
@@ -145,9 +170,13 @@ class Game extends Phaser.Scene {
     //   storeName.destroy()
     // }
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
+      $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
+      .then(function (result) {
+        $("table").append(addMoreItem(result))
+      });
+      this.storeLoadCount++;
       let newAnim = this.player.anims.currentAnim.key.split('-') // change anime to idle
       this.player.play("idle-" + newAnim[1])
-      console.log(this.storeId)
       if ($("#store-data").length === 0) { // allow user to open 1 window only
         this.miniCam.setVisible(false);
         this.inshop = true //set inshop true, to 'pause' game
@@ -175,19 +204,29 @@ class Game extends Phaser.Scene {
         $("canvas").prev().children().remove() //remove the added dom
         this.inshop = false; //'unpause' game
         this.miniCam.setVisible(true);
+        this.storeLoadCount = 0;
       })
-      $("#request-data").on("click", () => { //need to replace
-        $("canvas").prev().children().remove() 
-        this.inshop = false; 
-        this.miniCam.setVisible(true);
+      $("#request-data").on("click", () => { //wait for helper
+        $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//use ajax to handle request to the server
+          .then(function (result) {
+            $("table").append(addMoreItem(result))
+          })
+        this.storeLoadCount++;
       })
       $("#customer-support").on("click", () => { //need to replace
         $("canvas").prev().children().remove() 
         this.inshop = false; 
         this.miniCam.setVisible(true);
+        this.storeLoadCount = 0;
       })
-      $("td").on("click", (x) => {
+      $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
+        console.log(x.currentTarget)
         $("#products").remove() //remove products and load detail
+        $("#store-data").html(`
+        <div id='products'>
+
+        </div>
+        `)
       })
     }
     this.player.setVelocity(0);
