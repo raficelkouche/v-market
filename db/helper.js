@@ -1,11 +1,7 @@
 const { Pool } = require('pg');
+const dbParams = require('./config')
 
-const pool = new Pool({
-  user: 'labber',
-  password: 'labber',
-  host: 'localhost',
-  database: 'vmark'
-});
+const pool = new Pool({ dbParams });
 
 const getAllUsers = function() {
   return pool.query(`

@@ -14,6 +14,7 @@ app.use(express.static("assets"));
 app.set("view engine", "ejs");
 
 app.get('/', (req, res) => {
+  db.getAllUsers().then(res => console.log(res))
   res.render('index')
 })
 
