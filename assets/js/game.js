@@ -94,12 +94,20 @@ class Game extends Phaser.Scene {
     this.cameras.main.setZoom(3); //zoom in
 
     //add overlapArea detect
-    this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { this.storeId = y.name; this.overlap = true; }, undefined, this); //check overlap with store area, change overlap to true
+    this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
+      this.storeId = y.name;
+      this.storeName = y.name; 
+      this.overlap = true;
+    }, undefined, this); //check overlap with store area, change overlap to true
 
     //add collider with player
     // this.physics.add.collider(this.player, this.wallLayer);
     this.physics.add.collider(this.player, this.groundLayer)
     this.physics.add.collider(this.player, this.cityObjLayer)
+
+    this.physics.world.bounds.width = this.map.widthInPixels;
+    this.physics.world.bounds.height = this.map.heightInPixels;
+    this.player.body.setCollideWorldBounds(true); 
 
   }
 
