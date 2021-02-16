@@ -9,7 +9,7 @@ class Game extends Phaser.Scene {
 
   preload() {
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
-    this.load.image('tile', 'maps/vMarketTiles.png')
+    this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -126,13 +126,13 @@ class Game extends Phaser.Scene {
       this.player.setVelocity(0); //no player movement allow
       return; //end update
     }
-    if (this.overlap === true) {
-      const storeName = this.add.text(this.storeX, this.storeY - 32*3 , 'Hello World');
-      // console.log(this.storeName)
-    } 
-    if (this.overlap === false && storeName) {
-      storeName.destroy()
-    }
+    // if (this.overlap === true) {
+    //   const storeName = this.add.text(this.storeX, this.storeY - 32*3 , 'Hello World');
+    //   // console.log(this.storeName)
+    // } 
+    // if (this.overlap === false && storeName) {
+    //   storeName.destroy()
+    // }
 
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
       let newAnim = this.player.anims.currentAnim.key.split('-') // change anime to idle
