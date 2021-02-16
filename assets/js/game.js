@@ -114,9 +114,8 @@ class Game extends Phaser.Scene {
         // console.log(res)
         if (res.length){
           this.add.text(y.x, y.y - 32*3 , `${res[0].s_name}`);
-        } else {
-          this.add.text(y.x, y.y - 32*3, "Store Closed")
-        }
+        } 
+
       });
       this.overlap = true;
     }, undefined, this); //check overlap with store area, change overlap to true
