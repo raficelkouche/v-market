@@ -125,6 +125,7 @@ class Game extends Phaser.Scene {
 
   update() {
 
+
     const addMoreItem = function(result) {
       let outOfItem = `<p>There is no more listing from this vendor at the moment...</p>
       <p>Thanks for your support!</p>`;
@@ -220,13 +221,30 @@ class Game extends Phaser.Scene {
         this.storeLoadCount = 0;
       })
       $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
-        console.log(x.currentTarget)
-        $("#products").remove() //remove products and load detail
-        $("#store-data").html(`
-        <div id='products'>
-
-        </div>
-        `)
+        console.log(this.storeId)
+        console.log($(x.currentTarget).attr('value'))
+        $("#products-grid").remove(); //remove info from products page and start to load detail
+        $.ajax(`/stores/${this.storeId}/products/${$(x.currentTarget).attr('value')}`, {method: 'GET'})
+        .then(function (result) {
+          console.log(result)
+          let pendingHTML = `
+          <div id="product-container">
+            <div id='products-img'>
+              <img class="thumbnail" src=${result.thumbnail};/>
+            </div>
+            <div id='product-des'>
+              ${result.name}
+              ${result.description}
+            </div>
+            <div id='product-price'>
+              ${result.price}
+              Only ${result.quantity} left
+            </div>
+          </div>
+          `;
+          $("#products").html(pendingHTML)
+          console.log(result)
+        })
       })
     }
     this.player.setVelocity(0);

@@ -18,12 +18,20 @@ app.get('/', (req, res) => {
 })
 
 app.get('/stores/:store_id/:call_count', (req, res) => {
-  console.log(req.params);
   const store_id = Number(req.params.store_id);
   const call_count = Number(req.params.call_count);
-  db.getProducts(store_id, call_count)
+  db.getMoreProducts(store_id, call_count)
     .then(products => {
-      res.json(products)
+      res.json(products);
+    });
+})
+
+app.get('/stores/:store_id/products/:product_id', (req, res) => {
+  console.log(req.params);
+  const product_id = Number(req.params.product_id);
+  db.getProduct(product_id)
+    .then(product => {
+      res.json(product);
     });
 })
 

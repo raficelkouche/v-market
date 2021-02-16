@@ -14,7 +14,7 @@ const getAllUsers = function() {
 }
 exports.getAllUsers = getAllUsers;
 
-const getProducts = function(store_id, called) {
+const getMoreProducts = function(store_id, called) {
   return pool.query(`
   select s.name, s.banner_img, p.id, p.name, p.description, p.price, p.discount, p.thumbnail
   from stores s 
@@ -25,4 +25,14 @@ const getProducts = function(store_id, called) {
   `, [store_id, called * 4])
   .then(res => res.rows);
 }
-exports.getProducts = getProducts;
+exports.getMoreProducts = getMoreProducts;
+
+const getProduct = function(product_id) {
+  return pool.query(`
+  select *
+  from products
+  where id = $1;
+  `, [product_id])
+  .then(res => res.rows[0]);
+}
+exports.getProduct = getProduct;
