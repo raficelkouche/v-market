@@ -174,6 +174,10 @@ class Game extends Phaser.Scene {
               <div class="price">
                 $${result[i].price}
               </div>
+              <div class="product-card-buttons">
+                <button><i class="fas fa-cart-plus"></i></button>
+                <button><i class="fas fa-star"></i></button>
+              </div>
             </div>
           </td>`
         } else  {

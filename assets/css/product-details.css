@@ -1,3 +1,9 @@
+/* Added style for store page cards */
+.single-product .product-card-buttons {
+  display:flex;
+  justify-content: space-around;
+}
+
 
 /* Style for Product Details */
 
