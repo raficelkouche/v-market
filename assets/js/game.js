@@ -175,8 +175,8 @@ class Game extends Phaser.Scene {
                 $${result[i].price}
               </div>
               <div class="product-card-buttons">
-                <button><i class="fas fa-cart-plus"></i></button>
-                <button><i class="fas fa-star"></i></button>
+                <button onclick="event.stopPropagation();"><i class="fas fa-cart-plus"></i></button>
+                <button onclick="event.stopPropagation();"><i class="fas fa-star"></i></button>
               </div>
             </div>
           </td>`
@@ -202,11 +202,13 @@ class Game extends Phaser.Scene {
 
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
       console.log(this.cursors.space.isDown)
+      let storeProducts = null;
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
       .then(function (result) {
         // console.log(result)
         if (result[0]) { //need to add helper to check if store exist but no product and rewrite
-          $("table").append(addMoreItem(result))
+          storeProducts = addMoreItem(result)
+          $("table").append(storeProducts)
           $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
           $('h1').text(`${result[0].s_name}`);
           $('h1').css('font-size', '80px')
@@ -264,7 +266,9 @@ class Game extends Phaser.Scene {
         this.storeLoadCount = 0;
       })
       $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
-        console.log(this.storeId)
+        console.log('after single product')
+        let storeID = this.storeId
+        let storeLoadCount = 0
         console.log($(x.currentTarget).attr('value'))
         $("#products-grid").remove(); //remove info from products page and start to load detail
         $.ajax(`/stores/${this.storeId}/products/${$(x.currentTarget).attr('value')}`, {method: 'GET'})
@@ -293,22 +297,21 @@ class Game extends Phaser.Scene {
           $("#products").html(pendingHTML)
           // when clicking back to view the store again
           $("#back-button").on("click", () => {
-          //   $("#product-container").css("background-color", "red").remove() //remove the added dom
-
-          // $("#products").add('div').text("HELLOOO") //remove the added dom
-
-          //   // $("#products").append($("products-grid")); //remove info from products page and start to load detail
-          //   // $("table").append(addMoreItem(result))
-
-          //   $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
-          //   .then(function (result) {
-          //     console.log('inside the back ajax call?')
-          //     console.log(result)
-          //     if (result[0]) { //need to add helper to check if store exist but no product and rewrite
-          //       $("table").append(addMoreItem(result))
-          //       $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
-          //       $('h1').text(`${result[0].s_name}`)
-          //   }})
+            // remove the product-container and rebuild the products grid
+            $("#products").html("<div id='products-grid'></div>")
+            $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
+            $("table").append(storeProducts)
+            // to load more products
+            $("#request-data").on("click", () => { //wait for helper
+              console.log('storecount to load more after viewing one product')
+              storeLoadCount++;
+              console.log(storeLoadCount)
+              $.ajax(`/stores/${storeID}/${storeLoadCount}`, {method: 'GET'})//use ajax to handle request to the server
+                .then(function (result) {
+                  $("table").append(addMoreItem(result))
+                })
+              // this.storeLoadCount++;
+          })
             console.log('go back!!')
           })
           console.log(result)
