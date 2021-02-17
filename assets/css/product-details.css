@@ -34,4 +34,14 @@
 
 #product-buttons button{
   margin: 2em;
+  
+}
+
+/* for the closed sign */
+#products #closedImg {
+  width: 70%;
+  height: 70%;
+  margin-right: 15%;
+  margin-top: 5%;
+  
 }
