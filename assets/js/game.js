@@ -126,11 +126,11 @@ class Game extends Phaser.Scene {
       // if have access to db then can assign it here, or hardcode it?
       // let storeNameCall = null;
       if (this.storeExistThisMap[this.storeId] && !this.storeExistThisMap[this.storeId].display) {
-        this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: " 32px Arial Black", fill: "#fff"});
+        this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: "bold 28px Messiri", fill: "#fff"});
         this.helper = this.add.text(y.x -32, y.y, `Space to interact`);
         this.storeExistThisMap[this.storeId].display = true;
       } else if (this.storeExistThisMap[this.storeId] && !this.storeName) {
-        this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: " 32px Arial Black", fill: "#fff" });
+        this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: "bold 28px Messiri", fill: "#fff" });
         this.helper = this.add.text(y.x -32, y.y, `Space to interact`);
         this.add.text(y.x -32, y.y, `Space to interact`);
       } 
@@ -138,15 +138,6 @@ class Game extends Phaser.Scene {
         this.storeName._text
       }
       this.overlap = true;
-      /*
-      $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
-      .then( res => {
-        // console.log(res)
-        if (res.length){
-          this.add.text(y.x, y.y - 32*3 , `${res[0].s_name}`);
-        } 
-      });
-      */
     }, undefined, this); //check overlap with store area, change overlap to true
 
     //add collider with player
@@ -204,13 +195,7 @@ class Game extends Phaser.Scene {
       this.player.setVelocity(0); //no player movement allow
       return; //end update
     }
-    // if (this.overlap === true) {
-    //   const storeName = this.add.text(this.storeX, this.storeY - 32*3 , 'Hello World');
-    //   // console.log(this.storeName)
-    // } 
-    // if (this.overlap === false && storeName) {
-    //   storeName.destroy()
-    // }
+
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
       console.log(this.cursors.space.isDown)
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
@@ -219,7 +204,8 @@ class Game extends Phaser.Scene {
         if (result[0]) { //need to add helper to check if store exist but no product and rewrite
           $("table").append(addMoreItem(result))
           $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
-          $('h1').text(`${result[0].s_name}`)
+          $('h1').text(`${result[0].s_name}`);
+          $('h1').css('font-size', '80px')
         } else {
           $('#customer-support').remove();
           $("#request-data").parent().html('');

@@ -30,6 +30,10 @@
   align-self: center;
   -webkit-user-select: none; /* Safari */
   user-select: none;
+  /* Change the font for the store to look nicer */
+  /* font-family:'Monaco, Helvetica, sans-serif';
+  border: 2px solid red; */
+  font-family: 'Carter One', cursive;
 }
 
 #store_banner > header {
@@ -77,8 +81,8 @@
 }
 
 #search-bar {
- /* to be added*/
-
+  /* to be added*/
+  
 }
 
 #store-data {
@@ -133,8 +137,9 @@ td {
   border:0;
 }
 
-.thumbnail:hover{
+td:hover{
   cursor: pointer;
+  box-shadow: 0 0 11px rgba(33, 33, 33, .2);
 }
 
 .description{
@@ -175,7 +180,7 @@ td {
 }
 
 #request-data {
-
+  
 }
 
 #customer-support {
