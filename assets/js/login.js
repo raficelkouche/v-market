@@ -17,8 +17,11 @@ class Login extends Phaser.Scene {
       e.preventDefault();
       $.ajax("/users/login", {method: 'POST', data: $("#login").serialize()})
         .then((res) => {
-
-          this.scene.start('Game' , res)
+          if(res.err) {
+            console.log(res.err) //display err in html
+          } else {
+            this.scene.start('Game' , res)
+          }
         });
     })
 

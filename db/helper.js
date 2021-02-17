@@ -16,7 +16,7 @@ const userLogin = function(IGN) { // would probably want to compare password her
   select * 
   from users
   where lower(gaming_name) = lower($1);`, [IGN])
-  .then(res => res.rows);
+  .then(res => res.rows[0]);
 }
 exports.userLogin = userLogin;
 

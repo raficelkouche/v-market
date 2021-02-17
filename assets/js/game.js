@@ -5,47 +5,53 @@ class Game extends Phaser.Scene {
   
   game ()
   {
-    Phaser.Scene.call(this, { key: 'game' });// get info from first scene
+    //call on first scence to get data
+    Phaser.Scene.call(this, { key: 'game' });
   }
   init(data)
   {
-    this.playerID = data.id //data should be player info
+    //pass var from login scence
+    this.playerInfo = {name: data.name, guest: data.guest || false}
   }
 
   static player = Phaser.Physics.Arcade.Sprite;
+  static playerName;
   static overlap = true;
   static inshop = false;
   static storeInfo = [];
   static storeExistThisMap;
   static storeId;
-  static storeLoadCount;
+  static storeLoadCount = 0;
   static storeName;
-  static helper;
-  static camX;
-  static camY;
-  static miniMapBorder;
-
+  static helperMsg;
 
   preload() {
-    console.log(this.playerID)
+    //load all texture
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
     this.cursors = this.input.keyboard.createCursorKeys();
     this.key = this.input.keyboard.addKeys("W, A, S, D, ESC")
+    //get all store info
     $.ajax(`/stores`, {method: 'GET'})
-      .then((res) => this.storeInfo = Array.from(res))// copy store info to storeInfo
+      .then((res) => this.storeInfo = Array.from(res))
   }
 
   create() {
     let storeExist = {};
     this.storeExistThisMap = {};
-    for (const sotre of this.storeInfo) { // get all store info to a more easy handle data type
+
+    // get all store info to a more easy handle data type
+    for (const sotre of this.storeInfo) { 
       storeExist[sotre.id] = sotre
     }
-    delete this.storeInfo // remove for reason
+    //remove as no longer needed, unless we make an other map
+    delete this.storeInfo 
+
+    //make the map of this scence
     this.map = this.make.tilemap({ key: "map" });
+
     //add object layer first. 
     let storesArea = this.map.getObjectLayer('StoreObj')['objects'];
     let storeAreaGroup = this.physics.add.staticGroup({});
@@ -53,26 +59,26 @@ class Game extends Phaser.Scene {
       let a = storeAreaGroup.create(area.x, area.y);
       a.setScale(area.width / 32, area.height / 32);
       a.setOrigin(0); //to replace auto offset
-      a.body.width = area.width; //body of the physics body
+      a.body.width = area.width;
       a.body.height = area.height;
       a.name = area.properties[0].value //add store_id as name to do ajax call, 
       //please note, this store_id must be set as first custom_property in tile
-      //overlap cb does not return id for some reason, so use name
+      //overlap cb does not seems to return id for some reason, so use name
       if (storeExist[a.name]) {
         this.storeExistThisMap[a.name] = storeExist[a.name]; // only get store on this map
       }
     });
 
-    this.storeLoadCount = 0; //init
-    storeAreaGroup.refresh(); //physics body needs to refresh
-    console.log(storeAreaGroup.children.entries[0].name);//example of storeArea's store_id path
+    //physics body needs to refresh
+    storeAreaGroup.refresh();
+    //console.log(storeAreaGroup.children.entries[0].name) < Example of storeArea's store_id path
 
     //add other layer to overwrite obj layer
     this.tileset = this.map.addTilesetImage('vMarketTiles', 'tile')
     this.groundLayer = this.map.createLayer("Ground", this.tileset, 0, 0)
     this.cityObjLayer = this.map.createLayer("CityObj", this.tileset, 0, 0)
 
-
+    //grab collides tile from each map. Note: collides have NOT been set yet
     this.groundLayer.setCollisionByProperty({ collides: true });
     this.cityObjLayer.setCollisionByProperty({ collides: true });
 
@@ -118,37 +124,47 @@ class Game extends Phaser.Scene {
       frameRate: 7,
       repeat: -1
     });
-    //add player sprite
-    this.player = this.physics.add.sprite(400, 300, "fm_02")
-    this.player.play('idle-d') // play idle-d as default 
 
-    //add camera
-    this.cameras.main.setBounds(0, 0, 1920, 1920); //set camera to size of map
-    this.cameras.main.setZoom(3); //zoom in
+    //add player sprite, animation and name
+    this.player = this.physics.add.sprite(400, 300, "fm_02")
+    this.player.play('idle-d')
+    this.playerName = this.add.text(this.player.x, this.player.y+32, `${this.playerInfo.name}`)
+
+    //add 3 camera, 1st to follow player, mini(2nd) for mini map, and 3rd for background when pause 
+    //set camera to size of map, zoom in for better view, then make this follow player
+    this.cameras.main.setBounds(0, 0, 1920, 1920);
+    this.cameras.main.setZoom(3);
     this.cameras.main.startFollow(this.player, true)
+
+    //make 'mini map' and place to top right, set bound of map, zoom out so it is mini, and set to follow player
     this.miniCam = this.cameras.add(1030, 0, 250, 250);
     this.miniCam.setBounds(0, 0, 1920, 1920)
     this.miniCam.zoom = 0.35;
     this.miniCam.startFollow(this.player, true)
-    
+
+    //set camera to size design res of canvas, center the cam, hide it to wait for call
+    this.pauseCam = this.cameras.add(0, 0, 1280, 960);
+    this.pauseCam.setBounds(320,480,1920,1920)
+    this.pauseCam.zoom = 1;
+    this.pauseCam.setVisible(false);
     
     //add overlapArea detect
     this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
       this.storeId = y.name;
-      // if have access to db then can assign it here, or hardcode it?
-      // let storeNameCall = null;
+
+      /*
+      check if the store exist, if do and name have not been display, add name and interactible msg on screen, and trigger display so it will only run once.
+      if for some reason, player is still overlap, but name disspear, add it back.
+      */
       if (this.storeExistThisMap[this.storeId] && !this.storeExistThisMap[this.storeId].display) {
         this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: " 32px Arial Black", fill: "#fff"});
-        this.helper = this.add.text(y.x -32, y.y, `Space to interact`);
+        this.helperMsg = this.add.text(y.x -32, y.y, `Space to interact`);
         this.storeExistThisMap[this.storeId].display = true;
       } else if (this.storeExistThisMap[this.storeId] && !this.storeName) {
         this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: " 32px Arial Black", fill: "#fff" });
-        this.helper = this.add.text(y.x -32, y.y, `Space to interact`);
+        this.helperMsg = this.add.text(y.x -32, y.y, `Space to interact`);
         this.add.text(y.x -32, y.y, `Space to interact`);
       } 
-      if(this.storeName){
-        this.storeName._text
-      }
       this.overlap = true;
       /*
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
@@ -171,14 +187,25 @@ class Game extends Phaser.Scene {
     this.player.body.setCollideWorldBounds(true); 
   }
 
+  
+  
   update() {
-    if (!this.overlap && this.storeName) {
-      for (const x of Object.keys(this.storeExistThisMap)) {
-        if (this.storeExistThisMap[x].name === this.storeName._text) this.storeExistThisMap[x].display = false;
-      }
-      this.storeName.destroy();
-      this.helper.destroy();
+
+    //function to 'pause' the game when open shop
+    const shopPause = function (pCam, mCam, Cam){
+      pCam.setVisible(true)
+      mCam.setVisible(false)
+      Cam.setVisible(false)
     }
+
+    //function to 'resume' the game when close shop
+    const shopResume = function (pCam, mCam, Cam){
+      mCam.setVisible(true)
+      Cam.setVisible(true)
+      pCam.setVisible(false)
+    }
+
+    //logic when player want more listing in a store
     const addMoreItem = function(result) {
       let outOfItem = `<p>There is no more listing from this vendor at the moment...</p>
       <p>Thanks for your support!</p>`;
@@ -205,14 +232,14 @@ class Game extends Phaser.Scene {
       return pendingHTML
     }
 
+    //if player is shopping, restrict movement
     if (this.inshop) { //when in shop stop
-      if (this.key.ESC.isDown) {
+      if (this.key.ESC.isDown) { //if ESC is press close shop
         $("canvas").prev().children().remove()
+        shopResume(this.pauseCam, this.miniCam, this.cameras.main)
         this.inshop = false;
-        this.miniCam.setVisible(true);
         this.storeLoadCount = 0;
       }
-      this.cameras.main.setZoom(1); //while in shop, stay zoom out
       this.player.setVelocity(0); //no player movement allow
       return; //end update
     }
@@ -224,7 +251,6 @@ class Game extends Phaser.Scene {
     //   storeName.destroy()
     // }
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
-      console.log(this.cursors.space.isDown)
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
       .then(function (result) {
         // console.log(result)
@@ -243,32 +269,17 @@ class Game extends Phaser.Scene {
       let newAnim = this.player.anims.currentAnim.key.split('-') // change anime to idle
       this.player.play("idle-" + newAnim[1])
       if ($("#store-data").length === 0) { // allow user to open 1 window only
-        this.miniCam.setVisible(false);
-        this.inshop = true //set inshop true, to 'pause' game
-        this.cameras.main.setZoom(1); //zoom out cause phaser dom is weird
-        if (this.player.x < 640){
-          this.camX = 640
-        } else if (this.player.x > 1280){
-          this.camX = 1280
-        } else {
-          this.camX = this.player.x
-        }
-        if (this.player.y < 480){
-          this.camY = 480
-        } else if (this.player.y > 1440){
-          this.camY = 1440
-        } else {
-          this.camY = this.player.y
-        }
-        this.add.dom(this.camX, this.camY).createFromCache('store_window'); //place dom in center
+        shopPause(this.pauseCam, this.miniCam, this.cameras.main)
+        this.inshop = true
+        this.add.dom(960,960).createFromCache('store_window'); //place dom in center
       }
       if ($("#customer-support")) {
         $("#backdrop").css('visibility', 'visible');
       }
       $("#close-button").on("click", () => {
         $("canvas").prev().children().remove() //remove the added dom
-        this.inshop = false; //'unpause' game
-        this.miniCam.setVisible(true);
+        shopResume(this.pauseCam, this.miniCam, this.cameras.main)
+        this.inshop = false;
         this.storeLoadCount = 0;
       })
       $("#request-data").on("click", () => { //wait for helper
@@ -280,8 +291,8 @@ class Game extends Phaser.Scene {
       })
       $("#customer-support").on("click", () => { //need to replace
         $("canvas").prev().children().remove() 
-        this.inshop = false; 
-        this.miniCam.setVisible(true);
+        shopResume(this.pauseCam, this.miniCam, this.cameras.main)
+        this.inshop = false;
         this.storeLoadCount = 0;
       })
       $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
@@ -311,6 +322,8 @@ class Game extends Phaser.Scene {
         })
       })
     }
+
+    //update player movement
     this.player.setVelocity(0);
     if (this.cursors.left.isDown || this.key.A.isDown) {
       this.player.setVelocityX(-200);
@@ -340,13 +353,27 @@ class Game extends Phaser.Scene {
         this.player.play('walk-d')
       }
     }
-    if (!this.cursors.down.isDown && !this.cursors.up.isDown && !this.cursors.right.isDown && !this.cursors.left.isDown && !this.key.W.isDown && !this.key.A.isDown && !this.key.S.isDown && !this.key.D.isDown) {//if no arrow input, change to idle anime
+
+    //if player does not move, play idle anime
+    if (!this.cursors.down.isDown && !this.cursors.up.isDown && !this.cursors.right.isDown && !this.cursors.left.isDown && !this.key.W.isDown && !this.key.A.isDown && !this.key.S.isDown && !this.key.D.isDown) {
       if (!this.player.anims.currentAnim.key.includes('idle')) {
         let newAnim = this.player.anims.currentAnim.key.split('-')
         this.player.play("idle-" + newAnim[1])
       }
     }
-    this.cameras.main.setZoom(3);
+
+    //if player left the interactive area, remove shop name and interactible msg
+    if (!this.overlap && this.storeName) {
+      for (const x of Object.keys(this.storeExistThisMap)) {
+        if (this.storeExistThisMap[x].name === this.storeName._text) this.storeExistThisMap[x].display = false;
+      }
+      this.storeName.destroy();
+      this.helperMsg.destroy();
+    }
+
+    //update player name's place
+    this.playerName.x = this.player.x;  
+    this.playerName.y = this.player.y+20;
     this.overlap = false; //update overlap check
   }
 }
