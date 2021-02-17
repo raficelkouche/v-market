@@ -183,7 +183,7 @@ td:hover{
   
 }
 
-#customer-support {
+#customer {
   position:fixed;
   display: flex;
   flex-direction: column;
@@ -193,7 +193,7 @@ td:hover{
   /* need to change for responsive */
 }
 
-#customer-support > div {
+#customer > div {
   align-self: center;
   height: 3.5rem;
   width: 3.5rem;
@@ -207,17 +207,17 @@ td:hover{
   opacity: 0.5;
 }
 
-#customer-support > div:hover {
+#customer > div:hover {
   opacity: 0.75;
   cursor: pointer;
 }
 
-#customer-support > div:active {
+#customer > div:active {
   opacity: 1;
   cursor: pointer;
 }
 
-#customer-support > p {
+#customer > p {
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
   white-space: pre;

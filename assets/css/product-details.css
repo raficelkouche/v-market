@@ -10,6 +10,35 @@
   margin-top: 2px;
 }
 
+#checkout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 1em;
+  margin-left: 5px;
+}
+#checkout p {
+  align-self: center;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+#checkout i {
+  opacity: 0.5;
+  color: darkgreen;
+}
+
+#checkout > #credit-card:hover {
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+#checkout > #credit-card:active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+
 
 /* Style for Product Details */
 
