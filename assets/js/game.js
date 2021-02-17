@@ -169,14 +169,14 @@ class Game extends Phaser.Scene {
             <img class="thumbnail" src="${result[i].thumbnail};"/>
             <div class="description">
               <div class="product-name">
-                ${result[i].description}
+                ${result[i].name}
               </div>
               <div class="price">
                 $${result[i].price}
               </div>
               <div class="product-card-buttons">
-                <button onclick="event.stopPropagation();"><i class="fas fa-cart-plus"></i></button>
-                <button onclick="event.stopPropagation();"><i class="fas fa-star"></i></button>
+                <button class='btn btn-outline-success' onclick="event.stopPropagation();"> <i class="fas fa-cart-plus"></i></button>
+                <button class='btn btn-outline-info' onclick="event.stopPropagation();"> <i class="fas fa-star"></i> </button>
               </div>
             </div>
           </td>`
@@ -288,8 +288,9 @@ class Game extends Phaser.Scene {
                 <p>Only ${result.quantity} left</p>
               </div>
               <div id='product-buttons'>
-                <button class='btn btn-outline-success'> Add to Cart </button>
-                <button id='back-button' class='btn btn-outline-warning'> Go back </button>
+                <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+                <button class='btn btn-outline-success'> <i class="fas fa-cart-plus"></i> Add to Cart</button>
+                <button class='btn btn-outline-info'> <i class="fas fa-star"></i> Favorite</button>
               </div>
             </div>
           </div>

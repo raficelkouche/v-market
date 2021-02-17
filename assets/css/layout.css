@@ -156,6 +156,7 @@ td:hover{
   font-family: Arial;
   text-align: center;
   overflow: hidden;
+  font-size: 1.5rem;
 }
 
 .price {
@@ -163,7 +164,6 @@ td:hover{
   height: 40%;
   text-align: center;
   font-family: Arial;
-  font-size: 1.5rem;
   font-weight: bold;
 }
 

@@ -1,7 +1,13 @@
 /* Added style for store page cards */
+.single-product .description {
+  display: flex;
+  flex-direction: column;
+}
+
 .single-product .product-card-buttons {
   display:flex;
   justify-content: space-around;
+  margin-top: 2px;
 }
 
 
@@ -40,7 +46,7 @@
 }
 
 #product-buttons button{
-  margin: 2em;
+  margin: 1em;
   
 }
 
