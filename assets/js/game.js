@@ -217,9 +217,9 @@ class Game extends Phaser.Scene {
       .then(function (result) {
         // console.log(result)
         if (result[0]) { //need to add helper to check if store exist but no product and rewrite
-          storeProducts = addMoreItem(result)
+          storeProducts = result
           // store view 
-          $("table").append(storeProducts)
+          $("table").append(addMoreItem(result))
           $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
           $('h1').text(`${result[0].s_name}`);
           $('h1').css('font-size', '80px')
@@ -292,7 +292,7 @@ class Game extends Phaser.Scene {
       })
       // viewing single product
       $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
-        console.log('after single product')
+        // console.log('after single product')
         let storeID = this.storeId
         let storeLoadCount = 0
         console.log($(x.currentTarget).attr('value'))
@@ -327,7 +327,12 @@ class Game extends Phaser.Scene {
             // remove the product-container and rebuild the products grid
             $("#products").html("<div id='products-grid'></div>")
             $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
-            $("table").append(storeProducts)
+            $("table").append(addMoreItem(storeProducts))
+            for (let product of storeProducts) {
+              $(`#add-to-cart${product.id}`).on('click', function () {
+                addToCart(product)
+              })
+            }
             // to load more products
             $("#request-data").on("click", () => { //wait for helper
               console.log('storecount to load more after viewing one product')
@@ -336,17 +341,22 @@ class Game extends Phaser.Scene {
               $.ajax(`/stores/${storeID}/${storeLoadCount}`, {method: 'GET'})//use ajax to handle request to the server
                 .then(function (result) {
                   $("table").append(addMoreItem(result))
+                  for (let product of result) {
+                    $(`#add-to-cart${product.id}`).on('click', function () {
+                      addToCart(product)
+                    })
+                  }
                 })
               // this.storeLoadCount++;
           })
-            console.log('go back!!')
+            // console.log('go back!!')
           })
           // to add to cart from product view -> diff format from store view
           $('#add-to-cart').on('click', function () {
             console.log('add to cart button clicked')
             addToCart(result)
           })
-          console.log(result)
+          // console.log(result)
         }
         )
       })
