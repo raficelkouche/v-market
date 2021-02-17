@@ -5,8 +5,12 @@ class Game extends Phaser.Scene {
   static player = Phaser.Physics.Arcade.Sprite;
   static overlap = true;
   static inshop = false;
+  static storeInfo = [];
+  static storeExistThisMap;
   static storeId;
   static storeLoadCount;
+  static storeName;
+  static helper;
   static camX;
   static camY;
   static miniMapBorder;
@@ -18,9 +22,17 @@ class Game extends Phaser.Scene {
     this.load.html('store_window', 'templates/store_window.html');
     this.cursors = this.input.keyboard.createCursorKeys();
     this.key = this.input.keyboard.addKeys("W, A, S, D, ESC")
+    $.ajax(`/stores`, {method: 'GET'})
+      .then((res) => this.storeInfo = Array.from(res))// copy store info to storeInfo
   }
 
   create() {
+    let storeExist = {};
+    this.storeExistThisMap = {};
+    for (const sotre of this.storeInfo) { // get all store info to a more easy handle data type
+      storeExist[sotre.id] = sotre
+    }
+    delete this.storeInfo // remove for reason
     this.map = this.make.tilemap({ key: "map" });
     //add object layer first. 
     let storesArea = this.map.getObjectLayer('StoreObj')['objects'];
@@ -33,8 +45,12 @@ class Game extends Phaser.Scene {
       a.body.height = area.height;
       a.name = area.properties[0].value //add store_id as name to do ajax call, 
       //please note, this store_id must be set as first custom_property in tile
-      //overlap cb does not return id for some reason, so use name     
+      //overlap cb does not return id for some reason, so use name
+      if (storeExist[a.name]) {
+        this.storeExistThisMap[a.name] = storeExist[a.name]; // only get store on this map
+      }
     });
+
     this.storeLoadCount = 0; //init
     storeAreaGroup.refresh(); //physics body needs to refresh
     console.log(storeAreaGroup.children.entries[0].name);//example of storeArea's store_id path
@@ -109,15 +125,28 @@ class Game extends Phaser.Scene {
       this.storeId = y.name;
       // if have access to db then can assign it here, or hardcode it?
       // let storeNameCall = null;
+      if (this.storeExistThisMap[this.storeId] && !this.storeExistThisMap[this.storeId].display) {
+        this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: " 32px Arial Black", fill: "#fff"});
+        this.helper = this.add.text(y.x -32, y.y, `Space to interact`);
+        this.storeExistThisMap[this.storeId].display = true;
+      } else if (this.storeExistThisMap[this.storeId] && !this.storeName) {
+        this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: " 32px Arial Black", fill: "#fff" });
+        this.helper = this.add.text(y.x -32, y.y, `Space to interact`);
+        this.add.text(y.x -32, y.y, `Space to interact`);
+      } 
+      if(this.storeName){
+        this.storeName._text
+      }
+      this.overlap = true;
+      /*
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
       .then( res => {
         // console.log(res)
         if (res.length){
           this.add.text(y.x, y.y - 32*3 , `${res[0].s_name}`);
         } 
-
       });
-      this.overlap = true;
+      */
     }, undefined, this); //check overlap with store area, change overlap to true
 
     //add collider with player
@@ -131,6 +160,13 @@ class Game extends Phaser.Scene {
   }
 
   update() {
+    if (!this.overlap && this.storeName) {
+      for (const x of Object.keys(this.storeExistThisMap)) {
+        if (this.storeExistThisMap[x].name === this.storeName._text) this.storeExistThisMap[x].display = false;
+      }
+      this.storeName.destroy();
+      this.helper.destroy();
+    }
     const addMoreItem = function(result) {
       let outOfItem = `<p>There is no more listing from this vendor at the moment...</p>
       <p>Thanks for your support!</p>`;
@@ -176,6 +212,7 @@ class Game extends Phaser.Scene {
     //   storeName.destroy()
     // }
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
+      console.log(this.cursors.space.isDown)
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
       .then(function (result) {
         // console.log(result)

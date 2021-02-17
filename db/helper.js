@@ -10,6 +10,14 @@ const getAllUsers = function() {
 }
 exports.getAllUsers = getAllUsers;
 
+const getAllStores = function() { // should take in a map_id as arg if want to make this game have more then 1 map
+  return pool.query(`
+  SELECT name, description, id
+  FROM stores;`)
+  .then(res => res.rows);
+}
+exports.getAllStores = getAllStores;
+
 const getMoreProducts = function(store_id, called) {
   return pool.query(`
   select s.name as s_name, s.banner_img, s.description as s_des, p.id, p.name, p.description, p.price, p.discount, p.thumbnail
