@@ -32,15 +32,50 @@ app.get('/', (req, res) => {
 app.get('/chat', (req, res) => {
   res.sendFile(__dirname + '/temp/chat.html')
 })
-let counter = 1;
+
 //socket configuration
+let activeConnections = [];
+
 io.on('connection', (socket) => {
+  const id = socket.handshake.query.id 
+  socket.join(id)
+  
+  const existingConnection = activeConnections.find( 
+    connection => connection === socket.id
+    )
+  //if current user is not in the array, emit the updated users list excluding that user
+  if (!existingConnection) {           
+    console.log("i will add now");
+    activeConnections.push(socket.id)
+
+    socket.emit('updated-users-list', {
+      users: activeConnections.filter(
+        connection => connection !== socket.id
+      )
+    })
+    socket.emit('your-id', socket.id) //allows the client to display their own id
+
+    socket.broadcast.emit('updated-users-list', { //update all clients with the new user that just joined
+      users: [socket.id]
+    })
+  }
+
+  console.log(activeConnections);
+  
   socket.on('send message', (message) => {
+    console.log("message received: ", message)
     socket.broadcast.emit('receive message', message)
   })
 
   socket.on('disconnect', () => {
     console.log('user disconnected')
+    //keep all connections except for the current user
+    activeConnections = activeConnections.filter(
+      connection => connection !== socket.id
+    );
+    socket.broadcast.emit("delete-user", {
+      socket_id: socket.id
+    })
   })
 })
 
