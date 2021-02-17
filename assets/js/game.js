@@ -258,14 +258,35 @@ class Game extends Phaser.Scene {
               </div>
               <div id='product-buttons'>
                 <button class='btn btn-outline-success'> Add to Cart </button>
-                <button class='btn btn-outline-warning'> Go back </button>
+                <button id='back-button' class='btn btn-outline-warning'> Go back </button>
               </div>
             </div>
           </div>
           `;
           $("#products").html(pendingHTML)
+          // when clicking back to view the store again
+          $("#back-button").on("click", () => {
+          //   $("#product-container").css("background-color", "red").remove() //remove the added dom
+
+          // $("#products").add('div').text("HELLOOO") //remove the added dom
+
+          //   // $("#products").append($("products-grid")); //remove info from products page and start to load detail
+          //   // $("table").append(addMoreItem(result))
+
+          //   $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
+          //   .then(function (result) {
+          //     console.log('inside the back ajax call?')
+          //     console.log(result)
+          //     if (result[0]) { //need to add helper to check if store exist but no product and rewrite
+          //       $("table").append(addMoreItem(result))
+          //       $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
+          //       $('h1').text(`${result[0].s_name}`)
+          //   }})
+            console.log('go back!!')
+          })
           console.log(result)
-        })
+        }
+        )
       })
     }
     this.player.setVelocity(0);
