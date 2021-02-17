@@ -27,6 +27,7 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+
     let storeExist = {};
     this.storeExistThisMap = {};
     for (const sotre of this.storeInfo) { // get all store info to a more easy handle data type
@@ -151,6 +152,15 @@ class Game extends Phaser.Scene {
   }
 
   update() {
+    // testing cart
+    const cart = [];
+
+    const addToCart = function(product) {
+      cart.push(product);
+      console.log('this is cart')
+      console.log(cart)
+    }
+
     if (!this.overlap && this.storeName) {
       for (const x of Object.keys(this.storeExistThisMap)) {
         if (this.storeExistThisMap[x].name === this.storeName._text) this.storeExistThisMap[x].display = false;
@@ -158,6 +168,7 @@ class Game extends Phaser.Scene {
       this.storeName.destroy();
       this.helper.destroy();
     }
+
     const addMoreItem = function(result) {
       let outOfItem = `<p>There is no more listing from this vendor at the moment...</p>
       <p>Thanks for your support!</p>`;
@@ -175,8 +186,8 @@ class Game extends Phaser.Scene {
                 $${result[i].price}
               </div>
               <div class="product-card-buttons">
-                <button class='btn btn-outline-success' onclick="event.stopPropagation(); console.log('add cart to ${result[i].name}')"> <i class="fas fa-cart-plus"></i></button>
-                <button class='btn btn-outline-info' onclick="event.stopPropagation(); console.log('add fave to ${result[i].name}')"> <i class="fas fa-star"></i> </button>
+                <button id="add-to-cart${result[i].id}" class='btn btn-outline-success' onclick="event.stopPropagation(); console.log('add cart to ${result[i].name}')"> <i class="fas fa-cart-plus"></i></button>
+                <button id="add-to-fave" class='btn btn-outline-info' onclick="event.stopPropagation(); console.log('add fave to ${result[i].name}')"> <i class="fas fa-star"></i> </button>
               </div>
             </div>
           </td>`
@@ -184,7 +195,7 @@ class Game extends Phaser.Scene {
           pendingHTML += `<td></td>`;
           if ($("#request-data")) $("#request-data").parent().html(outOfItem);
         }
-      }
+      }      
       return pendingHTML
     }
 
@@ -201,17 +212,24 @@ class Game extends Phaser.Scene {
     }
 
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
-      console.log(this.cursors.space.isDown)
       let storeProducts = null;
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
       .then(function (result) {
         // console.log(result)
         if (result[0]) { //need to add helper to check if store exist but no product and rewrite
           storeProducts = addMoreItem(result)
+          // store view 
           $("table").append(storeProducts)
           $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
           $('h1').text(`${result[0].s_name}`);
           $('h1').css('font-size', '80px')
+          // to add to cart from the store view -> different data structure from product view
+          for (let product of result) {
+            $(`#add-to-cart${product.id}`).on('click', function () {
+              addToCart(product)
+            })
+          }
+
         } else {
           $('#customer-support').remove();
           $("#request-data").parent().html('');
@@ -242,6 +260,7 @@ class Game extends Phaser.Scene {
           this.camY = this.player.y
         }
         this.add.dom(this.camX, this.camY).createFromCache('store_window'); //place dom in center
+        
       }
       if ($("#customer-support")) {
         $("#backdrop").css('visibility', 'visible');
@@ -256,6 +275,12 @@ class Game extends Phaser.Scene {
         $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//use ajax to handle request to the server
           .then(function (result) {
             $("table").append(addMoreItem(result))
+            // to be able to add to cart
+            for (let product of result) {
+              $(`#add-to-cart${product.id}`).on('click', function () {
+                addToCart(product)
+              })
+            }
           })
         this.storeLoadCount++;
       })
@@ -265,6 +290,7 @@ class Game extends Phaser.Scene {
         this.miniCam.setVisible(true);
         this.storeLoadCount = 0;
       })
+      // viewing single product
       $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
         console.log('after single product')
         let storeID = this.storeId
@@ -289,8 +315,8 @@ class Game extends Phaser.Scene {
               </div>
               <div id='product-buttons'>
                 <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
-                <button class='btn btn-outline-success' onclick="console.log('add cart${result.name}');"> <i class="fas fa-cart-plus"></i> Add to Cart</button>
-                <button class='btn btn-outline-info' onclick="console.log('add fave ${result.name}');"> <i class="fas fa-star"></i> Favorite</button>
+                <button id='add-to-cart' class='btn btn-outline-success' onclick="console.log('add cart${result.name}');"> <i class="fas fa-cart-plus"></i> Add to Cart</button>
+                <button id='add-to-fave' class='btn btn-outline-info' onclick="console.log('add fave ${result.name}');"> <i class="fas fa-star"></i> Favorite</button>
               </div>
             </div>
           </div>
@@ -314,6 +340,11 @@ class Game extends Phaser.Scene {
               // this.storeLoadCount++;
           })
             console.log('go back!!')
+          })
+          // to add to cart from product view -> diff format from store view
+          $('#add-to-cart').on('click', function () {
+            console.log('add to cart button clicked')
+            addToCart(result)
           })
           console.log(result)
         }
