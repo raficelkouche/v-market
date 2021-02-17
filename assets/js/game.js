@@ -2,6 +2,16 @@ class Game extends Phaser.Scene {
   constructor() {
     super('Game');
   }
+  
+  game ()
+  {
+    Phaser.Scene.call(this, { key: 'game' });// get info from first scene
+  }
+  init(data)
+  {
+    this.playerID = data.id //data should be player info
+  }
+
   static player = Phaser.Physics.Arcade.Sprite;
   static overlap = true;
   static inshop = false;
@@ -15,7 +25,9 @@ class Game extends Phaser.Scene {
   static camY;
   static miniMapBorder;
 
+
   preload() {
+    console.log(this.playerID)
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
