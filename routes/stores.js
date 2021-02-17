@@ -21,6 +21,13 @@ module.exports = () => {
         res.json(product);
       });
   })
+
+  router.get('/', (req, res) => {
+    db.getAllStores()
+      .then(stores => {
+        res.json(stores);
+      });
+  })
   return router;
 }
 
