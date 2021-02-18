@@ -7,7 +7,7 @@ socket.on('receive message', message => {
 })
 
 socket.on('updated-users-list', usersList  => {
-  console.log(usersList)
+  //console.log(usersList)
   usersList.users.forEach(user => {
     if (!document.getElementById(user)) {
       $("#active-users-container ul").append(`<li id="${user}">${user}</li>`)

@@ -5,13 +5,7 @@ class Login extends Phaser.Scene {
 
   init() {
 
-    $.ajax({
-      method: 'GET',
-      url: '/login'
-    }).then(res => {
-      console.log(res)
-      this.scene.start('Game', res)
-    }).catch(err => console.log(err))
+    
   }
   preload() {
     
@@ -21,12 +15,24 @@ class Login extends Phaser.Scene {
 
   create() {
     
+    //check if a user is already logged in
+    $.ajax({
+      method: 'GET',
+      url: '/users/login'
+    }).then(res => {
+      console.log(res)
+      if (res.user_ID) {
+        this.scene.start('Game')
+      }
+    }).catch(err => console.log(err))
+    
     this.add.image(140, 0, 'background').setOrigin(0).setDepth(0);
     const form = this.add.dom(640, 480).createFromCache('loginForm')
     
     /* const form = this.add.dom(this.game.renderer.width / 2, this.game.renderer.height / 2).createFromCache('loginForm') */
 
     form.addListener('click')
+
     form.on('click', (event) => {
       if (event.target.id === 'login-button'){
         this.scene.start('Game')
@@ -35,19 +41,6 @@ class Login extends Phaser.Scene {
         alert("Error has occured , try again!")
       }
     })
-    
-    //This is for testing only
-    $("#login").on('submit', (event) => {
-      event.preventDefault()
-      $.ajax({
-        method: "POST",
-        url: "/login",
-        data: $('form').serialize()
-      }).then((data) => {
-        this.scene.start('Game',data)
-      }).catch(result => alert(result.responseJSON.error))
-    })
-    
 }
 
   update(){

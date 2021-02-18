@@ -8,13 +8,15 @@ const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 const morgan = require('morgan'); //HTTP request logger
 const path = require('path');
-const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(express.static("assets"));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieSession({ name: 'session', keys: ['key1', 'key2'] }))
+
 
 app.set("view engine", "ejs");
 
@@ -30,13 +32,7 @@ app.get('/', (req, res) => {
 })
 
 //chat testing routes and logic
-const cookieSession = require('cookie-session');
 
-
-app.use(cookieSession({
-  name:'session',
-  keys:['key1','key2']
-}))
 
 /* let userInformation;
 app.get('/chat', (req, res) => {
@@ -49,35 +45,13 @@ app.get('/chat', (req, res) => {
 })
  */
 
-app.post('/login', (req,res) => {
-  const {email, password} = req.body
-  db.getUser(email, password).then(data => {
-    if (data) {
-      req.session.user_ID = data.id
-      res.status(200).send(data)
-    }
-    else {
-      res.sendStatus(500).json({error: 'access denied'})
-    }
-  })
-})
-
-app.get('/login', (req,res) => {
-  const user_ID = req.session.user_ID
-  if (user_ID) {
-    res.json(user_ID)
-  }
-  else {
-    res.sendStatus(500).json({error: 'not logged in'})
-  }
-})
 
 //socket configuration
 let activeConnections = [];
 
 io.on('connection', (socket) => {
   const userInfo = socket.handshake.query
-  console.log(userInfo)
+  //console.log(userInfo)
   socket.join(userInfo.user_id) //this is the client's id
   
   
@@ -102,7 +76,7 @@ io.on('connection', (socket) => {
   }
 
   socket.on('send message', ({recipient, message}) => {
-    console.log("message received: ", message)
+    //console.log("message received: ", message)
     socket.to(recipient).emit('receive message', userInfo.user_id, message)
   })
 

@@ -17,7 +17,8 @@ module.exports = () => {
         } else if(result.password !== req.body.password) {//passsword does not match with record
           res.json({err: 'password'})
         } else { //pass IGN to game
-          res.json({name: result.gaming_name});
+          req.session.user_ID = result.id
+          res.json({name: result.gaming_name, user_id: result.id});
         }
       })
     } else if (req.body.password){ //if user try to log in
@@ -28,7 +29,8 @@ module.exports = () => {
           } else if(result.password !== req.body.password) { //passsword does not match with record
             res.json({err: 'password'})
           } else { //pass IGN to game
-            res.json({name: result.gaming_name});
+            req.session.user_ID = result.id
+            res.json({name: result.gaming_name, user_id: result.id});
           }
         })
     } else { //if login as guest
@@ -57,13 +59,23 @@ module.exports = () => {
     } else if (req.body.password === req.body.confirm_password) { //if password does match, let user in
       db.userNew(req.body)
         .then(result => {
-          console.log(result);
-          res.json({name: result.gaming_name})
+          //console.log(result);
+          res.json({name: result.gaming_name, user_id: result.id})
         })
     } else { // if password doesn't match record
       res.json({err: 'password'})
     }
   })
+
+  router.get("/login", (req, res) => {
+    const user_ID = req.session.user_ID
+    if (user_ID) {
+      res.json({user_ID})
+    } else {
+      res.json({ err: 'not logged in' })
+    }
+  })
+
 
   return router;
 }
