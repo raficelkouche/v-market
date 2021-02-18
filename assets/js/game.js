@@ -153,13 +153,24 @@ class Game extends Phaser.Scene {
 
   update() {
     // testing cart
-    const cart = [];
+    let cart = [];
 
     const addToCart = function(product) {
       cart.push(product);
       console.log('this is cart')
       console.log(cart)
       $('#checkout-cart-count').html(cart.length)
+    }
+
+    const removeFromCart = function(index) {
+      let newCart = []
+      //  loop through cart take out product
+      for(let i = 0; i < cart.length; i++) {
+        if(i !== index) {
+          newCart.push(cart[i])
+        }
+      }
+      cart = newCart;
     }
 
     const cartTotal = function(cart) {
@@ -178,7 +189,7 @@ class Game extends Phaser.Scene {
           <td style="width: 20%">${product.name}</td>
           <td style="width: 40%">${product.description}</td>
           <td style="width: 20%">${product.price}</td>
-          <td style="width: 10%"><button onclick=""><i class="far fa-trash-alt fa-2x "></i></button> </td>
+          <td style="width: 10%"><button id="remove-cart${cart.indexOf(product)}" onclick="console.log('${cart.indexOf(product)}')"><i class="far fa-trash-alt fa-2x "></i></button> </td>
         </tr>
         `
       }
@@ -349,6 +360,15 @@ class Game extends Phaser.Scene {
             `)
           $('tbody').append(checkOutList(cart))
           $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
+          // add remove function
+          for (let product of cart) {
+            $(`#remove-cart${cart.indexOf(product)}`).on("click", () => {
+              removeFromCart(cart.indexOf(product))
+              // rerender the page with update
+              $('#back-button').click()
+              $("#checkout").click() //need to replace
+            })
+          }
         } else {
             $('#products').append(`
               <div id="checkout-table">
@@ -376,6 +396,7 @@ class Game extends Phaser.Scene {
               addToCart(product)
             })
           }
+
           // to load more products
           $("#request-data").on("click", () => { //wait for helper
             console.log('storecount to load more after viewing one product')
@@ -460,6 +481,7 @@ class Game extends Phaser.Scene {
             console.log('add to cart button clicked')
             addToCart(result)
           })
+
           // console.log(result)
         }
         )
