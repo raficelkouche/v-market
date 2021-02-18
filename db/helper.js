@@ -10,6 +10,16 @@ const getAllUsers = function() {
 }
 exports.getAllUsers = getAllUsers;
 
+const userLogin = function(IGN) { // would probably want to compare password here too?
+  console.log(IGN.toLowerCase())
+  return pool.query(`
+  select * 
+  from users
+  where lower(gaming_name) = lower($1);`, [IGN])
+  .then(res => res.rows[0]);
+}
+exports.userLogin = userLogin;
+
 const getAllStores = function() { // should take in a map_id as arg if want to make this game have more then 1 map
   return pool.query(`
   SELECT name, description, id

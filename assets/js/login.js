@@ -11,18 +11,20 @@ class Login extends Phaser.Scene {
   create() {
     this.add.image(140,0,'background').setOrigin(0).setDepth(0);
 
-    const form = this.add.dom(this.game.renderer.width / 2, this.game.renderer.height / 2).createFromCache('loginForm')
+    const form = this.add.dom(640-150, 480-125).createFromCache('loginForm')
 
-    form.addListener('click')
-
-    form.on('click', (event) => {
-      if (event.target.id === 'login-button'){
-        this.scene.start('Game')
-      }
-      else if (event.target.id === 'error-button'){
-        alert("Error has occured , try again!")
-      }
+    $("#login").on("submit", (e) => { //need to replace
+      e.preventDefault();
+      $.ajax("/users/login", {method: 'POST', data: $("#login").serialize()})
+        .then((res) => {
+          if(res.err) {
+            console.log(res.err) //display err in html
+          } else {
+            this.scene.start('Game' , res)
+          }
+        });
     })
+
   }
 
   update(){

@@ -4,4 +4,6 @@ public/styles
 *.log
 *.sqlite3
 testFiles
+server.js
+.gitingore
 temp/
