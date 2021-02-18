@@ -21,3 +21,29 @@
   box-shadow: unset;
   cursor: unset;
 }
+
+#line-item-row > td > button {
+  color: grey;
+  border: none;
+  background-color: #FFF;
+  opacity: 0.5;
+  text-align: center;
+  margin: 5px;
+}
+
+
+#line-item-row > td > button:hover {
+  color: red;
+  opacity: 1;
+}
+
+#proceed {
+  display: flex;
+  justify-content: space-around;
+}
+
+
+#order-total {
+  font-weight: bold;
+  text-align: right;
+}

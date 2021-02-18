@@ -161,16 +161,23 @@ class Game extends Phaser.Scene {
       console.log(cart)
     }
 
+    const cartTotal = function(cart) {
+      let total = 0;
+      cart.forEach(item => total += parseFloat(item.price))
+      return total;
+    }
+
     // testing checkout page
     const checkOutList = function(cart) {
       let pendingHTML = ``;
       for (let product of cart) {
         pendingHTML += `
         <tr id="line-item-row">
-          <td class="line-item-thumbnail" style="width: 20%; text-align: center;"><img src="${product.thumbnail}" style="width: 50px; height:50px;"/></td>
+          <td class="line-item-thumbnail" style="width: 10%; text-align: center;"><img src="${product.thumbnail}" style="width: 50px; height:50px;"/></td>
           <td style="width: 20%">${product.name}</td>
           <td style="width: 40%">${product.description}</td>
           <td style="width: 20%">${product.price}</td>
+          <td style="width: 10%"><button onclick=""><i class="far fa-trash-alt fa-2x "></i></button> </td>
         </tr>
         `
       }
@@ -310,6 +317,7 @@ class Game extends Phaser.Scene {
       $("#checkout").on("click", () => { //need to replace
         // cart info available - show page
         console.log(cart)
+        const total = cartTotal(cart)
         
         $('#products-grid').remove();
         $('#product-container').remove();
@@ -323,16 +331,55 @@ class Game extends Phaser.Scene {
                   <td>Name</td>
                   <td>Description</td>
                   <td>Price</td>
+                  <td>Remove</td>
                 </tr>
               </thead>
               <tbody></tbody>
             </table>
+            <div id="proceed">
+              <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+              <button class="btn btn-primary">Proceed</button>
+            </div>
           </div>
           `)
         $('tbody').append(checkOutList(cart))
-
+        $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
+        $('#checkout').css("visibility", "hidden");
         // return button to take back to store front
 
+        $("#back-button").on("click", () => {
+          let storeID = this.storeId
+          let storeLoadCount = 0
+
+          // turn the checkout button on
+          $('#checkout').css("visibility", "visible");
+          // remove the product-container and rebuild the products grid
+          $("#checkout-table").remove()
+          $("#products").html("<div id='products-grid'></div>")
+          $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
+          $("table").append(addMoreItem(storeProducts))
+          for (let product of storeProducts) {
+            $(`#add-to-cart${product.id}`).on('click', function () {
+              addToCart(product)
+            })
+          }
+          // to load more products
+          $("#request-data").on("click", () => { //wait for helper
+            console.log('storecount to load more after viewing one product')
+            storeLoadCount++;
+            console.log(storeLoadCount)
+            $.ajax(`/stores/${storeID}/${storeLoadCount}`, {method: 'GET'})//use ajax to handle request to the server
+              .then(function (result) {
+                $("table").append(addMoreItem(result))
+                for (let product of result) {
+                  $(`#add-to-cart${product.id}`).on('click', function () {
+                    addToCart(product)
+                  })
+                }
+              })
+            // this.storeLoadCount++;
+        })
+        })
       })
       // viewing single product
       $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
