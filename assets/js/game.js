@@ -13,9 +13,47 @@ class Game extends Phaser.Scene {
   static camX;
   static camY;
   static miniMapBorder;
-
+  
   init(data) {
-    console.log("init", data)
+    
+    const socket = io('http://localhost:3000', {
+      query: {
+        user_id: data
+      }
+    })
+    
+    let active_user;
+
+    $("#chat-side-bar form").on('submit', (event) => {
+      event.preventDefault();
+      if ($('#chat-message').val()) {
+        socket.emit('send message', {
+          recipient: active_user,
+          message: $('#input').val()
+        })
+        $('#input').val('')
+      }
+    })
+
+    socket.on('updated-users-list', usersList => {
+      console.log(usersList)
+      usersList.users.forEach(user => {
+        if (!document.getElementById(user)) {
+          $("#friends-list ul").append(`<li id="${user}">${user}</li>`)
+          $("#friends-list li").on("click", function (event) {
+            $("#friends-list ul").children().css("color", "black")
+            $(this).css("color", "red")
+            activeUser = event.target
+            console.log(activeUser)
+          })
+        }
+      })
+    })
+
+    socket.on('receive message', message => {
+      $('#messages').append(`<li>${message}</li`)
+    })
+
   }
 
   preload() {

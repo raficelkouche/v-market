@@ -3,12 +3,24 @@ class Login extends Phaser.Scene {
     super('Login')
   }
 
+  init() {
+
+    $.ajax({
+      method: 'GET',
+      url: '/login'
+    }).then(res => {
+      console.log(res)
+      this.scene.start('Game', res)
+    }).catch(err => console.log(err))
+  }
   preload() {
+    
     this.load.html('loginForm', 'templates/login.html')
     this.load.image('background', 'maps/farmersMarket.jpeg')
   }
 
   create() {
+    
     this.add.image(140,0,'background').setOrigin(0).setDepth(0);
     const form = this.add.dom(this.game.renderer.width / 2, this.game.renderer.height / 2).createFromCache('loginForm')
 
@@ -23,7 +35,7 @@ class Login extends Phaser.Scene {
     })
     
     //This is for testing only
-    $("form").on('submit', (event) => {
+    $("#login").on('submit', (event) => {
       event.preventDefault()
       $.ajax({
         method: "POST",
