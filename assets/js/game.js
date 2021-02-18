@@ -11,8 +11,6 @@ class Game extends Phaser.Scene {
   init(data)
   {
     //pass var from login scence
-    console.log('this is the data passed to make the player name')
-    console.log(data)
     this.playerInfo = {
       name: data.name.replace(/%20/g, " ").trim(), 
       guest: data.guest || false,
@@ -430,12 +428,36 @@ class Game extends Phaser.Scene {
                 <button id="checkout-button" class="btn btn-primary"><i class="far fa-credit-card"></i> Proceed</button>
               </div>
             </div>
-          
+            <script type="text/javascript">
+            var stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
+            </script>
             `)
           $('tbody').append(checkOutList(cart))
           $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
+          
           // checkout button function
           $('#checkout-button').on('click', () => {
+              $.ajax('/create-checkout-session', { method: 'POST'})
+              .then((response) => {
+                console.log('this is the response from ajax call to make checkout session')
+                console.log(response)
+                return response
+              })
+              .then(function(session) {
+                console.log('inside the second response with sesssion')
+                return stripe.redirectToCheckout({ sessionId: session.id });
+              })
+              .then(function(result) {
+                console.log('this the result after session is done')
+                console.log(result)
+                if (result.error) {
+                  alert(result.error.message);
+                }
+              })
+              .catch(function(error) {
+                console.error('Error:', error);
+              });
+            // });
             console.log('checkout button hit!')
             console.log(this.playerInfo.id)
             const data = {
@@ -444,6 +466,7 @@ class Game extends Phaser.Scene {
               total_price: total,
               cart: cart
             }
+            //  -----------------------------------
             // COMPLETE ORDER AND RENDER CONFIMRATION PAGE
             $.ajax(`/users/${this.playerInfo.id}/orders`, {method: 'POST', data: { data: data}})
             .then((order) => {
@@ -492,7 +515,6 @@ class Game extends Phaser.Scene {
                   this.storeLoadCount = 0;
                 })
                 
-                //  CART GETS MESSED UP WITH GOING BACK TO SHOP lol
                 // // add back function for order confimration page
                 $("#back-button").on("click", () => {
                   let storeID = this.storeId
@@ -527,13 +549,14 @@ class Game extends Phaser.Scene {
                   
                 })
                 })
-
+                // if order was not processed
               } else {
                 res.json('Oops! something went wrong?')
               }
                 })
-            })
-          // add remove function
+            }) // end of the checkout function 
+
+          // add remove function for items in cart before checkingout
           for (let product of cart) {
             $(`#remove-cart${cart.indexOf(product)}`).on("click", () => {
               removeFromCart(cart.indexOf(product))
@@ -542,6 +565,7 @@ class Game extends Phaser.Scene {
               $("#checkout").click() //need to replace
             })
           }
+          // if no items in the cart on the checkout page
         } else {
           $('#products').append(`
             <div id="checkout-table">
@@ -551,7 +575,7 @@ class Game extends Phaser.Scene {
             </div>
           `)
         }
-        // return button to take back to store front
+        // return button to take back to store front from checkout page
         $("#back-button").on("click", () => {
           let storeID = this.storeId
           let storeLoadCount = 0
@@ -709,7 +733,7 @@ class Game extends Phaser.Scene {
     }
 
     //update player name's place
-    this.playerName.x = this.player.x;  
+    this.playerName.x = this.player.x-20;  
     this.playerName.y = this.player.y+20;
     this.overlap = false; //update overlap check
   }

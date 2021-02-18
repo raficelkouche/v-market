@@ -35,7 +35,8 @@ app.post('/create-checkout-session', async (req, res) => {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: 'T-shirt',
+            name: 'Stubborn Attachments',
+            images: ['https://i.imgur.com/EHyR2nP.png'],
           },
           unit_amount: 2000,
         },
@@ -43,8 +44,8 @@ app.post('/create-checkout-session', async (req, res) => {
       },
     ],
     mode: 'payment',
-    success_url: 'https://example.com/success',
-    cancel_url: 'https://example.com/cancel',
+    success_url: `http://localhost:${PORT}/`,
+    cancel_url: `http://localhost:${PORT}/`,
   });
   res.json({ id: session.id });
 });
