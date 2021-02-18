@@ -1,0 +1,26 @@
+main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+#game-chat-container{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+#game-container{
+  border: 4px solid blue;
+  width: 75%;
+  flex-basis: auto;
+}
+#chat-side-bar{
+  border: 4px solid red;
+  flex-basis: 25%;
+}
+#top-nav-bar{
+  display: flex;
+  border: 4px solid green;
+  align-items: center;
+}

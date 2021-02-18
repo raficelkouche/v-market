@@ -32,3 +32,15 @@ const getProduct = function(product_id) {
   .then(res => res.rows[0]);
 }
 exports.getProduct = getProduct;
+
+
+//For testing only
+const getUser = function(email, password) {
+  return pool.query(`
+  select *
+  from users
+  where email = $1 AND password = $2
+  `,[email,password])
+  .then(res => res.rows[0])
+}
+exports.getUser = getUser;

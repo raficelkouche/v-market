@@ -1,3 +1,6 @@
+//socket logic
+//const socket = io()
+
 class Game extends Phaser.Scene {
   constructor() {
     super('Game');
@@ -10,6 +13,10 @@ class Game extends Phaser.Scene {
   static camX;
   static camY;
   static miniMapBorder;
+
+  init(data) {
+    console.log("init", data)
+  }
 
   preload() {
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")

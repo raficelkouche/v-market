@@ -28,47 +28,76 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
-//chat testing route
+//chat testing routes and logic
+const cookieSession = require('cookie-session');
+
+
+app.use(cookieSession({
+  name:'session',
+  keys:['key1','key2']
+}))
+
+let userInformation;
 app.get('/chat', (req, res) => {
-  res.sendFile(__dirname + '/temp/chat.html')
+  const user_id = req.session.user_ID
+  if (user_id) {
+    res.sendFile(__dirname + '/temp/chat.html')
+  } else {
+    res.json({ error: "not authenticated" })
+  }
 })
+
+
+app.post('/login', (req,res) => {
+  const {email, password} = req.body
+  db.getUser(email, password).then(data => {
+    if (data) {
+      req.session.user_ID = data.id
+      userInformation = data.id
+      res.status(200).send(data)
+    }
+    else {
+      res.status(500).json({error: 'access denied'})
+    }
+  })
+})
+
+
 
 //socket configuration
 let activeConnections = [];
 
 io.on('connection', (socket) => {
-  const id = socket.handshake.query.id 
-  socket.join(id)
+  const id = socket.handshake.query.id
+  socket.join(userInformation) //this is the client's id
+  
   
   const existingConnection = activeConnections.find( 
-    connection => connection === socket.id
+    connection => connection === userInformation
     )
   //if current user is not in the array, emit the updated users list excluding that user
   if (!existingConnection) {           
-    console.log("i will add now");
-    activeConnections.push(socket.id)
+    
+    activeConnections.push(userInformation)
 
     socket.emit('updated-users-list', {
       users: activeConnections.filter(
-        connection => connection !== socket.id
+        connection => connection !== userInformation
       )
     })
-    socket.emit('your-id', socket.id) //allows the client to display their own id
+    socket.emit('your-id', userInformation) //allows the client to display their own id
 
     socket.broadcast.emit('updated-users-list', { //update all clients with the new user that just joined
-      users: [socket.id]
+      users: [userInformation]
     })
   }
 
-  console.log(activeConnections);
-  
   socket.on('send message', (message) => {
     console.log("message received: ", message)
-    socket.broadcast.emit('receive message', message)
+    
   })
 
   socket.on('disconnect', () => {
-    console.log('user disconnected')
     //keep all connections except for the current user
     activeConnections = activeConnections.filter(
       connection => connection !== socket.id
