@@ -32,28 +32,12 @@ app.get('/', (req, res) => {
 })
 
 //chat testing routes and logic
-
-
-/* let userInformation;
-app.get('/chat', (req, res) => {
-  const user_id = req.session.user_ID
-  if (user_id) {
-    res.sendFile(__dirname + '/temp/chat.html')
-  } else {
-    res.json({ error: "not authenticated" })
-  }
-})
- */
-
-
-//socket configuration
 let activeConnections = [];
 
 io.on('connection', (socket) => {
   const userInfo = socket.handshake.query
-  //console.log(userInfo)
+  console.log("socket server:", userInfo)
   socket.join(userInfo.user_id) //this is the client's id
-  
   
   const existingConnection = activeConnections.find( 
     connection => connection === userInfo.user_id
@@ -76,8 +60,9 @@ io.on('connection', (socket) => {
   }
 
   socket.on('send message', ({recipient, message}) => {
-    //console.log("message received: ", message)
-    socket.to(recipient).emit('receive message', userInfo.user_id, message)
+    console.log("message received: ", message)
+    console.log("recipient: ", recipient)
+    socket.to(recipient).emit('receive message', message)
   })
 
   socket.on('disconnect', () => {

@@ -11,6 +11,7 @@ class Login extends Phaser.Scene {
     
     this.load.html('loginForm', 'templates/login.html')
     this.load.image('background', 'maps/farmersMarket.jpeg')
+    
   }
 
   create() {
@@ -20,27 +21,15 @@ class Login extends Phaser.Scene {
       method: 'GET',
       url: '/users/login'
     }).then(res => {
-      console.log(res)
+      console.log("results in login: ", res)
       if (res.user_ID) {
         this.scene.start('Game')
+      }else{
+        this.add.image(140, 0, 'background').setOrigin(0).setDepth(0);
+        const form = this.add.dom(640, 480).createFromCache('loginForm')
       }
     }).catch(err => console.log(err))
-    
-    this.add.image(140, 0, 'background').setOrigin(0).setDepth(0);
-    const form = this.add.dom(640, 480).createFromCache('loginForm')
-    
-    /* const form = this.add.dom(this.game.renderer.width / 2, this.game.renderer.height / 2).createFromCache('loginForm') */
 
-    form.addListener('click')
-
-    form.on('click', (event) => {
-      if (event.target.id === 'login-button'){
-        this.scene.start('Game')
-      }
-      else if (event.target.id === 'error-button'){
-        alert("Error has occured , try again!")
-      }
-    })
 }
 
   update(){
@@ -103,7 +92,10 @@ class Login extends Phaser.Scene {
               //add animation for box appear if have time
               $(`#loginInsert`).append(err);
             } else { //let user in game
-              this.scene.start('Game' , res);
+              sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
+              sessionStorage.setItem("user_id", res.user_id)
+              sessionStorage.setItem("guest", res.guest || false)
+              this.scene.start('Game');
             }
           });
         }

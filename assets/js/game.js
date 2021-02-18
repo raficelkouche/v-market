@@ -11,53 +11,11 @@ class Game extends Phaser.Scene {
     //call on first scence to get data
     Phaser.Scene.call(this, { key: 'game' });
   } */
-  init(data)
+  /* init(data)
   {
-    console.log(data)
-    //pass var from login scence
-    if (data.name) {
-      this.playerInfo = {name: data.name.replace(/%20/g, " ").trim(), guest: data.guest || false}
-      localStorage.setItem("username", this.playerInfo.name)
-     /*  const socket = io('http://localhost:3000', {
-        query: {
-          user_id: data.user_id,
-          username: data.name
-        }
-      }) */
-    }
-
-
-    /* let active_user;
-
-    $("#chat-side-bar form").on('submit', (event) => {
-      event.preventDefault();
-      if ($('#chat-message').val()) {
-        socket.emit('send message', {
-          recipient: active_user,
-          message: $('#input').val()
-        })
-        $('#input').val('')
-      }
-    })
-
-    socket.on('updated-users-list', usersList => {
-      usersList.users.forEach(user => {
-        if (!document.getElementById(user)) {
-          $("#friends-list ul").append(`<li id="${user}">${user}</li>`)
-          $("#friends-list li").on("click", function (event) {
-            $("#friends-list ul").children().css("color", "black")
-            $(this).css("color", "red")
-            activeUser = event.target
-          })
-        }
-      })
-    })
-
-    socket.on('receive message', message => {
-      $('#messages').append(`<li>${message}</li`)
-    }) */
+     
   }
-
+ */
   static player = Phaser.Physics.Arcade.Sprite;
   static playerName;
   static overlap = true;
@@ -68,23 +26,70 @@ class Game extends Phaser.Scene {
   static storeLoadCount
   static storeName;
   static helperMsg;
+  static playerInfo;
   
   preload() {
     //load all texture
-    this.storeLoadCount = 0;
-    console.log("store: ", this.storeLoadCount)
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
     this.cursors = this.input.keyboard.createCursorKeys();
     this.key = this.input.keyboard.addKeys("W, A, S, D, ESC")
+    this.storeLoadCount = 0;
     //get all store info
     $.ajax(`/stores`, {method: 'GET'})
-      .then((res) => this.storeInfo = Array.from(res))
+      .then((res) => {
+        this.storeInfo = Array.from(res)
+      })
   }
 
   create() {
+    
+    const socket = io('http://localhost:3000', {
+      query: {
+        user_id: sessionStorage.getItem("user_id"),
+        username: sessionStorage.getItem("IGN")
+      }
+    })
+    let activeUser;
+
+    $("#chat-side-bar form").on('submit', (event) => {
+      //alert("message sent")
+      event.preventDefault();
+      console.log("chat message: ",$('#chat-message').val())
+      if ($('#chat-message').val()) {
+        socket.emit('send message', {
+          recipient: activeUser,
+          message: $('#chat-message').val()
+        })
+        $('#chat-message').val('')
+      }
+    })
+
+    socket.on('updated-users-list', usersList => {
+      console.log("users: ", usersList)
+      usersList.users.forEach(user => {
+        if (!document.getElementById(user)) {
+          $("#friends-list ul").append(`<li id="${user}">${user}</li>`)
+          $("#friends-list li").on("click", function (event) {
+            $("#friends-list ul").children().css("color", "black")
+            $(this).css("color", "red")
+            activeUser = event.target.innerHTML
+            console.log(activeUser)
+          })
+        }
+      })
+    })
+
+    socket.on('receive message', message => {
+      $('#messages').append(`<li>${message}</li`)
+    })
+    
+    
+    
+    
+    
     let storeExist = {};
     this.storeExistThisMap = {};
 
@@ -175,7 +180,7 @@ class Game extends Phaser.Scene {
     this.player = this.physics.add.sprite(400, 300, "fm_02")
     this.player.play('idle-d')
     //this.playerName = this.add.text(this.player.x, this.player.y+32, `${this.playerInfo.name}`)
-    this.playerName = this.add.text(this.player.x, this.player.y + 32, `${localStorage.getItem("username")}`)
+    this.playerName = this.add.text(this.player.x, this.player.y + 32, `${sessionStorage.getItem("IGN")}`)
     //add 3 camera, 1st to follow player, mini(2nd) for mini map, and 3rd for background when pause 
     //set camera to size of map, zoom in for better view, then make this follow player
     this.cameras.main.setBounds(0, 0, 1920, 1920);
@@ -297,10 +302,8 @@ class Game extends Phaser.Scene {
     //   storeName.destroy()
     // }
     if (this.overlap === true && this.cursors.space.isDown) {//if player is on interact area and press space
-      console.log("storecount: ", this.storeLoadCount)
       $.ajax(`/stores/${this.storeId}/${this.storeLoadCount}`, {method: 'GET'})//load init 4 items
       .then(function (result) {
-        // console.log(result)
         if (result[0]) { //need to add helper to check if store exist but no product and rewrite
           $("table").append(addMoreItem(result))
           $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
@@ -348,7 +351,6 @@ class Game extends Phaser.Scene {
         $("#products-grid").remove(); //remove info from products page and start to load detail
         $.ajax(`/stores/${this.storeId}/products/${$(x.currentTarget).attr('value')}`, {method: 'GET'})
         .then(function (result) {
-          //console.log(result)
           let pendingHTML = `
           <div id="product-container">
             <div id='products-img'>
