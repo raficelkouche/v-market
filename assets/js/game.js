@@ -403,9 +403,10 @@ class Game extends Phaser.Scene {
               </table>
               <div id="proceed">
                 <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
-                <button class="btn btn-primary"><i class="far fa-credit-card"></i> Proceed</button>
+                <button id="checkout-button" class="btn btn-primary"><i class="far fa-credit-card"></i> Proceed</button>
               </div>
             </div>
+          
             `)
           $('tbody').append(checkOutList(cart))
           $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
