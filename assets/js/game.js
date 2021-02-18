@@ -442,6 +442,7 @@ class Game extends Phaser.Scene {
               total_price: total,
               cart: cart
             }
+            // COMPLETE ORDER AND RENDER CONFIMRATION PAGE
             $.ajax(`/users/${this.playerInfo.id}/orders`, {method: 'POST', data: { data: data}})
             .then((order) => {
               if(order) { // sucessful and returns the order
@@ -451,6 +452,7 @@ class Game extends Phaser.Scene {
                 const orderItems = cart;
                 // empty cart
                 cart = [];
+                $('#checkout-cart-count').html(cart.length)
                 // rerender with order details
                 $('#checkout-table').remove()
                 $('#products').append(`
@@ -472,13 +474,57 @@ class Game extends Phaser.Scene {
                       </table>
                     <div id="proceed">
                       <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+                      <button id='exit-button' class='btn btn-outline-danger'> Exit </button>
                     </div>
                   </div>
                 `)
                 $('tbody').append(orderList(orderItems))
                 $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
 
-                // add back function
+                // add exit function for order confirmation page
+                $("#exit-button").on("click", () => {
+                  $("canvas").prev().children().remove() //remove the added dom
+                  shopResume(this.pauseCam, this.miniCam, this.cameras.main)
+                  this.cameras.main.setZoom(2); //zoom out cause phaser dom is weird
+                  this.inshop = false;
+                  this.storeLoadCount = 0;
+                })
+                
+                //  CART GETS MESSED UP WITH GOING BACK TO SHOP lol
+                // // add back function for order confimration page
+                $("#back-button").on("click", () => {
+                  let storeID = this.storeId
+                  let storeLoadCount = 0
+            
+                  // turn the checkout button on
+                  $('#checkout').css("visibility", "visible");
+                  // remove the product-container and rebuild the products grid
+                  $("#checkout-table").remove()
+                  $("#products").html("<div id='products-grid'></div>")
+                  $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
+                  $("table").append(addMoreItem(storeProducts))
+                  for (let product of storeProducts) {
+                    $(`#add-to-cart${product.id}`).on('click', function () {
+                      addToCart(product)
+                    })
+                  }
+                  // to load more products
+                  $("#request-data").on("click", () => { //wait for helper
+                    // console.log('storecount to load more after viewing one product')
+                    storeLoadCount++;
+                    // console.log(storeLoadCount)
+                    $.ajax(`/stores/${storeID}/${storeLoadCount}`, {method: 'GET'})//use ajax to handle request to the server
+                      .then(function (result) {
+                        $("table").append(addMoreItem(result))
+                        for (let product of result) {
+                          $(`#add-to-cart${product.id}`).on('click', function () {
+                            addToCart(product)
+                          })
+                        }
+                      })
+                  
+                })
+                })
 
               } else {
                 res.json('Oops! something went wrong?')
