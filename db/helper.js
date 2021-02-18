@@ -14,7 +14,7 @@ const userNew = function(newUser) { //make new user
 
   return pool.query(`
   INSERT INTO users (name, email, password, gaming_name, is_online) VALUES ($1, $2, $3, $4, true)
-  returning gaming_name;
+  returning *;
   `, [newUser.full_name, newUser.email, newUser.password, newUser.name])
   .then(res => res.rows[0]);
 }
