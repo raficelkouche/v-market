@@ -4,7 +4,8 @@
         <label for="name">User Name</label>
         <input type="text" id="name" name="name" required placeholder="Your user name"></input>
         <label for="password">Password</label>
-        <input class="invalid" type="password" id="password" name="password" placeholder="Guest account : Leave this blank"></input>
+        <!--remove require if guest account is allow-->
+        <input class="invalid" type="password" id="password" name="password" required placeholder="Your password"></input>
         <div>
           <button class="btn btn-primary btn-lg" id="login-button">Login</button>
           <button type="button"class="btn btn-success btn-lg" id="register-button">Register</button>

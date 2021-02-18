@@ -30,7 +30,8 @@ class Login extends Phaser.Scene {
       e.preventDefault();
       $.ajax("/users/login", {method: 'POST', data: $("#login").serialize()})
         .then((res) => {
-          if(res.guest) {
+          /* uncomment the following if guest is allow
+          if(res.guest) { 
             let confirm = `
             <div class="box confirm">
               <div>You sure you want to login as Guest?</div>
@@ -38,7 +39,7 @@ class Login extends Phaser.Scene {
             </div>`
             //add animation for box appear if have time
             $(`#loginInsert`).append(confirm)
-          } else if(res.err) {
+          } else */if(res.err) {
             let err = `
             <div class="box err">
               <div>Error :  Invalid ${res.err}</div>
