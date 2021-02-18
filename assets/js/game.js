@@ -159,6 +159,7 @@ class Game extends Phaser.Scene {
       cart.push(product);
       console.log('this is cart')
       console.log(cart)
+      $('#checkout-cart-count').html(cart.length)
     }
 
     const cartTotal = function(cart) {
@@ -338,7 +339,7 @@ class Game extends Phaser.Scene {
             </table>
             <div id="proceed">
               <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
-              <button class="btn btn-primary">Proceed</button>
+              <button class="btn btn-primary"><i class="far fa-credit-card"></i> Proceed</button>
             </div>
           </div>
           `)

@@ -28,14 +28,18 @@
   color: darkgreen;
 }
 
-#checkout > #credit-card:hover {
+#checkout > #checkout-cart:hover {
   opacity: 0.75;
   cursor: pointer;
 }
 
-#checkout > #credit-card:active {
+#checkout > #checkout-cart:active {
   opacity: 1;
   cursor: pointer;
+}
+
+#checkout > #checkout-cart-count {
+  
 }
 
 
