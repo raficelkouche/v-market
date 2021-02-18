@@ -6,6 +6,7 @@ const express = require('express')
 const app = express()
 const morgan = require('morgan'); //HTTP request logger
 const path = require('path');
+const cookieParser = require('cookie-parser')
 
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));

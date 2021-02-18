@@ -19,6 +19,19 @@ module.exports = () => {
       res.json({guest : true});
     }
   })
+
+  router.post('/new', (req, res) => {
+    if (req.body.password === req.body.confirm_password) {
+      db.userNew(req.body)
+        .then(result => {
+          console.log(result);
+          res.json({name: result.gaming_name})
+        })
+    } else {
+      res.json({err: 'password not match'})
+    }
+  })
+
   return router;
 }
 

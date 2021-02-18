@@ -10,6 +10,16 @@ const getAllUsers = function() {
 }
 exports.getAllUsers = getAllUsers;
 
+const userNew = function(newUser) { //make new user
+
+  return pool.query(`
+  INSERT INTO users (name, email, password, gaming_name, is_online) VALUES ($1, $2, $3, $4, true)
+  returning gaming_name;
+  `, [newUser.full_name, newUser.email, newUser.password, newUser.name])
+  .then(res => res.rows[0]);
+}
+exports.userNew = userNew;
+
 const userLogin = function(IGN) { // would probably want to compare password here too?
   console.log(IGN.toLowerCase())
   return pool.query(`
