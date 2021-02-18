@@ -335,7 +335,8 @@ class Game extends Phaser.Scene {
           }
 
         } else {
-          $('#customer-support').remove();
+          $('#checkout').css("visibility", "hidden");
+          $('#customer').remove();
           $("#request-data").parent().html('');
           $('#products').append('<img id="closedImg" src="https://images-na.ssl-images-amazon.com/images/I/61s6wHsXOqL._AC_SL1000_.jpg"/>')
           $('h1').text(`Sorry! This store is currently closed. Come back again later.`)
