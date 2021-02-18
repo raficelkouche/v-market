@@ -1,7 +1,7 @@
 const { Pool } = require('pg');
-const {user, password, host ,database} = require('./config')
+const dbParams = require('./config')
 
-const pool = new Pool({ user, password, host, database });
+const pool = new Pool(dbParams);
 
 const getAllUsers = function() {
   return pool.query(`
@@ -9,6 +9,43 @@ const getAllUsers = function() {
   .then(res => res);
 }
 exports.getAllUsers = getAllUsers;
+
+const userNew = function(newUser) { //make new user
+
+  return pool.query(`
+  INSERT INTO users (name, email, password, gaming_name, is_online) VALUES ($1, $2, $3, $4, true)
+  returning gaming_name;
+  `, [newUser.full_name, newUser.email, newUser.password, newUser.name])
+  .then(res => res.rows[0]);
+}
+exports.userNew = userNew;
+
+const userLogin = function(IGN) {
+  console.log(IGN.toLowerCase())
+  return pool.query(`
+  select * 
+  from users
+  where lower(gaming_name) = lower($1);`, [IGN])
+  .then(res => res.rows[0]);
+}
+exports.userLogin = userLogin;
+
+const userLoginWithEmail = function(email) {
+  return pool.query(`
+  select * 
+  from users
+  where lower(email) = lower($1);`, [email])
+  .then(res => res.rows[0]);
+}
+exports.userLoginWithEmail = userLoginWithEmail;
+
+const getAllStores = function() { // should take in a map_id as arg if want to make this game have more then 1 map
+  return pool.query(`
+  SELECT name, description, id
+  FROM stores;`)
+  .then(res => res.rows);
+}
+exports.getAllStores = getAllStores;
 
 const getMoreProducts = function(store_id, called) {
   return pool.query(`
@@ -32,15 +69,3 @@ const getProduct = function(product_id) {
   .then(res => res.rows[0]);
 }
 exports.getProduct = getProduct;
-
-
-//For testing only
-const getUser = function(email, password) {
-  return pool.query(`
-  select *
-  from users
-  where email = $1 AND password = $2
-  `,[email,password])
-  .then(res => res.rows[0])
-}
-exports.getUser = getUser;

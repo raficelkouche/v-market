@@ -1,24 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <div>
-    <button class="btn btn-primary btn-lg" id="login-button">Login</button>
-    <button class="btn btn-danger btn-lg" id="error-button">Error</button>
-    <!--Temporary form for testing only-->
-    <br><br>
-    <form id="login" style="background-color: aquamarine;">
-      <label for="email-input">Email</label>
-      <input type="email" name="email" id="email-input">
-      <label for="password-input">Password</label>
-      <input type="password" name="password" id="password-input">
-      <button>submit</button>
+<div id="loginInsert">
+  <div class="card login">
+    <form id='login'>
+      <label for="name">User Name</label>
+      <input type="text" id="name" name="name" placeholder="Your user name"></input>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Your password"></input>
+      <div>
+        <button type="submit" class="btn btn-primary btn-lg" id="login-button">Login</button>
+        <button type="button"class="btn btn-success btn-lg" id="register-button">Register</button>
+      </div>
     </form>
   </div>
-</body>
-</html>
+</div>
+
+
+
+

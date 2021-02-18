@@ -8,8 +8,9 @@ const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 const morgan = require('morgan'); //HTTP request logger
 const path = require('path');
+const cookieParser = require('cookie-parser')
 
-
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(express.static("assets"));
 app.use(express.json())
