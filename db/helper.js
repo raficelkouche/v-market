@@ -69,3 +69,54 @@ const getProduct = function(product_id) {
   .then(res => res.rows[0]);
 }
 exports.getProduct = getProduct;
+
+// get all orders for the one user
+const getUserOrders = function(user_id) {
+  return pool.query(`
+  SELECT *
+  FROM Orders
+  Where user_id = $1;`
+  , [user_id])
+  .then(res => res.rows)
+}
+exports.getUserOrders = getUserOrders
+
+const orderNew = function(order) { //make new user
+  // const { user_id, store_id, total_price, cart} = data
+  // get user id make a new order with store id
+  // using the order id make line items with order id, product id
+  console.log('order info from post request')
+  console.log(order)
+  // make the order -> use order id
+  return pool.query(`
+  INSERT INTO orders (store_id, user_id, total_price) 
+  VALUES ($1, $2, $3)
+  returning *;
+  `, [order.store_id, order.user_id, order.total_price])
+  .then(res => {
+    console.log('this the result from adding order to db')
+    console.log(res.rows[0])
+    const newOrder = res.rows[0]
+
+    // should give back order id
+    // make another query for the cart items
+    // for each cart, use order_id, producT_id, quanity = 1 for now
+    // product_price
+    for (let i = 0; i < order.cart.length; i++) {
+        pool.query(`
+        INSERT INTO lineItems (order_id, product_id, quantity, total_price)
+        VALUES ($1, $2, $3, $4)
+        returning id;
+      `,[res.rows[0].order_id, order.cart[i].product_id, 1, order.cart[i].price])
+        .then(res => {
+          // check if each line was entered
+          // console.log('this the result from adding lineitems')
+          // console.log(res)
+      })
+    }
+
+    return { order: newOrder}
+
+  });
+}
+exports.orderNew = orderNew;

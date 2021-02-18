@@ -17,7 +17,7 @@ module.exports = () => {
         } else if(result.password !== req.body.password) {//passsword does not match with record
           res.json({err: 'password'})
         } else { //pass IGN to game
-          res.json({name: result.gaming_name});
+          res.json({name: result.gaming_name, user_id: result.id});
         }
       })
     } else if (req.body.password){ //if user try to log in
@@ -28,7 +28,7 @@ module.exports = () => {
           } else if(result.password !== req.body.password) { //passsword does not match with record
             res.json({err: 'password'})
           } else { //pass IGN to game
-            res.json({name: result.gaming_name});
+            res.json({name: result.gaming_name, user_id: result.id});
           }
         })
     } else { //if login as guest
@@ -63,6 +63,20 @@ module.exports = () => {
     } else { // if password doesn't match record
       res.json({err: 'password'})
     }
+  })
+
+  // Orders routes
+
+  router.post('/:user_id/orders', (req, res) => {
+    // console.log('inside orders route')
+    // console.log(req.body.data)
+    // need two variables = user_id and cart array with product ids
+    db.orderNew(req.body.data)
+      .then(result => {
+        console.log('this the result from after db call')
+        console.log(result);
+        res.json(result)
+      })
   })
 
   return router;

@@ -11,7 +11,13 @@ class Game extends Phaser.Scene {
   init(data)
   {
     //pass var from login scence
-    this.playerInfo = {name: data.name.replace(/%20/g, " ").trim(), guest: data.guest || false}
+    console.log('this is the data passed to make the player name')
+    console.log(data)
+    this.playerInfo = {
+      name: data.name.replace(/%20/g, " ").trim(), 
+      guest: data.guest || false,
+      id: data.user_id
+    }
   }
 
   static player = Phaser.Physics.Arcade.Sprite;
@@ -218,7 +224,22 @@ class Game extends Phaser.Scene {
           <td style="width: 20%">${product.name}</td>
           <td style="width: 40%">${product.description}</td>
           <td style="width: 20%">${product.price}</td>
-          <td style="width: 10%"><button id="remove-cart${cart.indexOf(product)}" onclick="console.log('${cart.indexOf(product)}')"><i class="far fa-trash-alt fa-2x "></i></button> </td>
+          <td id="remove-cart" style="width: 10%"><button id="remove-cart${cart.indexOf(product)}" onclick="console.log('${cart.indexOf(product)}')"><i class="far fa-trash-alt fa-2x "></i></button> </td>
+        </tr>
+        `
+      }
+      return pendingHTML
+    }
+    // order confimration page
+    const orderList = function(orderItems) {
+      let pendingHTML = ``;
+      for (let product of orderItems) {
+        pendingHTML += `
+        <tr id="line-item-row">
+          <td class="line-item-thumbnail" style="width: 20%; text-align: center;"><img src="${product.thumbnail}" style="width: 50px; height:50px;"/></td>
+          <td style="width: 20%">${product.name}</td>
+          <td style="width: 40%">${product.description}</td>
+          <td style="width: 20%">${product.price}</td>
         </tr>
         `
       }
@@ -411,6 +432,59 @@ class Game extends Phaser.Scene {
             `)
           $('tbody').append(checkOutList(cart))
           $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
+          // checkout button function
+          $('#checkout-button').on('click', () => {
+            console.log('checkout button hit!')
+            console.log(this.playerInfo.id)
+            const data = {
+              user_id: this.playerInfo.id,
+              store_id: this.storeId,
+              total_price: total,
+              cart: cart
+            }
+            $.ajax(`/users/${this.playerInfo.id}/orders`, {method: 'POST', data: { data: data}})
+            .then((order) => {
+              if(order) { // sucessful and returns the order
+                console.log('ajax for checkout called')
+                console.log(order)
+                //  FINALLY !!!! order received back as obj
+                const orderItems = cart;
+                // empty cart
+                cart = [];
+                // rerender with order details
+                $('#checkout-table').remove()
+                $('#products').append(`
+                  <div id="checkout-table">
+                    <h1>Order Confirmation</h1>
+                    <p style="font-size: medium"> Hello ${this.playerInfo.name}. Thank you for your purchase!<p>
+                    <p style="font-size: medium"> Your Order Number is <b> ${order.order.id}.</b>
+                    <br>
+                      <table class="table table-bordered">
+                        <thead class="table-dark">
+                          <tr id="line-item-row">
+                            <td style="width: 50px; height:50px;"></td>
+                            <td>Name</td>
+                            <td>Description</td>
+                            <td>Price</td>
+                          </tr>
+                        </thead>
+                        <tbody></tbody>
+                      </table>
+                    <div id="proceed">
+                      <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+                    </div>
+                  </div>
+                `)
+                $('tbody').append(orderList(orderItems))
+                $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
+
+                // add back function
+
+              } else {
+                res.json('Oops! something went wrong?')
+              }
+                })
+            })
           // add remove function
           for (let product of cart) {
             $(`#remove-cart${cart.indexOf(product)}`).on("click", () => {
@@ -421,15 +495,14 @@ class Game extends Phaser.Scene {
             })
           }
         } else {
-            $('#products').append(`
-              <div id="checkout-table">
-                <h1>Review Order</h1>
-                <p>Hello! You have no items in the cart. Go back to the store page to view the our products. </p>
-                <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
-              </div>
-            `)
+          $('#products').append(`
+            <div id="checkout-table">
+              <h1>Review Order</h1>
+              <p>Hello! You have no items in the cart. Go back to the store page to view the our products. </p>
+              <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+            </div>
+          `)
         }
-
         // return button to take back to store front
         $("#back-button").on("click", () => {
           let storeID = this.storeId
