@@ -206,6 +206,7 @@ class Game extends Phaser.Scene {
         }
       }
       cart = newCart;
+      $('#checkout-cart-count').html(cart.length)
     }
 
     const cartTotal = function(cart) {
