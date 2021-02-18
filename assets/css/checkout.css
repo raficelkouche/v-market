@@ -1,0 +1,23 @@
+#checkout-table {
+  /* border: 1px solid red; */
+  width: 700px;
+  /* text-align: center; */
+  margin-left: 200px;
+  margin-top: 50px;
+  font-size: 2em;
+}
+
+#line-item-row {
+  /* border: 1px solid green; */
+  width: 25px;
+}
+
+#line-item-row > td {
+  /* border: 1px solid blue; */
+  height: 25px;
+}
+
+#line-item-row > td:hover {
+  box-shadow: unset;
+  cursor: unset;
+}

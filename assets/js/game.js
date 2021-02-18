@@ -161,6 +161,22 @@ class Game extends Phaser.Scene {
       console.log(cart)
     }
 
+    // testing checkout page
+    const checkOutList = function(cart) {
+      let pendingHTML = ``;
+      for (let product of cart) {
+        pendingHTML += `
+        <tr id="line-item-row">
+          <td class="line-item-thumbnail" style="width: 20%; text-align: center;"><img src="${product.thumbnail}" style="width: 50px; height:50px;"/></td>
+          <td style="width: 20%">${product.name}</td>
+          <td style="width: 40%">${product.description}</td>
+          <td style="width: 20%">${product.price}</td>
+        </tr>
+        `
+      }
+      return pendingHTML
+    }
+
     if (!this.overlap && this.storeName) {
       for (const x of Object.keys(this.storeExistThisMap)) {
         if (this.storeExistThisMap[x].name === this.storeName._text) this.storeExistThisMap[x].display = false;
@@ -289,6 +305,34 @@ class Game extends Phaser.Scene {
         this.inshop = false; 
         this.miniCam.setVisible(true);
         this.storeLoadCount = 0;
+      })
+      // view cart
+      $("#checkout").on("click", () => { //need to replace
+        // cart info available - show page
+        console.log(cart)
+        
+        $('#products-grid').remove();
+        $('#product-container').remove();
+        $('#products').append(`
+          <div id="checkout-table">
+            <h1>Review Order</h1>
+            <table class="table table-bordered">
+              <thead class="table-dark">
+                <tr id="line-item-row">
+                  <td style="width: 50px; height:50px;"></td>
+                  <td>Name</td>
+                  <td>Description</td>
+                  <td>Price</td>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          `)
+        $('tbody').append(checkOutList(cart))
+
+        // return button to take back to store front
+
       })
       // viewing single product
       $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
