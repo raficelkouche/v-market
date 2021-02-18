@@ -247,6 +247,7 @@ class Game extends Phaser.Scene {
           $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
           $('h1').text(`${result[0].s_name}`);
           $('h1').css('font-size', '80px')
+          $('h1').css('color', 'white')
           // to add to cart from the store view -> different data structure from product view
           for (let product of result) {
             $(`#add-to-cart${product.id}`).on('click', function () {
@@ -319,35 +320,46 @@ class Game extends Phaser.Scene {
         // cart info available - show page
         console.log(cart)
         const total = cartTotal(cart)
-        
+        // checkout page set up
+        $('#checkout').css("visibility", "hidden");
         $('#products-grid').remove();
         $('#product-container').remove();
-        $('#products').append(`
-          <div id="checkout-table">
-            <h1>Review Order</h1>
-            <table class="table table-bordered">
-              <thead class="table-dark">
-                <tr id="line-item-row">
-                  <td style="width: 50px; height:50px;"></td>
-                  <td>Name</td>
-                  <td>Description</td>
-                  <td>Price</td>
-                  <td>Remove</td>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-            <div id="proceed">
-              <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
-              <button class="btn btn-primary"><i class="far fa-credit-card"></i> Proceed</button>
+        // if cart has items
+        if (cart.length > 0) {
+          $('#products').append(`
+            <div id="checkout-table">
+              <h1>Review Order</h1>
+              <table class="table table-bordered">
+                <thead class="table-dark">
+                  <tr id="line-item-row">
+                    <td style="width: 50px; height:50px;"></td>
+                    <td>Name</td>
+                    <td>Description</td>
+                    <td>Price</td>
+                    <td>Remove</td>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <div id="proceed">
+                <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+                <button class="btn btn-primary"><i class="far fa-credit-card"></i> Proceed</button>
+              </div>
             </div>
-          </div>
-          `)
-        $('tbody').append(checkOutList(cart))
-        $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
-        $('#checkout').css("visibility", "hidden");
-        // return button to take back to store front
+            `)
+          $('tbody').append(checkOutList(cart))
+          $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
+        } else {
+            $('#products').append(`
+              <div id="checkout-table">
+                <h1>Review Order</h1>
+                <p>Hello! You have no items in the cart. Go back to the store page to view the our products. </p>
+                <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+              </div>
+            `)
+        }
 
+        // return button to take back to store front
         $("#back-button").on("click", () => {
           let storeID = this.storeId
           let storeLoadCount = 0
