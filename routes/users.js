@@ -8,16 +8,15 @@ module.exports = () => {
       db.userLogin(req.body.name)
         .then( result => {
           if (!result) {
-            res.json({err: 'invalid user'})
-          }
-          if(req.body.password === result.password) {
-            res.json({name: result.gaming_name});
+            res.json({err: 'user'})
+          } else if(result.password !== req.body.password) {
+            res.json({err: 'password'})
           } else {
-            res.json({err: 'invalid password'})
+            res.json({name: result.gaming_name});
           }
         })
     } else { //do we check name of guest so it won't be dup?
-      res.json({guest : true, name: req.body.name});
+      res.json({guest : true});
     }
   })
   return router;

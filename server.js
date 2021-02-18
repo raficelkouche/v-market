@@ -5,10 +5,9 @@ const ENV = process.env.ENV || "development";
 const express = require('express')
 const app = express()
 const morgan = require('morgan'); //HTTP request logger
-const bodyParser = require('body-parser')// to read req.body
 const path = require('path');
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(express.static("assets"));
 

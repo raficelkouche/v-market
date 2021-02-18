@@ -1,3 +1,8 @@
+#loginInsert {
+  width: 1280px;
+  height: 960px;
+}
+
 .card {
 	width: 300px;
 	height: 250px;
@@ -5,8 +10,9 @@
 	background:rgba(255,255,255,.85);
   border: 0;
 	border-radius: 0.5rem;
+  right: 490px;
+  top: 355px;
 	position: absolute;
-	transform: translateY(0);
 	box-shadow: 6px 6px 8px rgba(180,181,185,.5)
 }
 
@@ -34,7 +40,13 @@
   font-family: 'Arial';
   font-weight: bolder;
 } 
-.card form input {
+
+#id .invalid {
+  background-color: rgba(248, 110, 110, 0.6);
+  border:3px solid rgba(250, 66, 66, 0.6);
+}
+
+input {
   height: 2rem;
   width: 90%;
   align-self: center;
@@ -45,26 +57,77 @@
   margin-bottom: 5%;
   background-color: rgba(150,150,150,.6);
 } 
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active  {
+  -webkit-transition-delay: 9999999s;
+  -webkit-transition: color 9999999s ease-out, background-color 9999999s ease-out;
+}
+
 .card form div {
   margin-top: 5%;
   height: 30%;
-  width: 50%;
+  width: 100%;
   display:flex;
   align-content: center;
   justify-content: space-around;
 } 
 
-#login-button {
- width: 80.33%;
+.card form div button {
+ width: 40%;
  border-radius: 2rem;
  height: 3rem
 }
 
-#register-button {
-  width: 40%;
-  position: absolute;
-  margin-top: 63.1%;
-      margin-left: 55%;
-  border-radius: 1.5rem;
-  height: 3rem;
+.box.err {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  width: 300px;
+	height: 80px;
+	background:rgba(250, 163, 163, 0.85);
+  border: 3px solid rgba(224, 24, 24, 0.85);;
+	border-radius: 0.5rem;
+  right: 490px;
+  top: 625px;
+	position: absolute;
+	box-shadow: 6px 6px 8px rgba(180,181,185,.5)
 }
+
+.box.err > div{
+  align-self: center;
+  font-weight: bolder;
+  color: #800000;
+}
+
+.box.confirm {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  width: 300px;
+	height: 120px;
+  background-color: white;
+	background:rgba(255, 255, 255, 0.85);
+	border-radius: 0.5rem;
+  right: 490px;
+  top: 625px;
+	position: absolute;
+	box-shadow: 6px 6px 8px rgba(180,181,185,.5)
+}
+
+.box.confirm > div{
+  align-self: center;
+  font-weight: bolder;
+}
+
+.box.confirm > button{
+  margin-top: 0.5rem;
+  align-self: center;
+  width: 60%;
+  border-radius: 2rem;
+  height: 3rem
+}
+
