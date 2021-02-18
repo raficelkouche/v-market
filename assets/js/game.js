@@ -184,6 +184,15 @@ class Game extends Phaser.Scene {
     this.physics.world.bounds.width = this.map.widthInPixels;
     this.physics.world.bounds.height = this.map.heightInPixels;
     this.player.body.setCollideWorldBounds(true); 
+    
+    //move from update so it does not check every ticks
+    if (!this.overlap && this.storeName) {
+      for (const x of Object.keys(this.storeExistThisMap)) {
+        if (this.storeExistThisMap[x].name === this.storeName._text) this.storeExistThisMap[x].display = false;
+      }
+      this.storeName.destroy();
+      this.helperMsg.destroy();
+    }
   }
 
   update() {
@@ -247,15 +256,6 @@ class Game extends Phaser.Scene {
       return pendingHTML
     }
 
-    if (!this.overlap && this.storeName) {
-      for (const x of Object.keys(this.storeExistThisMap)) {
-        if (this.storeExistThisMap[x].name === this.storeName._text) this.storeExistThisMap[x].display = false;
-      }
-      this.storeName.destroy();
-      this.helperMsg.destroy();
-    }
-
-
     //function to 'pause' the game when open shop
     const shopPause = function (pCam, mCam, Cam){
       pCam.setVisible(true)
@@ -306,7 +306,6 @@ class Game extends Phaser.Scene {
       if (this.key.ESC.isDown) { //if ESC is press close shop
         $("canvas").prev().children().remove()
         shopResume(this.pauseCam, this.miniCam, this.cameras.main)
-        this.cameras.main.setZoom(2); //zoom out cause phaser dom is weird
         this.inshop = false;
         this.storeLoadCount = 0;
       }
@@ -349,7 +348,6 @@ class Game extends Phaser.Scene {
       if ($("#store-data").length === 0) { // allow user to open 1 window only
         this.miniCam.setVisible(false);
         this.inshop = true //set inshop true, to 'pause' game
-        this.cameras.main.setZoom(1); //zoom out cause phaser dom is weird
         if (this.player.x < 640){
           this.camX = 640
         } else if (this.player.x > 1280){
@@ -376,7 +374,6 @@ class Game extends Phaser.Scene {
       $("#close-button").on("click", () => {
         $("canvas").prev().children().remove() //remove the added dom
         shopResume(this.pauseCam, this.miniCam, this.cameras.main)
-        this.cameras.main.setZoom(2); //zoom out cause phaser dom is weird
         this.inshop = false;
         this.storeLoadCount = 0;
       })
@@ -487,7 +484,6 @@ class Game extends Phaser.Scene {
                 $("#exit-button").on("click", () => {
                   $("canvas").prev().children().remove() //remove the added dom
                   shopResume(this.pauseCam, this.miniCam, this.cameras.main)
-                  this.cameras.main.setZoom(2); //zoom out cause phaser dom is weird
                   this.inshop = false;
                   this.storeLoadCount = 0;
                 })

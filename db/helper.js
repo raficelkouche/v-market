@@ -47,15 +47,15 @@ const getAllStores = function() { // should take in a map_id as arg if want to m
 }
 exports.getAllStores = getAllStores;
 
-const getMoreProducts = function(store_id, called) {
+const getMoreProducts = function(store_id, called, limite = 4) {
   return pool.query(`
   select s.name as s_name, s.banner_img, s.description as s_des, p.id, p.name, p.description, p.price, p.discount, p.thumbnail
   from stores s 
   join products p on store_id = s.id
   where s.id = $1
-  limit 4
-  offset $2;
-  `, [store_id, called * 4])
+  limit $2
+  offset $3;
+  `, [store_id, limite, called * 4])
   .then(res => res.rows);
 }
 exports.getMoreProducts = getMoreProducts;
