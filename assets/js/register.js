@@ -26,6 +26,7 @@ class Register extends Phaser.Scene {
     $("#login-button").off().on("click", () => {
       this.scene.start('Login')
     })
+
     //user sub the login info
     $("#register").off().on("submit", (e) => {
       e.preventDefault();
@@ -38,33 +39,46 @@ class Register extends Phaser.Scene {
       </div>`;
       if (!$('#name').val() || !$('#full_name').val() || !$('#password').val() || !$('#confirm_password').val()) {
         $(`#RegisterInsert`).append(err);
-        console.log('a')
-      } else if ($('#password').val().length < 6 || $('#confirm_password').val().length < 6) {
+      } else if ($('#password').val().length < 6 || $('#confirm_password').val().length < 6) { //if 1 field is empty err
         err = `
           <div class="box err register">
             <div>Invalid password length(Min. 6)</div>
           </div>`
         $(`#RegisterInsert`).append(err);
-        console.log('b')
-      } else if ($('#password').val() != $('#confirm_password').val()) {
+      } else if ($('#password').val() != $('#confirm_password').val()) {//if password does not match
         err = `
           <div class="box err register">
             <div>Password does not match</div>
           </div>`
         $(`#RegisterInsert`).append(err);
-        console.log('c')
       } else {
-        console.log('d')
         $.ajax("/users/new", {method: 'POST', data: $("#register").serialize()})
           .then((res) => {
-            if(res.err) {
+            if(res.err === 'special character') { //special characyer in user name
               err = `
               <div class="box err register">
-                <div>Invalid password & user combination</div>
+                <div>No special character in user name</div>
               </div>`
-              //add animation for box appear if have time
               $(`#RegisterInsert`).append(err)
-            } else {
+            } else if (res.err === 'email'){ // if email is invalid
+              err = `
+              <div class="box err register">
+                <div>Please use valid email</div>
+              </div>`
+              $(`#RegisterInsert`).append(err)
+            } else if (res.err === 'full name'){ // if name have number / special c
+              err = `
+              <div class="box err register">
+                <div>No special/number in full name</div>
+              </div>`
+              $(`#RegisterInsert`).append(err)
+            } else if (res.err){ // if password does not match. NOTE: should not happen on normal cases
+              err = `
+              <div class="box err register">
+                <div>Password does not match</div>
+              </div>`
+              $(`#RegisterInsert`).append(err)
+            } else { // let user in game
               this.scene.start('Game' , {name: res.name})
             }
           });
@@ -72,5 +86,11 @@ class Register extends Phaser.Scene {
     })
   }
 }
-
+/*
+No special/number in full name X
+Special C in name X
+Password not match X
+Empty field not allow X
+check email valid X
+*/
 export { Register }

@@ -43,7 +43,7 @@ class Login extends Phaser.Scene {
       <div class="box err">
         <div>Please input both field</div>
       </div>`;
-      if (!$('#name').val()) {
+      if (!$('#name').val()) { //User doesn't enter name
         $(`#loginInsert`).append(err);
       } else {
         $.ajax("/users/login", {method: 'POST', data: $("#login").serialize()})
@@ -55,15 +55,27 @@ class Login extends Phaser.Scene {
                 <button type="button" class="btn btn-primary btn-lg" id="confirm-button">Just let me in!</button>
               </div>`
               $(`#loginInsert`).append(confirm)
-            } else if(res.err) {
+            } else if(res.err === "user exist") { //Guest use already existed username
+              err = `
+              <div class="box err">
+                <div>User name already taken</div>
+              </div>`
+              $(`#loginInsert`).append(err);
+            } else if(res.err === "special character is not allow") { //Guest use special character in the name
+              err = `
+              <div class="box err">
+                <div>Special character is not allow</div>
+              </div>`
+              $(`#loginInsert`).append(err);
+            }else if(res.err) { // User name/password not match
               err = `
               <div class="box err">
                 <div>Invalid password & user combination</div>
               </div>`
               //add animation for box appear if have time
-              $(`#loginInsert`).append(err)
-            } else {
-              this.scene.start('Game' , res)
+              $(`#loginInsert`).append(err);
+            } else { //let user in game
+              this.scene.start('Game' , res);
             }
           });
         }

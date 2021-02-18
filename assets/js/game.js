@@ -11,7 +11,7 @@ class Game extends Phaser.Scene {
   init(data)
   {
     //pass var from login scence
-    this.playerInfo = {name: data.name, guest: data.guest || false}
+    this.playerInfo = {name: data.name.replace(/%20/g, " ").trim(), guest: data.guest || false}
   }
 
   static player = Phaser.Physics.Arcade.Sprite;

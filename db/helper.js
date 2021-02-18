@@ -20,7 +20,7 @@ const userNew = function(newUser) { //make new user
 }
 exports.userNew = userNew;
 
-const userLogin = function(IGN) { // would probably want to compare password here too?
+const userLogin = function(IGN) {
   console.log(IGN.toLowerCase())
   return pool.query(`
   select * 
@@ -29,6 +29,15 @@ const userLogin = function(IGN) { // would probably want to compare password her
   .then(res => res.rows[0]);
 }
 exports.userLogin = userLogin;
+
+const userLoginWithEmail = function(email) {
+  return pool.query(`
+  select * 
+  from users
+  where lower(email) = lower($1);`, [email])
+  .then(res => res.rows[0]);
+}
+exports.userLoginWithEmail = userLoginWithEmail;
 
 const getAllStores = function() { // should take in a map_id as arg if want to make this game have more then 1 map
   return pool.query(`
