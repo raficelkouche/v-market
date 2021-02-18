@@ -3,23 +3,68 @@ const router = express.Router();
 const db = require('../db/helper');
 
 module.exports = () => {
+
+  let isEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+  let specialCharacter = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+  let englishCharacter = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?0-9]+/;
+
   router.post('/login', (req, res) => {
-    if(req.body.password) {
+    if (isEmail.test(req.body.name) && req.body.password) { //if user use email
+      db.userLoginWithEmail(req.body.name)
+      .then( result => {
+        if (!result) {//cannot find user in db
+          res.json({err: 'user'})
+        } else if(result.password !== req.body.password) {//passsword does not match with record
+          res.json({err: 'password'})
+        } else { //pass IGN to game
+          res.json({name: result.gaming_name});
+        }
+      })
+    } else if (req.body.password){ //if user try to log in
       db.userLogin(req.body.name)
         .then( result => {
-          if (!result) {
-            res.json({err: 'invalid user'})
-          }
-          if(req.body.password === result.password) {
+          if (!result) { //cannot find user in db
+            res.json({err: 'user'})
+          } else if(result.password !== req.body.password) { //passsword does not match with record
+            res.json({err: 'password'})
+          } else { //pass IGN to game
             res.json({name: result.gaming_name});
-          } else {
-            res.json({err: 'invalid password'})
           }
         })
-    } else { //do we check name of guest so it won't be dup?
-      res.json({guest : true, name: req.body.name});
+    } else { //if login as guest
+      if(specialCharacter.test(req.body.name)) { //check for sc
+        res.json({err : 'special character is not allow'});
+      } else {
+        db.userLogin(req.body.name)
+        .then( result => {
+          if (!result) { //if does not dup with existing user, let him in
+            res.json({guest : true});
+          } else { // return err if user exist
+            res.json({err : 'user exist'});
+          }
+        });
+      }
     }
   })
+  router.post('/new', (req, res) => {
+    // if no special character in name and no special character and number in real name
+    if (specialCharacter.test(req.body.name)) { 
+      res.json({err: 'special character'})
+    } else if (englishCharacter.test(req.body.full_name)) { //if special/number in full name
+      res.json({err: 'full name'})
+    } else if (!isEmail.test(req.body.email)) { // if email is not valid
+      res.json({err: "email"})
+    } else if (req.body.password === req.body.confirm_password) { //if password does match, let user in
+      db.userNew(req.body)
+        .then(result => {
+          console.log(result);
+          res.json({name: result.gaming_name})
+        })
+    } else { // if password doesn't match record
+      res.json({err: 'password'})
+    }
+  })
+
   return router;
 }
 

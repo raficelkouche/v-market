@@ -11,7 +11,7 @@ class Game extends Phaser.Scene {
   init(data)
   {
     //pass var from login scence
-    this.playerInfo = {name: data.name, guest: data.guest || false}
+    this.playerInfo = {name: data.name.replace(/%20/g, " ").trim(), guest: data.guest || false}
   }
 
   static player = Phaser.Physics.Arcade.Sprite;
@@ -21,7 +21,7 @@ class Game extends Phaser.Scene {
   static storeInfo = [];
   static storeExistThisMap;
   static storeId;
-  static storeLoadCount = 0;
+  static storeLoadCount;
   static storeName;
   static helperMsg;
 
@@ -33,6 +33,7 @@ class Game extends Phaser.Scene {
     this.load.html('store_window', 'templates/store_window.html');
     this.cursors = this.input.keyboard.createCursorKeys();
     this.key = this.input.keyboard.addKeys("W, A, S, D, ESC")
+    this.storeLoadCount = 0;
     //get all store info
     $.ajax(`/stores`, {method: 'GET'})
       .then((res) => this.storeInfo = Array.from(res))
@@ -44,8 +45,8 @@ class Game extends Phaser.Scene {
     this.storeExistThisMap = {};
 
     // get all store info to a more easy handle data type
-    for (const sotre of this.storeInfo) { 
-      storeExist[sotre.id] = sotre
+    for (const store of this.storeInfo) { 
+      storeExist[store.id] = store
     }
     //remove as no longer needed, unless we make an other map
     delete this.storeInfo 
