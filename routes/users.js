@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/helper');
-
+const bcrypt = require('bcrypt');
+const salt = bcrypt.genSaltSync(10);
 module.exports = () => {
 
   let isEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
@@ -14,7 +15,7 @@ module.exports = () => {
       .then( result => {
         if (!result) {//cannot find user in db
           res.json({err: 'user'})
-        } else if(result.password !== req.body.password) {//passsword does not match with record
+        } else if(!bcrypt.compareSync(req.body.password, result.password)) {//passsword does not match with record
           res.json({err: 'password'})
         } else { //pass IGN to game
           req.session.user_ID = result.id
@@ -26,7 +27,7 @@ module.exports = () => {
         .then( result => {
           if (!result) { //cannot find user in db
             res.json({err: 'user'})
-          } else if(result.password !== req.body.password) { //passsword does not match with record
+          } else if(!bcrypt.compareSync(req.body.password, result.password)) { //passsword does not match with record
             res.json({err: 'password'})
           } else { //pass IGN to game
             req.session.user_ID = result.id
@@ -57,7 +58,13 @@ module.exports = () => {
     } else if (!isEmail.test(req.body.email)) { // if email is not valid
       res.json({err: "email"})
     } else if (req.body.password === req.body.confirm_password) { //if password does match, let user in
-      db.userNew(req.body)
+      let newUser = {
+        full_name: req.body.full_name,
+        name: req.body.name,
+        email: req.body.email,
+        password: bcrypt.hashSync(req.body.password, salt)
+      }
+      db.userNew(newUser)
         .then(result => {
           //console.log(result);
           res.json({name: result.gaming_name, user_id: result.id})
@@ -76,13 +83,23 @@ module.exports = () => {
     }
   })
 
+  // Orders routes
+  router.post('/:user_id/orders', (req, res) => {
+    // console.log('inside orders route')
+    // console.log(req.body.data)
+    // need two variables = user_id and cart array with product ids
+    db.orderNew(req.body.data)
+      .then(result => {
+        console.log('this the result from after db call')
+        console.log(result);
+        res.json(result)
+      })
+  })
 
   return router;
 }
 
-
-
-
+//bcrypt.compareSync(req.body.password, users[userid].password)
 
 
 

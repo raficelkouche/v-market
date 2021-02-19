@@ -27,6 +27,10 @@
   align-self: center;
   -webkit-user-select: none; /* Safari */
   user-select: none;
+  /* Change the font for the store to look nicer */
+  /* font-family:'Monaco, Helvetica, sans-serif';
+  border: 2px solid red; */
+  font-family: 'Carter One', cursive;
 }
 
 #store_banner > header {
@@ -74,8 +78,8 @@
 }
 
 #search-bar {
- /* to be added*/
-
+  /* to be added*/
+  
 }
 
 #store-data {
@@ -130,8 +134,9 @@ td {
   border:0;
 }
 
-.thumbnail:hover{
+td:hover{
   cursor: pointer;
+  box-shadow: 0 0 11px rgba(33, 33, 33, .2);
 }
 
 .description{
@@ -148,6 +153,7 @@ td {
   font-family: Arial;
   text-align: center;
   overflow: hidden;
+  font-size: 1.5rem;
 }
 
 .price {
@@ -155,7 +161,6 @@ td {
   height: 40%;
   text-align: center;
   font-family: Arial;
-  font-size: 1.5rem;
   font-weight: bold;
 }
 
@@ -172,10 +177,10 @@ td {
 }
 
 #request-data {
-
+  
 }
 
-#customer-support {
+#customer {
   position:fixed;
   display: flex;
   flex-direction: column;
@@ -185,7 +190,7 @@ td {
   /* need to change for responsive */
 }
 
-#customer-support > div {
+#customer > div {
   align-self: center;
   height: 3.5rem;
   width: 3.5rem;
@@ -199,17 +204,17 @@ td {
   opacity: 0.5;
 }
 
-#customer-support > div:hover {
+#customer > div:hover {
   opacity: 0.75;
   cursor: pointer;
 }
 
-#customer-support > div:active {
+#customer > div:active {
   opacity: 1;
   cursor: pointer;
 }
 
-#customer-support > p {
+#customer > p {
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
   white-space: pre;

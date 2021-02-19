@@ -9,6 +9,8 @@ const io = require('socket.io')(server)
 const morgan = require('morgan'); //HTTP request logger
 const path = require('path');
 const cookieSession = require('cookie-session');
+const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc')
+const cookieParser = require('cookie-parser')
 
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
@@ -104,3 +106,20 @@ app.get("/test", (req,res) => {
 server.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)
 })
+
+
+// stripe
+// Token is created using Stripe Checkout or Elements!
+// Get the payment token ID submitted by the form:
+
+// const customer = await stripe.customers.create({
+//   email: 'customer@example.com',
+//   source: request.body.stripeToken,
+// });
+
+// const charge = await stripe.charges.create({
+//   customer: customer.id,
+//   description: 'Custom t-shirt',
+//   amount: order.amount,
+//   currency: 'usd',
+// });

@@ -1,0 +1,87 @@
+/* Added style for store page cards */
+.single-product .description {
+  display: flex;
+  flex-direction: column;
+}
+
+.single-product .product-card-buttons {
+  display:flex;
+  justify-content: space-around;
+  margin-top: 2px;
+}
+
+#checkout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 1em;
+  margin-left: 5px;
+}
+#checkout p {
+  align-self: center;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+#checkout i {
+  opacity: 0.5;
+  color: darkgreen;
+}
+
+#checkout > #checkout-cart:hover {
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+#checkout > #checkout-cart:active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+/* Style for Product Details */
+
+#product-container {
+  /* border: 2px solid red; */
+  display: flex;
+  align-items: top;
+  margin-top: 2em;
+}
+
+#product-container .thumbnail{
+  /* border: 2px solid blue; */
+  width: 300px;
+  height: 300px;
+  margin: 2px;
+}
+
+#product-container #product-des {
+  /* border: 2px solid green; */
+  margin: 2px;
+  padding: 1em;
+  width: 500px
+}
+
+#product-des h2 {
+  font-size:2em;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#product-container #product-price {
+  /* border: 2px solid yellow */
+  margin-top: 2em;
+}
+
+#product-buttons button{
+  margin: 1em;
+  
+}
+
+/* for the closed sign */
+#products #closedImg {
+  width: 70%;
+  height: 70%;
+  margin-right: 15%;
+  margin-top: 5%;
+  
+}
