@@ -365,9 +365,9 @@ class Store extends Phaser.Scene {
           `)
         $('tbody').append(checkOutList(cart))
         $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
-        $('form').submit(function(event) {
-          event.preventDefault();
-        })
+        // $('form').submit(function(event) {
+        //   event.preventDefault();
+        // })
         // add remove function
         for (let product of cart) {
           $(`#remove-cart${cart.indexOf(product)}`).on("click", () => {
