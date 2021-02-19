@@ -377,6 +377,105 @@ class Store extends Phaser.Scene {
             $("#checkout").click() //need to replace
           })
         }
+        // checkout button function
+        $('#checkout-button').on('click', () => {
+
+          console.log('checkout button hit!')
+          console.log(this.playerInfo.id)
+          const data = {
+            user_id: this.playerInfo.id,
+            store_id: this.storeId,
+            total_price: total,
+            cart: cart
+          }
+          //  -----------------------------------
+          // COMPLETE ORDER AND RENDER CONFIMRATION PAGE
+          $.ajax(`/users/${this.playerInfo.id}/orders`, {method: 'POST', data: { data: data}})
+          .then((order) => {
+            if(order) { // sucessful and returns the order
+              console.log('ajax for checkout called')
+              console.log(order)
+              //  FINALLY !!!! order received back as obj
+              const orderItems = cart;
+              // empty cart
+              cart = [];
+              $('#checkout-cart-count').html(cart.length)
+              // rerender with order details
+              $('#checkout-table').remove()
+              $('#products').append(`
+                <div id="checkout-table">
+                  <h1>Order Confirmation</h1>
+                  <p style="font-size: medium"> Hello ${this.playerInfo.name}. Thank you for your purchase!<p>
+                  <p style="font-size: medium"> Your Order Number is <b> ${order.order.id}.</b>
+                  <br>
+                    <table class="table table-bordered">
+                      <thead class="table-dark">
+                        <tr id="line-item-row">
+                          <td style="width: 50px; height:50px;"></td>
+                          <td>Name</td>
+                          <td>Description</td>
+                          <td>Price</td>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  <div id="proceed">
+                    <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+                    <button id='exit-button' class='btn btn-outline-danger'> Exit </button>
+                  </div>
+                </div>
+              `)
+              $('tbody').append(orderList(orderItems))
+              $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
+
+              // add exit function for order confirmation page
+              $("#exit-button").on("click", () => {
+                $("canvas").prev().children().remove() //remove the added dom
+                this.scene.start('Game', this.playerInfo);
+
+              })
+              
+              // // add back function for order confimration page
+              $("#back-button").on("click", () => {
+                let storeID = this.storeId
+                let storeLoadCount = 0
+          
+                // turn the checkout button on
+                $('#checkout').css("visibility", "visible");
+                // remove the product-container and rebuild the products grid
+                $("#checkout-table").remove()
+                $("#products").html("<div id='products-grid'></div>")
+                $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
+                $("table").append(addMoreItem(storeProducts))
+                for (let product of storeProducts) {
+                  $(`#add-to-cart${product.id}`).on('click', function () {
+                    addToCart(product)
+                  })
+                }
+                // to load more products
+                $("#request-data").on("click", () => { //wait for helper
+                  // console.log('storecount to load more after viewing one product')
+                  storeLoadCount++;
+                  // console.log(storeLoadCount)
+                  $.ajax(`/stores/${storeID}/${storeLoadCount}`, {method: 'GET'})//use ajax to handle request to the server
+                    .then(function (result) {
+                      $("table").append(addMoreItem(result))
+                      for (let product of result) {
+                        $(`#add-to-cart${product.id}`).on('click', function () {
+                          addToCart(product)
+                        })
+                      }
+                    })
+                
+              })
+              })
+              // if order was not processed
+            } else {
+              res.json('Oops! something went wrong?')
+            }
+              })
+          }) // end of the checkout function 
+        
       } else {
         $('#products').append(`
           <div id="checkout-table">
