@@ -40,8 +40,12 @@
 #proceed {
   display: flex;
   justify-content: space-around;
+  height: 40px;
 }
 
+#checkout-button {
+  margin-top: 5px;
+}
 
 #order-total {
   font-weight: bold;

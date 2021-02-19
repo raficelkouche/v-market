@@ -29,14 +29,18 @@ app.get('/', (req, res) => {
 // stripe
 // Token is created using Stripe Checkout or Elements!
 // Get the payment token ID submitted by the form:
-const token = request.body.stripeToken; // Using Express
 
-const charge = await stripe.charges.create({
-  amount: 999,
-  currency: 'usd',
-  description: 'Example charge',
-  source: token,
-});
+// const customer = await stripe.customers.create({
+//   email: 'customer@example.com',
+//   source: request.body.stripeToken,
+// });
+
+// const charge = await stripe.charges.create({
+//   customer: customer.id,
+//   description: 'Custom t-shirt',
+//   amount: order.amount,
+//   currency: 'usd',
+// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)

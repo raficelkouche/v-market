@@ -425,7 +425,17 @@ class Game extends Phaser.Scene {
               </table>
               <div id="proceed">
                 <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
-                <button id="checkout-button" class="btn btn-primary"><i class="far fa-credit-card"></i> Proceed</button>
+                <form id="checkout-button">
+                <script
+                  src="https://checkout.stripe.com/checkout.js"
+                  class="stripe-button"
+                  data-key="pk_test_TYooMQauvdEDq54NiTphI7jx"
+                  data-name="V-Market"
+                  data-description="Purchase for ${this.storeName._text}"
+                  data-amount="{${total}}"
+                  data-currency="usd">
+                </script>
+              </form>
               </div>
             </div>
             <script type="text/javascript">
@@ -434,102 +444,12 @@ class Game extends Phaser.Scene {
             `)
           $('tbody').append(checkOutList(cart))
           $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
-          
+          $('form').submit(function(event) {
+            event.preventDefault();
+          })
           // checkout button function
           $('#checkout-button').on('click', () => {
-            const stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
-            const elements = stripe.elements({
-              fonts: [
-                {
-                  cssSrc: 'https://fonts.googleapis.com/css?family=Roboto',
-                },
-              ],
-              // Stripe's examples are localized to specific languages, but if
-              // you wish to have Elements automatically detect your user's locale,
-              // use `locale: 'auto'` instead.
-              locale: window.__exampleLocale
-            });
-            $('#products').append(`
-              <div>
-                <form action="/charge" method="post" id="payment-form">
-                <div class="form-row">
-                  <label for="card-element">
-                    Credit or debit card
-                  </label>
-                  <div id="card-element">
-                    <!-- A Stripe Element will be inserted here. -->
-                  </div>
-              
-                  <!-- Used to display Element errors. -->
-                  <div id="card-errors" role="alert"></div>
-                </div>
-              
-                <button>Submit Payment</button>
-              </form>
-              </div>
-              `)
-              // Custom styling can be passed to options when creating an Element.
-              const style = {
-                  iconStyle: 'solid',
-                  style: {
-                    base: {
-                      iconColor: '#c4f0ff',
-                      color: '#fff',
-                      fontWeight: 500,
-                      fontFamily: 'Roboto, Open Sans, Segoe UI, sans-serif',
-                      fontSize: '16px',
-                      fontSmoothing: 'antialiased',
-              
-                      ':-webkit-autofill': {
-                        color: '#fce883',
-                      },
-                      '::placeholder': {
-                        color: '#87BBFD',
-                      },
-                    },
-                    invalid: {
-                      iconColor: '#FFC7EE',
-                      color: '#FFC7EE',
-                    },
-                  },
-                }
-
-              // Create an instance of the card Element.
-              const card = elements.create('card', {style});
-
-              // Add an instance of the card Element into the `card-element` <div>.
-              card.mount('#card-element');
-              // Create a token or display an error when the form is submitted.
-              const form = document.getElementById('payment-form');
-              form.addEventListener('submit', async (event) => {
-                event.preventDefault();
-
-                const {token, error} = await stripe.createToken(card);
-
-                if (error) {
-                  // Inform the customer that there was an error.
-                  const errorElement = document.getElementById('card-errors');
-                  errorElement.textContent = error.message;
-                } else {
-                  // Send the token to your server.
-                  stripeTokenHandler(token);
-                }
-              });
-
-              const stripeTokenHandler = (token) => {
-                // Insert the token ID into the form so it gets submitted to the server
-                const form = document.getElementById('payment-form');
-                const hiddenInput = document.createElement('input');
-                hiddenInput.setAttribute('type', 'hidden');
-                hiddenInput.setAttribute('name', 'stripeToken');
-                hiddenInput.setAttribute('value', token.id);
-                form.appendChild(hiddenInput);
-              
-                // Submit the form
-                form.submit();
-              }
-
-            // });
+          
             console.log('checkout button hit!')
             console.log(this.playerInfo.id)
             const data = {
