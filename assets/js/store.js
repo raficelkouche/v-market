@@ -12,7 +12,6 @@ class Store extends Phaser.Scene {
   init(data)
   {
     //pass var from login scence
-    console.log(data)
     this.playerInfo = {
       name: data.name.replace(/%20/g, " ").trim(), 
       guest: data.guest || false,
@@ -226,6 +225,8 @@ class Store extends Phaser.Scene {
 
     //if this is init loading
     if(this.initload) {
+      this.initload = false;
+      console.log('a')
       $.ajax(`/stores/${storeID}/${storeLoadCount}`, {method: 'GET'})//load init 4 items
       .then(function (result) {
         console.log(result)
@@ -252,7 +253,6 @@ class Store extends Phaser.Scene {
         }
       });
       storeLoadCount ++;
-      this.initload = false;
     }
 
     //if click load more item

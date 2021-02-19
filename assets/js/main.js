@@ -23,6 +23,10 @@ const config = {
       debug: false
     }
   },
+  fps: {
+    target: 30,
+    forceSetTimeOut: true
+  },
   scene: [Login, Register, Game, Store]
 };
 

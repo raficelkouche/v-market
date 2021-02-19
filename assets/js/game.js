@@ -23,13 +23,17 @@ class Game extends Phaser.Scene {
 
   static player = Phaser.Physics.Arcade.Sprite;
   static playerName;
+  static playerNameBox;
+  static enterStore; //to prevent scence change fire more then once
   static overlap = true;
   static inshop = false;
   static storeExistThisMap;
+  static storeNameThisMap;
   static storeId;
   static storeLoadCount;
   static storeName;
   static helperMsg;
+  static gra;
 
   preload() {
     //load all texture
@@ -37,15 +41,19 @@ class Game extends Phaser.Scene {
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.key = this.input.keyboard.addKeys("W, A, S, D, X") //WASD to move, M to toggle minimap
+    this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, DOWN, SPACE, X") //WASD to move, M to toggle minimap
     this.miniTog = this.input.keyboard.addKeys("M")
     this.storeLoadCount = 0;
     //get all store info
   }
 
   create() {
-    console.log(this.storeInfo)
+    //draw back drop for player name, will refresh
+    this.gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
+    this.gra.alpha= .5;
+
+    this.enterStore = false;
+    this.storeNameThisMap = {};
     let storeExist = {};
     this.storeExistThisMap = {};
     // get all store info to a more easy handle data type
@@ -68,15 +76,30 @@ class Game extends Phaser.Scene {
       a.name = area.properties[0].value //add store_id as name to do ajax call, 
       //please note, this store_id must be set as first custom_property in tile
       //overlap cb does not seems to return id for some reason, so use name
+
       if (storeExist[a.name]) {
         this.storeExistThisMap[a.name] = storeExist[a.name]; // only get store on this map
+        this.storeNameThisMap[a.name] = {[a.name]: undefined};
+        //add Store Name and helper Msg
+        this.storeNameThisMap[a.name].storeName = this.add.text(a.x + 48, a.y - 32*3 , `${this.storeExistThisMap[a.name].name}`, { font: "bold 28px Messiri", fill: "#fff"}).setOrigin(0.5);
+        this.storeNameThisMap[a.name].storeName.setDepth(0);
+        this.storeNameThisMap[a.name].helperMsg = this.helperMsg = this.add.text(a.x + 48, a.y + 16, `Press 'Space'\nto interact`, {font: "bold", align: 'center'} ).setOrigin(0.5);
+        this.storeNameThisMap[a.name].helperMsg.setDepth(0);
+        //make graphic for this store
+        this.storeNameThisMap[a.name].gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
+        this.storeNameThisMap[a.name].gra.alpha= .35; 
+        //Make Backdrop so text is easier to read
+        this.storeNameThisMap[a.name].storeNameBox = new Phaser.Geom.Rectangle(this.storeNameThisMap[a.name].storeName.x - 5 - this.storeNameThisMap[a.name].storeName.width / 2, this.storeNameThisMap[a.name].storeName.y - this.storeNameThisMap[a.name].storeName.height / 2, this.storeNameThisMap[a.name].storeName.width + 10 , this.storeNameThisMap[a.name].storeName.height);
+        this.storeNameThisMap[a.name].helperMsgBox = new Phaser.Geom.Rectangle(this.storeNameThisMap[a.name].helperMsg.x - 5 - this.storeNameThisMap[a.name].helperMsg.width / 2, this.storeNameThisMap[a.name].helperMsg.y - this.storeNameThisMap[a.name].helperMsg.height / 2, this.storeNameThisMap[a.name].helperMsg.width + 10, this.storeNameThisMap[a.name].helperMsg.height);
+        //fill in backdrop, and push it behide the screen
+        this.storeNameThisMap[a.name].gra.fillRectShape(this.storeNameThisMap[a.name].storeNameBox)
+        this.storeNameThisMap[a.name].gra.fillRectShape(this.storeNameThisMap[a.name].helperMsgBox).setDepth(-1)
       }
     });
 
     //physics body needs to refresh
     storeAreaGroup.refresh();
     //console.log(storeAreaGroup.children.entries[0].name) < Example of storeArea's store_id path
-
     //add other layer to overwrite obj layer
     this.tileset = this.map.addTilesetImage('vMarketTiles', 'tile')
     this.groundLayer = this.map.createLayer("Ground", this.tileset, 0, 0)
@@ -131,7 +154,10 @@ class Game extends Phaser.Scene {
     //add player sprite, animation and name
     this.player = this.physics.add.sprite( this.playerInfo.x ||400, this.playerInfo.y || 300, "fm_02")
     this.player.play('idle-d')
-    this.playerName = this.add.text(this.player.x -60, this.player.y+32, `${this.playerInfo.name}`)
+    this.playerName = this.add.text(this.player.x -60, this.player.y+32, this.playerInfo.guest ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
+    this.playerName.setDepth(9);
+    this.playerNameBox = new Phaser.Geom.Rectangle(this.player.x - 3 - this.playerName.width / 2, this.playerName.y - this.playerName.height / 2, this.playerName.width + 6, this.playerName.height);
+    this.gra.setDepth(8);
 
     //add 3 camera, 1st to follow player, mini(2nd) for mini map, and 3rd for background when pause 
     //set camera to size of map, zoom in for better view, then make this follow player
@@ -139,7 +165,7 @@ class Game extends Phaser.Scene {
     this.cameras.main.setZoom(3);
     this.cameras.main.startFollow(this.player, true)
 
-    //make 'mini map' and place to top right, set bound of map, zoom out so it is mini, and set to follow player
+    //make 'mini map' and place to top RIGHT, set bound of map, zoom out so it is mini, and set to follow player
     this.miniCam = this.cameras.add(1030, 0, 250, 250);
     this.miniCam.setBounds(0, 0, 1920, 1920)
     this.miniCam.zoom = 0.35;
@@ -148,29 +174,15 @@ class Game extends Phaser.Scene {
     //add overlapArea detect
     this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
       this.storeId = y.name;
-      /*
-      check if the store exist, if do and name have not been display, add name and interactible msg on screen, and trigger display so it will only run once.
-      if for some reason, player is still overlap, but name disspear, add it back.
-      */
-      if (this.storeExistThisMap[this.storeId] && !this.storeExistThisMap[this.storeId].display) {
-        this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: "bold 28px Messiri", fill: "#fff"});
-        this.helperMsg = this.add.text(y.x -32, y.y, `Space to interact`);
-        this.storeExistThisMap[this.storeId].display = true;
-      } else if (this.storeExistThisMap[this.storeId] && !this.storeName) {
-        this.storeName = this.add.text(y.x, y.y - 32*3 , `${this.storeExistThisMap[this.storeId].name}`, { font: "bold 28px Messiri", fill: "#fff" });
-        this.helperMsg = this.add.text(y.x -32, y.y, `Space to interact`);
-        this.add.text(y.x -32, y.y, `Space to interact`);
-      } 
-      if (this.cursors.space.isDown) {
-        this.playerInfo.store_id = this.storeId;
-        this.playerInfo.x = this.player.x;
-        this.playerInfo.y = this.player.y;
-        this.playerInfo.storeInfo = this.storeInfo;
-        this.storeName
-          ? this.playerInfo.storeName = this.storeName._text
-          : this.playerInfo.storeName = null;
-        this.scene.start('store', this.playerInfo);
+
+      //if store exist, show it name by putting the name in the front layer
+      if (this.storeExistThisMap[this.storeId] && !this.storeName) { 
+        this.storeName = `${this.storeExistThisMap[this.storeId].name}`
+        this.storeNameThisMap[this.storeId].storeName.setDepth(4)
+        this.storeNameThisMap[this.storeId].helperMsg.setDepth(4);
+        this.storeNameThisMap[this.storeId].gra.setDepth(3)
       }
+
       this.overlap = true;
     }, undefined, this); //check overlap with store area, change overlap to true
 
@@ -183,14 +195,6 @@ class Game extends Phaser.Scene {
     this.physics.world.bounds.height = this.map.heightInPixels;
     this.player.body.setCollideWorldBounds(true); 
     
-    //move from update so it does not check every ticks
-    if (!this.overlap && this.storeName) {
-      for (const x of Object.keys(this.storeExistThisMap)) {
-        if (this.storeExistThisMap[x].name === this.storeName._text) this.storeExistThisMap[x].display = false;
-      }
-      this.storeName.destroy();
-      this.helperMsg.destroy();
-    }
     // toggle mini map
     this.input.keyboard.on('keydown', function (event) {
       if(event.key === 'm') {
@@ -200,31 +204,44 @@ class Game extends Phaser.Scene {
   }
   
   update() {
+    //take player into store if space is press when overlap
+    if (this.key.SPACE.isDown && !this.enterStore) {
+      this.enterStore = true; //prevent event fire twice
+      this.playerInfo.store_id = this.storeId;
+      this.playerInfo.x = this.player.x;
+      this.playerInfo.y = this.player.y;
+      this.playerInfo.storeInfo = this.storeInfo;
+      this.storeName
+        ? this.playerInfo.storeName = this.storeName
+        : this.playerInfo.storeName = null;
+      this.scene.start('store', this.playerInfo);
+    }
+
     this.player.setVelocity(0);
     //update player movement
-    if (this.cursors.left.isDown || this.key.A.isDown) {
-      this.player.setVelocityX(-200);
+    if (this.key.LEFT.isDown || this.key.A.isDown) {
+      this.player.setVelocityX(-150);
       if (this.player.anims.currentAnim.key === 'walk-l') { }
-      else if (this.cursors.up.isDown || this.cursors.down.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
+      else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
         this.player.play('walk-l')
       }
     }
-    else if (this.cursors.right.isDown || this.key.D.isDown) {
-      this.player.setVelocityX(200);
+    else if (this.key.RIGHT.isDown || this.key.D.isDown) {
+      this.player.setVelocityX(150);
       if (this.player.anims.currentAnim.key === 'walk-r') { }
-      else if (this.cursors.up.isDown || this.cursors.down.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
+      else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
         this.player.play('walk-r')
       }
     }
-    if (this.cursors.up.isDown || this.key.W.isDown) {
-      this.player.setVelocityY(-200);
+    if (this.key.UP.isDown || this.key.W.isDown) {
+      this.player.setVelocityY(-150);
       if (this.player.anims.currentAnim.key === 'walk-u') { }
       else {
         this.player.play('walk-u')
       }
     }
-    else if (this.cursors.down.isDown || this.key.S.isDown) {
-      this.player.setVelocityY(200);
+    else if (this.key.DOWN.isDown || this.key.S.isDown) {
+      this.player.setVelocityY(150);
       if (this.player.anims.currentAnim.key === 'walk-d') { }
       else {
         this.player.play('walk-d')
@@ -232,26 +249,31 @@ class Game extends Phaser.Scene {
     }
 
     //if player does not move, play idle anime
-    if (!this.cursors.down.isDown && !this.cursors.up.isDown && !this.cursors.right.isDown && !this.cursors.left.isDown && !this.key.W.isDown && !this.key.A.isDown && !this.key.S.isDown && !this.key.D.isDown) {
+    if (!this.key.DOWN.isDown && !this.key.UP.isDown && !this.key.RIGHT.isDown && !this.key.LEFT.isDown && !this.key.W.isDown && !this.key.A.isDown && !this.key.S.isDown && !this.key.D.isDown) {
       if (!this.player.anims.currentAnim.key.includes('idle')) {
         let newAnim = this.player.anims.currentAnim.key.split('-')
         this.player.play("idle-" + newAnim[1])
       }
     }
 
-    //if player left the interactive area, remove shop name and interactible msg
+    //if player LEFT the interactive area, remove shop name and interactible msg
+    
     if (!this.overlap && this.storeName) {
-      for (const x of Object.keys(this.storeExistThisMap)) {
-        if (this.storeExistThisMap[x].name === this.storeName._text) this.storeExistThisMap[x].display = false;
-      }
-      this.storeName.destroy();
-      this.helperMsg.destroy();
-    }
+      this.storeName = null;
+      this.storeNameThisMap[this.storeId].storeName.setDepth(-1);
 
+      this.storeNameThisMap[this.storeId].helperMsg.setDepth(-1);
+      this.storeNameThisMap[this.storeId].gra.setDepth(-1);
+    }
+    
     //update player name's place
-    this.playerName.x = this.player.x-20;  
-    this.playerName.y = this.player.y+20;
+    this.playerName.x = this.player.x;  
+    this.playerName.y = this.playerInfo.guest ? this.player.y + 34 : this.player.y + 28; 
+    this.playerNameBox.x = this.playerName.x - 3 - this.playerName.width / 2
+    this.playerNameBox.y = this.playerName.y - this.playerName.height / 2
     this.overlap = false; //update overlap check
+    this.gra.clear() //redraw the backdrop on name
+    this.gra.fillRectShape(this.playerNameBox);
   }
 }
 
