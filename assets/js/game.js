@@ -12,9 +12,12 @@ class Game extends Phaser.Scene {
   {
     //pass var from login scence
     this.playerInfo = {
-      name: data.name.replace(/%20/g, " ").trim(), 
-      guest: data.guest || false,
-      id: data.user_id,
+      //name: data.name.replace(/%20/g, " ").trim(), 
+      //guest: data.guest || false,
+      //id: data.user_id,
+      name: sessionStorage.getItem("IGN"),
+      guest: false,
+      id: sessionStorage.getItem("user_id"),
       x: data.x || undefined,
       y: data.y || undefined
     }
@@ -24,46 +27,102 @@ class Game extends Phaser.Scene {
   static player = Phaser.Physics.Arcade.Sprite;
   static playerName;
   static playerNameBox;
-  static enterStore; //to prevent scence change fire more then once
   static overlap = true;
   static inshop = false;
+  static enterStore; //to prevent scence change fire more then once
+  static storeInfo = [];
   static storeExistThisMap;
-  static storeNameThisMap;
   static storeId;
-  static storeLoadCount;
+  static storeLoadCount
+  static storeNameThisMap;
   static storeName;
   static helperMsg;
+  static user_id;
+  static username;
   static gra;
 
   preload() {
     //load all texture
+    console.log("store info", this.storeInfo)
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
+    this.load.audio('background', 'audio/TownTheme.mp3')
     this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, SPACE, DOWN, X, M") //WASD to move, M to toggle minimap
     this.storeLoadCount = 0;
-    //disable key cap on all element so it would not steal the focus
+    //have to make the ajax call here since after checkout we come back to Game scene but it doesn't have the data from the login
+    /* $.ajax(`/stores`, { method: 'GET' })
+      .then((res) => {
+        this.storeInfo = Array.from(res)
+      }) */
   }
 
   create() {
-    /*
-    $('canvas').on('blur', () => {
-      console.log('brrrrrrrrr')
+    
+    this.username = sessionStorage.getItem("IGN")
+    this.user_id = sessionStorage.getItem("user_id");
+
+    const socket = io('http://localhost:3000', {
+      query: {
+        user_id: this.user_id,
+        username: this.username
+      }
     })
-    this.game.events.addListener(Phaser.Core.Events.FOCUS, (() => {
-      console.log('on')
-      for (const k of Object.keys(this.key)){
-        this.key[k].enabled = true
+    
+    let activeUser;
+    
+    $("#chat-side-bar form").on('submit', (event) => {
+      event.preventDefault();
+      let message = $('#chat-message').val()
+      if ($('#chat-message').val() && activeUser) {
+        $('#messages').append(`<li>${this.username}: ${message}</li`)
+        socket.emit('send message', {
+          recipient: activeUser,
+          message
+        })
+        $('#chat-message').val('')
+      } else {
+        alert("select a user first and then type your message")
       }
-    }), this);
-    this.game.events.on('blur', () => {
-      console.log('off')
-      for (const k of Object.keys(this.key)){
-        this.key[k].enabled = false
-      }
-    }, this)
-    */
+    })
+    
+    socket.on('updated-friends-list', usersList => {
+      console.log("users List: ", usersList)
+      Object.keys(usersList).forEach((user_id) => {
+        if (!document.getElementById(user_id) && user_id !== this.user_id) {
+          $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
+          $("#friends-list li").on("click", function (event) {
+            $("#friends-list ul").children().css("color", "black")
+            $(this).css("color", "red")
+            activeUser = event.target.id
+          })
+        }
+      })
+    });
+
+    socket.on('receive message', data => {
+      $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
+    })
+    
+    socket.on('delete user', user_id => {
+      console.log("delete: ", user_id)
+      $(`#${user_id}`).remove()
+    })
+
+    /* socket.on('all players', playersList => {
+      Object.keys(playersList).forEach((player) => {
+        if(player !== this.user_id) {
+          this.addOtherPlayers(playersList[player])
+        } else {
+          this.createPlayer(playersList[player])
+        }
+      })
+    })
+  */
+    
+      
+   //disable key cap on all element so it would not steal the focus
     this.input.on('pointerdownoutside', () => {
       this.input.keyboard.disableGlobalCapture();
       for (const k of Object.keys(this.key)) {
@@ -193,9 +252,10 @@ class Game extends Phaser.Scene {
 
     //add 3 camera, 1st to follow player, mini(2nd) for mini map, and 3rd for background when pause 
     //set camera to size of map, zoom in for better view, then make this follow player
-    this.cameras.main.setBounds(0, 0, 1920, 1920);
+   /*  this.cameras.main.setBounds(0, 0, 1920, 1920);
     this.cameras.main.setZoom(3);
-    this.cameras.main.startFollow(this.player, true)
+    this.cameras.main.startFollow(this.player, true) */
+    this.updateCamera()
 
     //make 'mini map' and place to top RIGHT, set bound of map, zoom out so it is mini, and set to follow player
     this.miniCam = this.cameras.add(1030, 0, 250, 250);
@@ -234,9 +294,9 @@ class Game extends Phaser.Scene {
       }
     }, this);
   }
-  
-  update() {
 
+  update() {
+    
     //take player into store if space is press when overlap
     if (this.overlap && this.key.SPACE.isDown && !this.enterStore) {
       this.enterStore = true; //prevent event fire twice
@@ -308,6 +368,22 @@ class Game extends Phaser.Scene {
     this.gra.clear() //redraw the backdrop on name
     this.gra.fillRectShape(this.playerNameBox);
   }
+  
+  createPlayer(playerInfo) {
+    this.player = this.physics.add.sprite(0, 0, "fm_02")
+    this.container = this.add.container(playerInfo.x, playerInfo.y);
+    this.container.setSize(32,32);
+    this.physics.world.enable(this.container)
+    this.updateCamera();
+    this.container.body.setCollideWorldBounds(true);
+  }
+
+  updateCamera(){
+    this.cameras.main.setBounds(0, 0, 1920, 1920);
+    this.cameras.main.setZoom(2);
+    this.cameras.main.startFollow(this.player, true)
+  }
+
 }
 
 export { Game }

@@ -3,17 +3,40 @@ class Login extends Phaser.Scene {
     super('Login')
   }
 
+  static storeInfo;
+
+  init() {
+
+    
+  }
   preload() {
+    
     this.load.html('loginForm', 'templates/login.html')
     this.load.image('background', 'maps/farmersMarket.jpeg')
+    //this will be used if page gets refreshed since we will start from login 
+    $.ajax(`/stores`, { method: 'GET' })
+      .then((res) => {
+        this.storeInfo = Array.from(res)
+      })
+    
   }
 
   create() {
+    
+    //check if a user is already logged in
+    $.ajax({
+      method: 'GET',
+      url: '/users/login'
+    }).then(res => {
+      if (res.user_ID) {
+        this.scene.start('Game', {storeInfo: this.storeInfo})
+      }else{
+        this.add.image(140, 0, 'background').setOrigin(0).setDepth(0);
+        const form = this.add.dom(640, 480).createFromCache('loginForm')
+      }
+    }).catch(err => console.log(err))
 
-    this.add.image(140,0,'background').setOrigin(0).setDepth(0);
-    const form = this.add.dom(640,480).createFromCache('loginForm')
-
-  }
+}
 
   update(){
 
@@ -79,10 +102,14 @@ class Login extends Phaser.Scene {
               //add animation for box appear if have time
               $(`#loginInsert`).append(err);
             } else { //let user in game
+              //store user information in the session
+              sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
+              sessionStorage.setItem("user_id", res.user_id)
+              sessionStorage.setItem("guest", res.guest || false)
+              //ajax call to get the store information before switching scenes
               $.ajax(`/stores`, {method: 'GET'})
               .then((result) => {
                 res.storeInfo = Array.from(result)
-  
                 this.scene.start('Game' , res);
               })
             }
@@ -90,6 +117,8 @@ class Login extends Phaser.Scene {
         }
     })
   }
+
 }
 
 export { Login }
+
