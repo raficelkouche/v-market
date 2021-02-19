@@ -12,9 +12,12 @@ class Game extends Phaser.Scene {
   {
     //pass var from login scence
     this.playerInfo = {
-      name: data.name.replace(/%20/g, " ").trim(), 
-      guest: data.guest || false,
-      id: data.user_id,
+      //name: data.name.replace(/%20/g, " ").trim(), 
+      //guest: data.guest || false,
+      //id: data.user_id,
+      name: sessionStorage.getItem("IGN"),
+      guest: false,
+      id: sessionStorage.getItem("user_id"),
       x: data.x || undefined,
       y: data.y || undefined
     }
@@ -40,27 +43,36 @@ class Game extends Phaser.Scene {
 
   preload() {
     //load all texture
+    console.log("store info", this.storeInfo)
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
+    this.load.audio('background', 'audio/TownTheme.mp3')
     this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, SPACE, DOWN, X, M") //WASD to move, M to toggle minimap
     this.storeLoadCount = 0;
-  
-  
+    //have to make the ajax call here since after checkout we come back to Game scene but it doesn't have the data from the login
+    /* $.ajax(`/stores`, { method: 'GET' })
+      .then((res) => {
+        this.storeInfo = Array.from(res)
+      }) */
   }
 
   create() {
+    const music = this.sound.add('background', {loop: true})
+    
+    music.play()
+
     this.username = sessionStorage.getItem("IGN")
     this.user_id = sessionStorage.getItem("user_id");
 
-    const socket = io('192.168.0.12:3000', {
+    const socket = io('http://localhost:3000', {
       query: {
         user_id: this.user_id,
         username: this.username
       }
     })
-
+    
     let activeUser;
     
     $("#chat-side-bar form").on('submit', (event) => {
@@ -77,17 +89,16 @@ class Game extends Phaser.Scene {
         alert("select a user first and then type your message")
       }
     })
-
+    
     socket.on('updated-friends-list', usersList => {
       console.log("users List: ", usersList)
       Object.keys(usersList).forEach((user_id) => {
-        if (!document.getElementById(user_id)) {
+        if (!document.getElementById(user_id) && user_id !== this.user_id) {
           $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
           $("#friends-list li").on("click", function (event) {
             $("#friends-list ul").children().css("color", "black")
             $(this).css("color", "red")
             activeUser = event.target.id
-            console.log(activeUser)
           })
         }
       })
@@ -112,6 +123,7 @@ class Game extends Phaser.Scene {
       })
     })
   */
+    
       
    //disable key cap on all element so it would not steal the focus
     this.input.on('pointerdownoutside', () => {

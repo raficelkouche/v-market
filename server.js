@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
 //chat testing routes and logic
 const activeConnections = {};
 
-
+let count = 1;
 io.on('connection', (socket) => {
   const userInfo = {
     ...socket.handshake.query, 
@@ -45,13 +45,14 @@ io.on('connection', (socket) => {
   }
 
   let my_user_id = userInfo.user_id
-  
+  console.log("my user id is: ", my_user_id)
   socket.join(my_user_id) //this is the client's id
-  
+  console.log("join count: ", count++)
   /* const existingConnection = activeConnections.find( 
     connection => connection.user_id === userInfo.user_id
     ) */
   //if current user is not in the array, emit the updated users list excluding that user
+  console.log("activeConnections: ", activeConnections)
   if (!activeConnections[my_user_id]) {            
     activeConnections[my_user_id] = userInfo
   }
@@ -123,3 +124,4 @@ server.listen(PORT, () => {
 //   amount: order.amount,
 //   currency: 'usd',
 // });
+

@@ -85,8 +85,6 @@ const orderNew = function(order) { //make new user
   // const { user_id, store_id, total_price, cart} = data
   // get user id make a new order with store id
   // using the order id make line items with order id, product id
-  console.log('order info from post request')
-  console.log(order)
   // make the order -> use order id
   return pool.query(`
   INSERT INTO orders (store_id, user_id, total_price) 
@@ -94,8 +92,6 @@ const orderNew = function(order) { //make new user
   returning *;
   `, [order.store_id, order.user_id, order.total_price])
   .then(res => {
-    console.log('this the result from adding order to db')
-    console.log(res.rows[0])
     const newOrder = res.rows[0]
 
     // should give back order id

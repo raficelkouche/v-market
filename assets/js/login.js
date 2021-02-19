@@ -3,6 +3,8 @@ class Login extends Phaser.Scene {
     super('Login')
   }
 
+  static storeInfo;
+
   init() {
 
     
@@ -11,6 +13,11 @@ class Login extends Phaser.Scene {
     
     this.load.html('loginForm', 'templates/login.html')
     this.load.image('background', 'maps/farmersMarket.jpeg')
+    //this will be used if page gets refreshed since we will start from login 
+    $.ajax(`/stores`, { method: 'GET' })
+      .then((res) => {
+        this.storeInfo = Array.from(res)
+      })
     
   }
 
@@ -22,7 +29,7 @@ class Login extends Phaser.Scene {
       url: '/users/login'
     }).then(res => {
       if (res.user_ID) {
-        this.scene.start('Game')
+        this.scene.start('Game', {storeInfo: this.storeInfo})
       }else{
         this.add.image(140, 0, 'background').setOrigin(0).setDepth(0);
         const form = this.add.dom(640, 480).createFromCache('loginForm')

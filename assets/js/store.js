@@ -3,17 +3,15 @@ class Store extends Phaser.Scene {
     super('store');
   }
 
-  store ()
-  {
+  store() {
     //call on login/register scence to get data
     Phaser.Scene.call(this, { key: 'game' });
   }
 
-  init(data)
-  {
+  init(data) {
     //pass var from login scence
     this.playerInfo = {
-      name: data.name.replace(/%20/g, " ").trim(), 
+      name: data.name.replace(/%20/g, " ").trim(),
       guest: data.guest || false,
       id: data.user_id,
       x: data.x,
@@ -44,7 +42,7 @@ class Store extends Phaser.Scene {
     let storeID = this.storeId;
 
     //addMoreItem, to run a html for Jquery to add
-    const addMoreItem = function(result, reload = false) {
+    const addMoreItem = function (result, reload = false) {
       let outOfItem = `<p>There is no more listing from this vendor at the moment...</p>
       <p>Thanks for your support!</p>`;
       let pendingHTML = `<tr>`;
@@ -57,7 +55,7 @@ class Store extends Phaser.Scene {
       if (!reload) { //if not call from product detail back
         storeProducts = storeProducts.concat(result);
         for (let i = 0; i < 4; i++) {
-          if(result[i]) { // assign product_id to td as value for later calling 
+          if (result[i]) { // assign product_id to td as value for later calling 
             pendingHTML += `
             <td class="single-product" value=${result[i].id}>
               <img class="thumbnail" src="${result[i].thumbnail};"/>
@@ -74,14 +72,14 @@ class Store extends Phaser.Scene {
                 </div>
               </div>
             </td>`
-          } else { 
+          } else {
             pendingHTML += `<td></td>`;
-            if ($("#request-data")){
+            if ($("#request-data")) {
               endOfStore = true;
               $("#request-data").parent().html(outOfItem);
             }
           }
-        }      
+        }
       } else { //if reloading from product detail
         $('table').append(`
         <colgroup>
@@ -91,22 +89,22 @@ class Store extends Phaser.Scene {
           <col class="product">
           <col class="product">
         </colgroup>`);
-        for(let x = 0; x < result.length / 4; x++) { //push item out 4 per line
+        for (let x = 0; x < result.length / 4; x++) { //push item out 4 per line
           for (let i = 0; i < 4; i++) {
-            if(result[i + x*4]) {
+            if (result[i + x * 4]) {
               pendingHTML += `
-              <td class="single-product" value=${result[i + x*4].id}>
-                <img class="thumbnail" src="${result[i + x*4].thumbnail};"/>
+              <td class="single-product" value=${result[i + x * 4].id}>
+                <img class="thumbnail" src="${result[i + x * 4].thumbnail};"/>
                 <div class="description">
                   <div class="product-name">
-                    ${result[i + x*4].name}
+                    ${result[i + x * 4].name}
                   </div>
                   <div class="price">
-                    $${result[i + x*4].price}
+                    $${result[i + x * 4].price}
                   </div>
                   <div class="product-card-buttons">
-                    <button id="add-to-cart${result[i + x*4].id}" class='btn btn-outline-success' onclick="event.stopPropagation(); console.log('add cart to ${result[i + x*4].name}')"> <i class="fas fa-cart-plus"></i></button>
-                    <button id="add-to-fave" class='btn btn-outline-info' onclick="event.stopPropagation(); console.log('add fave to ${result[i + x*4].name}')"> <i class="fas fa-star"></i> </button>
+                    <button id="add-to-cart${result[i + x * 4].id}" class='btn btn-outline-success' onclick="event.stopPropagation(); console.log('add cart to ${result[i + x * 4].name}')"> <i class="fas fa-cart-plus"></i></button>
+                    <button id="add-to-fave" class='btn btn-outline-info' onclick="event.stopPropagation(); console.log('add fave to ${result[i + x * 4].name}')"> <i class="fas fa-star"></i> </button>
                   </div>
                 </div>
               </td>`
@@ -116,8 +114,8 @@ class Store extends Phaser.Scene {
             }
           }
           pendingHTML += `</tr>`;
-          $("table").append(pendingHTML); 
-          pendingHTML = `<tr>`;     
+          $("table").append(pendingHTML);
+          pendingHTML = `<tr>`;
         }
         if (endOfStore) {
           $("#request-data").parent().html(outOfItem);
@@ -126,13 +124,13 @@ class Store extends Phaser.Scene {
       return pendingHTML;
     }
 
-    const requestItemData = function() {
-      $.ajax(`/stores/${storeID}/${storeLoadCount}`, {method: 'GET'})//use ajax to handle request to the server
+    const requestItemData = function () {
+      $.ajax(`/stores/${storeID}/${storeLoadCount}`, { method: 'GET' })//use ajax to handle request to the server
         .then(function (result) {
           $("table").append(addMoreItem(result))
           // to be able to add to cart
           for (let product of result) {
-            $(`#add-to-cart${product.id}`).off().on('click', function () { 
+            $(`#add-to-cart${product.id}`).off().on('click', function () {
               addToCart(product)
             })
           }
@@ -140,7 +138,7 @@ class Store extends Phaser.Scene {
       storeLoadCount++;
     }
 
-    const back = function(fromCart = false) {
+    const back = function (fromCart = false) {
       // remove the product-container and rebuild the products grid
       if (fromCart) {
         $('#checkout').css("visibility", "visible");
@@ -157,15 +155,15 @@ class Store extends Phaser.Scene {
       }
     }
 
-    const addToCart = function(product) {
+    const addToCart = function (product) {
       cart.push(product);
       $('#checkout-cart-count').html(cart.length)
     }
 
-    const removeFromCart = function(index) {
+    const removeFromCart = function (index) {
       let newCart = []
-      for(let i = 0; i < cart.length; i++) {
-        if(i !== index) {
+      for (let i = 0; i < cart.length; i++) {
+        if (i !== index) {
           newCart.push(cart[i])
         }
       }
@@ -173,13 +171,13 @@ class Store extends Phaser.Scene {
       $('#checkout-cart-count').html(cart.length)
     }
 
-    const cartTotal = function(cart) {
+    const cartTotal = function (cart) {
       let total = 0;
       cart.forEach(item => total += parseFloat(item.price))
       return total;
     }
 
-    const checkOutList = function(cart) {
+    const checkOutList = function (cart) {
       let pendingHTML = ``;
       for (let product of cart) {
         pendingHTML += `
@@ -195,7 +193,7 @@ class Store extends Phaser.Scene {
       return pendingHTML
     }
 
-    const orderList = function(orderItems) {
+    const orderList = function (orderItems) {
       let pendingHTML = ``;
       for (let product of orderItems) {
         pendingHTML += `
@@ -217,42 +215,40 @@ class Store extends Phaser.Scene {
     this.cityObjLayer = this.map.createLayer("CityObj", this.tileset, 0, 0);
 
     //set cam
-    this.cameras.main.setBounds(320,480,1920,1920);
-    this.add.dom(960,960).createFromCache('store_window'); //place dom in center/
+    this.cameras.main.setBounds(320, 480, 1920, 1920);
+    this.add.dom(960, 960).createFromCache('store_window'); //place dom in center/
     if ($("#customer-support")) {
       $("#backdrop").css('visibility', 'visible');
     }
 
     //if this is init loading
-    if(this.initload) {
+    if (this.initload) {
       this.initload = false;
-      console.log('a')
-      $.ajax(`/stores/${storeID}/${storeLoadCount}`, {method: 'GET'})//load init 4 items
-      .then(function (result) {
-        console.log(result)
-        if (result[0]) { //need to add helper to check if store exist but no product and rewrite
-          // store view 
-          $('table').append(addMoreItem(result))
-          $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
-          $('h1').text(`${result[0].s_name}`);
-          $('h1').css('font-size', '80px')
-          $('h1').css('color', 'white')
-          // to add to cart from the store view -> different data structure from product view
-          for (let product of result) {
-            $(`#add-to-cart${product.id}`).on('click', function () {
-              addToCart(product)
-            })
+      $.ajax(`/stores/${storeID}/${storeLoadCount}`, { method: 'GET' })//load init 4 items
+        .then(function (result) {
+          if (result[0]) { //need to add helper to check if store exist but no product and rewrite
+            // store view 
+            $('table').append(addMoreItem(result))
+            $('#store_banner').css('background-image', `url(${result[0].banner_img})`)
+            $('h1').text(`${result[0].s_name}`);
+            $('h1').css('font-size', '80px')
+            $('h1').css('color', 'white')
+            // to add to cart from the store view -> different data structure from product view
+            for (let product of result) {
+              $(`#add-to-cart${product.id}`).on('click', function () {
+                addToCart(product)
+              })
+            }
+          } else {
+            $('#checkout').css("visibility", "hidden");
+            $('#customer').remove();
+            $("#request-data").parent().html('');
+            $('#products').append('<img id="closedImg" src="https://images-na.ssl-images-amazon.com/images/I/61s6wHsXOqL._AC_SL1000_.jpg"/>')
+            $('h1').text(`Sorry! This store is currently closed. Come back again later.`)
+            $('h1').css(`color`, 'black')
           }
-        } else {
-          $('#checkout').css("visibility", "hidden");
-          $('#customer').remove();
-          $("#request-data").parent().html('');
-          $('#products').append('<img id="closedImg" src="https://images-na.ssl-images-amazon.com/images/I/61s6wHsXOqL._AC_SL1000_.jpg"/>')
-          $('h1').text(`Sorry! This store is currently closed. Come back again later.`)
-          $('h1').css(`color`, 'black')
-        }
-      });
-      storeLoadCount ++;
+        });
+      storeLoadCount++;
     }
 
     //if click load more item
@@ -262,13 +258,13 @@ class Store extends Phaser.Scene {
 
     //take user back to game.js if click top left to close
     $("#close-button").on("click", () => {
-      console.log('close')
+      
       this.scene.start('Game', this.playerInfo);
     })
 
     //customer support button action
     $("#customer-support").on("click", () => { //need to replace
-      console.log('close')
+      
       this.scene.start('Game', this.playerInfo);
     })
 
@@ -276,10 +272,10 @@ class Store extends Phaser.Scene {
       // console.log('after single product')
       // console.log($(x.currentTarget).attr('value'))
       $("#products-grid").remove(); //remove info from products page and start to load detail
-      $.ajax(`/stores/${storeID}/products/${$(x.currentTarget).attr('value')}`, {method: 'GET'})
-      .then(function (result) {
-        // console.log(result)
-        let pendingHTML = `
+      $.ajax(`/stores/${storeID}/products/${$(x.currentTarget).attr('value')}`, { method: 'GET' })
+        .then(function (result) {
+          // console.log(result)
+          let pendingHTML = `
         <div id="product-container">
           <div id='products-img'>
             <img class="thumbnail" src=${result.thumbnail};/>
@@ -300,27 +296,27 @@ class Store extends Phaser.Scene {
           </div>
         </div>
         `;
-        $("#products").html(pendingHTML)
-        // when clicking back to view the store again
-        $("#back-button").on("click", () => {
-          back();
-          $("#request-data").off().on("click", () => { //wait for helper
-            requestItemData(storeID);
+          $("#products").html(pendingHTML)
+          // when clicking back to view the store again
+          $("#back-button").on("click", () => {
+            back();
+            $("#request-data").off().on("click", () => { //wait for helper
+              requestItemData(storeID);
+            })
+            // to load more products
+            // console.log('go back!!')
           })
-          // to load more products
-          // console.log('go back!!')
+          // to add to cart from product view -> diff format from store view
+          $('#add-to-cart').off().on('click', function () {
+            // console.log('add to cart button clicked')
+            addToCart(result)
+          })
+          // console.log(result)
         })
-        // to add to cart from product view -> diff format from store view
-        $('#add-to-cart').off().on('click', function () {
-          // console.log('add to cart button clicked')
-          addToCart(result)
-        })
-        // console.log(result)
-      })
     })
 
-      
-      // view cart
+
+    // view cart
     $("#checkout").off().on("click", () => { //need to replace
       // cart info available - show page
       // console.log(cart)
@@ -365,7 +361,7 @@ class Store extends Phaser.Scene {
           `)
         $('tbody').append(checkOutList(cart))
         $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
-        $('form').submit(function(event) {
+        $('form').submit(function (event) {
           event.preventDefault();
         })
         // add remove function
@@ -377,6 +373,99 @@ class Store extends Phaser.Scene {
             $("#checkout").click() //need to replace
           })
         }
+        // checkout button function
+        $('#checkout-button').on('click', () => {
+          const data = {
+            user_id: this.playerInfo.id,
+            store_id: this.storeId,
+            total_price: total,
+            cart: cart
+          }
+          //  -----------------------------------
+          // COMPLETE ORDER AND RENDER CONFIMRATION PAGE
+          $.ajax(`/users/${this.playerInfo.id}/orders`, { method: 'POST', data: { data: data } })
+            .then((order) => {
+              if (order) { // sucessful and returns the order
+                //  FINALLY !!!! order received back as obj
+                const orderItems = cart;
+                // empty cart
+                cart = [];
+                $('#checkout-cart-count').html(cart.length)
+                // rerender with order details
+                $('#checkout-table').remove()
+                $('#products').append(`
+                <div id="checkout-table">
+                  <h1>Order Confirmation</h1>
+                  <p style="font-size: medium"> Hello ${this.playerInfo.name}. Thank you for your purchase!<p>
+                  <p style="font-size: medium"> Your Order Number is <b> ${order.order.id}.</b>
+                  <br>
+                    <table class="table table-bordered">
+                      <thead class="table-dark">
+                        <tr id="line-item-row">
+                          <td style="width: 50px; height:50px;"></td>
+                          <td>Name</td>
+                          <td>Description</td>
+                          <td>Price</td>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  <div id="proceed">
+                    <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+                    <button id='exit-button' class='btn btn-outline-danger'> Exit </button>
+                  </div>
+                </div>
+              `)
+                $('tbody').append(orderList(orderItems))
+                $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
+
+                // add exit function for order confirmation page
+                $("#exit-button").on("click", () => {
+                  $("canvas").prev().children().remove() //remove the added dom
+                  this.scene.start('Game', this.playerInfo);
+                })
+
+                // // add back function for order confimration page
+                $("#back-button").on("click", () => {
+                  let storeID = this.storeId
+                  let storeLoadCount = 0
+
+                  // turn the checkout button on
+                  $('#checkout').css("visibility", "visible");
+                  // remove the product-container and rebuild the products grid
+                  $("#checkout-table").remove()
+                  $("#products").html("<div id='products-grid'></div>")
+                  $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
+                  $("table").append(addMoreItem(storeProducts))
+                  for (let product of storeProducts) {
+                    $(`#add-to-cart${product.id}`).on('click', function () {
+                      addToCart(product)
+                    })
+                  }
+                  // to load more products
+                  $("#request-data").on("click", () => { //wait for helper
+                    // console.log('storecount to load more after viewing one product')
+                    storeLoadCount++;
+                    // console.log(storeLoadCount)
+                    $.ajax(`/stores/${storeID}/${storeLoadCount}`, { method: 'GET' })//use ajax to handle request to the server
+                      .then(function (result) {
+                        $("table").append(addMoreItem(result))
+                        for (let product of result) {
+                          $(`#add-to-cart${product.id}`).on('click', function () {
+                            addToCart(product)
+                          })
+                        }
+                      })
+
+                  })
+                })
+                // if order was not processed
+              } else {
+                res.json('Oops! something went wrong?')
+              }
+            })
+        }) // end of the checkout function 
+
       } else {
         $('#products').append(`
           <div id="checkout-table">
@@ -386,7 +475,7 @@ class Store extends Phaser.Scene {
           </div>
         `)
       }
-      
+
       // return button to take back to store front
       $("#back-button").on("click", () => {
         back(true);
@@ -398,12 +487,12 @@ class Store extends Phaser.Scene {
     })
     //close shop with ESC
     this.input.keyboard.on('keydown', function (event) {
-      if(event.key === 'Escape') {
+      if (event.key === 'Escape') {
         this.scene.start('Game', this.playerInfo);
       }
     }, this);
   }
-    
+
   update() {
 
   }

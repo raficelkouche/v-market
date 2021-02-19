@@ -8,7 +8,7 @@ const config = {
   
   scale: {
     mode: Phaser.Scale.FIT,
-    //autoCenter: Phaser.Scale.CENTER_VERTICALLY,
+    autoCenter: Phaser.Scale.CENTER,
     width: 1280,
     height: 960,
     parent: "game-container"

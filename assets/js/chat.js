@@ -15,7 +15,6 @@ socket.on('updated-users-list', usersList  => {
         $("#active-users-container ul").children().css("color", "black")
         $(this).css("color", "red")
         activeUser = event.target
-        console.log(activeUser)
       })
     }
   })

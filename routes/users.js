@@ -90,8 +90,6 @@ module.exports = () => {
     // need two variables = user_id and cart array with product ids
     db.orderNew(req.body.data)
       .then(result => {
-        console.log('this the result from after db call')
-        console.log(result);
         res.json(result)
       })
   })
