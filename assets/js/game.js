@@ -293,6 +293,22 @@ class Game extends Phaser.Scene {
         this.miniCam.setVisible(!this.miniCam.visible)
       }
     }, this);
+    // on navbar
+    $('#mini-map').on('click', () => {
+      this.miniCam.setVisible(!this.miniCam.visible)
+    })
+
+    // show nav bar after login
+    $('#top-nav-bar').css('visibility', 'visible')
+
+    if (sessionStorage.getItem('guest') === true) {
+      document.getElementById('IGN').innerHTML = 'Guest';
+      document.getElementById('user-session').innerHTML = 'Login';
+    } else {
+      document.getElementById('IGN').innerHTML = sessionStorage.getItem('IGN');
+      document.getElementById('user-session').innerHTML = 'Logout';
+    }
+
   }
 
   update() {

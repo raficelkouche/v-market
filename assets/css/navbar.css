@@ -2,7 +2,7 @@
 
 #top-nav-bar{
   display: flex;
-  border: 2px solid dark grey;
+  border: 2px solid grey;
   align-items: center;
   background-image: url('/props/navbar-bkg.jpg');
   background-size: 200px 100px;
@@ -11,6 +11,10 @@
   top: 10px;
   left: 20%;
   justify-content: space-around;
+  padding-left: 10px;
+  padding-right: 10px;
+  visibility: hidden;
+
 }
 
 #top-nav-bar > button {
