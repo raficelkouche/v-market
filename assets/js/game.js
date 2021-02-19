@@ -38,7 +38,8 @@ class Game extends Phaser.Scene {
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.key = this.input.keyboard.addKeys("W, A, S, D, ESC")
+    this.key = this.input.keyboard.addKeys("W, A, S, D, X") //WASD to move, M to toggle minimap
+    this.miniTog = this.input.keyboard.addKeys("M")
     this.storeLoadCount = 0;
     //get all store info
   }
@@ -84,7 +85,6 @@ class Game extends Phaser.Scene {
     //grab collides tile from each map. Note: collides have NOT been set yet
     this.groundLayer.setCollisionByProperty({ collides: true });
     this.cityObjLayer.setCollisionByProperty({ collides: true });
-
 
     //make sprite anime
     this.anims.create({
@@ -144,12 +144,6 @@ class Game extends Phaser.Scene {
     this.miniCam.setBounds(0, 0, 1920, 1920)
     this.miniCam.zoom = 0.35;
     this.miniCam.startFollow(this.player, true)
-
-    //set camera to size design res of canvas, center the cam, hide it to wait for call
-    this.pauseCam = this.cameras.add(0, 0, 1280, 960);
-    this.pauseCam.setBounds(320,480,1920,1920)
-    this.pauseCam.zoom = 1;
-    this.pauseCam.setVisible(false);
     
     //add overlapArea detect
     this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
@@ -197,12 +191,17 @@ class Game extends Phaser.Scene {
       this.storeName.destroy();
       this.helperMsg.destroy();
     }
+    // toggle mini map
+    this.input.keyboard.on('keydown', function (event) {
+      if(event.key === 'm') {
+        this.miniCam.setVisible(!this.miniCam.visible)
+      }
+    }, this);
   }
-
+  
   update() {
-
-    //update player movement
     this.player.setVelocity(0);
+    //update player movement
     if (this.cursors.left.isDown || this.key.A.isDown) {
       this.player.setVelocityX(-200);
       if (this.player.anims.currentAnim.key === 'walk-l') { }

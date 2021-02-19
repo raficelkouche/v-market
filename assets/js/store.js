@@ -396,12 +396,16 @@ class Store extends Phaser.Scene {
         })
       })
     })
+    //close shop with ESC
+    this.input.keyboard.on('keydown', function (event) {
+      if(event.key === 'Escape') {
+        this.scene.start('Game', this.playerInfo);
+      }
+    }, this);
   }
     
   update() {
-    if (this.key.ESC.isDown) {
-      this.scene.start('Game', this.playerInfo);
-    }
+
   }
 }
 
