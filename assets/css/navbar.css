@@ -30,6 +30,10 @@
 .dropdown-item {
   color: #6c757d;
 }
+.dropdown {
+  margin: 2px;
+  margin-right: 10px;
+}
 
 #logo {
   margin-right: 5px;

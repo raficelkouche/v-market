@@ -36,6 +36,7 @@ main {
   flex-direction: column;
   flex-basis: 45%;
   border-bottom: solid 2px grey;
+  padding: 10px;
   /* background-color: aquamarine; */
 }
 
