@@ -21,7 +21,6 @@ class Login extends Phaser.Scene {
       method: 'GET',
       url: '/users/login'
     }).then(res => {
-      console.log("results in login: ", res)
       if (res.user_ID) {
         this.scene.start('Game')
       }else{

@@ -6,16 +6,6 @@ class Game extends Phaser.Scene {
     super('Game');
   }
   
-  /* game ()
-  {
-    //call on first scence to get data
-    Phaser.Scene.call(this, { key: 'game' });
-  } */
-  /* init(data)
-  {
-     
-  }
- */
   static player = Phaser.Physics.Arcade.Sprite;
   static playerName;
   static overlap = true;
@@ -26,7 +16,7 @@ class Game extends Phaser.Scene {
   static storeLoadCount
   static storeName;
   static helperMsg;
-  static playerInfo;
+  
   
   preload() {
     //load all texture
@@ -45,51 +35,58 @@ class Game extends Phaser.Scene {
   }
 
   create() {
-    
-    const socket = io('http://localhost:3000', {
+    const socket = io('192.168.0.12:3000', {
       query: {
         user_id: sessionStorage.getItem("user_id"),
         username: sessionStorage.getItem("IGN")
       }
     })
     let activeUser;
+    let currentUser;
+
+    socket.on('your id', username => currentUser = username)
 
     $("#chat-side-bar form").on('submit', (event) => {
-      //alert("message sent")
       event.preventDefault();
-      console.log("chat message: ",$('#chat-message').val())
-      if ($('#chat-message').val()) {
+      let message = $('#chat-message').val()
+      if ($('#chat-message').val() && activeUser) {
+        $('#messages').append(`<li>${currentUser}: ${message}</li`)
         socket.emit('send message', {
           recipient: activeUser,
-          message: $('#chat-message').val()
+          message
         })
         $('#chat-message').val('')
+      } else {
+        alert("select a user first and then type your message")
       }
     })
 
     socket.on('updated-users-list', usersList => {
-      console.log("users: ", usersList)
-      usersList.users.forEach(user => {
-        if (!document.getElementById(user)) {
-          $("#friends-list ul").append(`<li id="${user}">${user}</li>`)
+      console.log("users List: ", usersList)
+      Object.keys(usersList).forEach((user_id) => {
+        if (!document.getElementById(user_id)) {
+          $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
           $("#friends-list li").on("click", function (event) {
             $("#friends-list ul").children().css("color", "black")
             $(this).css("color", "red")
-            activeUser = event.target.innerHTML
+            activeUser = event.target.id
             console.log(activeUser)
           })
         }
       })
-    })
+    });
 
-    socket.on('receive message', message => {
-      $('#messages').append(`<li>${message}</li`)
+    socket.on('receive message', data => {
+      $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
+    })
+    
+    socket.on('delete user', user_id => {
+      console.log("delete: ", user_id)
+      $(`#${user_id}`).remove()
     })
     
     
-    
-    
-    
+
     let storeExist = {};
     this.storeExistThisMap = {};
 
@@ -183,9 +180,10 @@ class Game extends Phaser.Scene {
     this.playerName = this.add.text(this.player.x, this.player.y + 32, `${sessionStorage.getItem("IGN")}`)
     //add 3 camera, 1st to follow player, mini(2nd) for mini map, and 3rd for background when pause 
     //set camera to size of map, zoom in for better view, then make this follow player
-    this.cameras.main.setBounds(0, 0, 1920, 1920);
+   /*  this.cameras.main.setBounds(0, 0, 1920, 1920);
     this.cameras.main.setZoom(3);
-    this.cameras.main.startFollow(this.player, true)
+    this.cameras.main.startFollow(this.player, true) */
+    this.updateCamera()
 
     //make 'mini map' and place to top right, set bound of map, zoom out so it is mini, and set to follow player
     this.miniCam = this.cameras.add(1030, 0, 250, 250);
@@ -238,8 +236,6 @@ class Game extends Phaser.Scene {
     this.player.body.setCollideWorldBounds(true); 
   }
 
-  
-  
   update() {
 
     //function to 'pause' the game when open shop
@@ -425,6 +421,24 @@ class Game extends Phaser.Scene {
     this.playerName.y = this.player.y+20;
     this.overlap = false; //update overlap check
   }
+  
+  createPlayer(playerInfo) {
+    this.player = this.physics.add.sprite(0, 0, "fm_02")
+    this.container = this.add.container(playerInfo.x, playerInfo.y);
+    this.container.setSize(32,32);
+    this.physics.world.enable(this.container)
+    this.updateCamera();
+    this.container.body.setCollideWorldBounds(true);
+  }
+
+  updateCamera(){
+    this.cameras.main.setBounds(0, 0, 1920, 1920);
+    this.cameras.main.setZoom(2);
+    this.cameras.main.startFollow(this.player, true)
+  }
+
 }
+
+
 
 export { Game }

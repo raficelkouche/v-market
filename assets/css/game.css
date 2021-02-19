@@ -40,7 +40,13 @@ main {
 #messages li{
   list-style-type: none;
   color: white;
+  background-color: darkslategrey;
 }
+
+#messages>li:nth-child(odd) {
+    background: #efefef;
+    color:rgb(10, 10, 89)
+  }
 
 #chat-side-bar form{
   display: flex;
