@@ -488,6 +488,10 @@ class Store extends Phaser.Scene {
         })
       })
     })
+    $('#mini-map').on('click', () => {
+      this.miniCam.setVisible(!this.miniCam.visible)
+    })
+
     //close shop with ESC
     this.input.keyboard.on('keydown', function (event) {
       if (event.key === 'Escape') {

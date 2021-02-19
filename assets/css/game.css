@@ -26,6 +26,7 @@ main {
   flex-basis: 25%;
   /* background-color: rgb(71, 71, 174); */
   background-image: url('/props/navbar-bkg.jpg');
+  visibility: hidden;
 
 }
 

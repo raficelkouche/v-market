@@ -316,6 +316,9 @@ class Game extends Phaser.Scene {
       document.getElementById('user-session').innerHTML = 'Logout';
     }
 
+    // show chat bar after login
+    $('#chat-side-bar').css('visibility', 'visible')
+
   }
 
   update() {
