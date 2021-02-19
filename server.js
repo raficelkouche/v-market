@@ -96,6 +96,10 @@ io.on('connection', (socket) => {
     socket.broadcast.emit("delete user", my_user_id)
   })  
 })
+
+app.get("/test", (req,res) => {
+  res.json({res:"check cookies"})
+})
   
 server.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)

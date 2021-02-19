@@ -1,6 +1,3 @@
-//socket logic
-//const socket = io()
-
 class Game extends Phaser.Scene {
   constructor() {
     super('Game');
@@ -11,13 +8,13 @@ class Game extends Phaser.Scene {
   static overlap = true;
   static inshop = false;
   static storeInfo = [];
-  static storeExistThisMap;
+  static storeExistThisMap;s
   static storeId;
   static storeLoadCount
   static storeName;
   static helperMsg;
-  static user_id = sessionStorage.getItem("user_id");
-  static username = sessionStorage.getItem("IGN");
+  static user_id;
+  static username;
   
   preload() {
     //load all texture
@@ -36,22 +33,23 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+    this.username = sessionStorage.getItem("IGN")
+    this.user_id = sessionStorage.getItem("user_id");
+
     const socket = io('192.168.0.12:3000', {
       query: {
         user_id: this.user_id,
         username: this.username
       }
     })
+
     let activeUser;
-    let currentUser;
-
-    socket.on('your id', username => currentUser = username)
-
+    
     $("#chat-side-bar form").on('submit', (event) => {
       event.preventDefault();
       let message = $('#chat-message').val()
       if ($('#chat-message').val() && activeUser) {
-        $('#messages').append(`<li>${currentUser}: ${message}</li`)
+        $('#messages').append(`<li>${this.username}: ${message}</li`)
         socket.emit('send message', {
           recipient: activeUser,
           message
@@ -86,7 +84,7 @@ class Game extends Phaser.Scene {
       $(`#${user_id}`).remove()
     })
 
-    socket.on('all players', playersList => {
+    /* socket.on('all players', playersList => {
       Object.keys(playersList).forEach((player) => {
         if(player !== this.user_id) {
           this.addOtherPlayers(playersList[player])
@@ -95,7 +93,7 @@ class Game extends Phaser.Scene {
         }
       })
     })
-  
+  */
     
     let storeExist = {};
     this.storeExistThisMap = {};
@@ -186,7 +184,6 @@ class Game extends Phaser.Scene {
     //add player sprite, animation and name
     this.player = this.physics.add.sprite(400, 300, "fm_02")
     this.player.play('idle-d')
-    //this.playerName = this.add.text(this.player.x, this.player.y+32, `${this.playerInfo.name}`)
     this.playerName = this.add.text(this.player.x, this.player.y + 32, `${this.username}`)
     //add 3 camera, 1st to follow player, mini(2nd) for mini map, and 3rd for background when pause 
     //set camera to size of map, zoom in for better view, then make this follow player
