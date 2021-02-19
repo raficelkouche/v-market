@@ -10,7 +10,7 @@ const morgan = require('morgan'); //HTTP request logger
 const path = require('path');
 const cookieSession = require('cookie-session');
 const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc')
-const cookieParser = require('cookie-parser')
+
 
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
@@ -36,46 +36,49 @@ app.get('/', (req, res) => {
 //chat testing routes and logic
 const activeConnections = {};
 
-let count = 1;
-io.on('connection', (socket) => {
+io.use((socket, next) => {
+  if (activeConnections[socket.handshake.query.user_id]) {
+    console.log("connection already exists")
+    return next(new Error("connection already exists"))
+  } else {
+    console.log("Adding a new connection")
+    socket.emit("success")
+    return next();
+  }
+}).on('connection', (socket) => {
   const userInfo = {
-    ...socket.handshake.query, 
+    ...socket.handshake.query,
     x: Math.floor(Math.random() * 300) + 40,
     y: Math.floor(Math.random() * 400) + 50
   }
 
   let my_user_id = userInfo.user_id
-  console.log("my user id is: ", my_user_id)
+
   socket.join(my_user_id) //this is the client's id
-  console.log("join count: ", count++)
-  /* const existingConnection = activeConnections.find( 
-    connection => connection.user_id === userInfo.user_id
-    ) */
-  //if current user is not in the array, emit the updated users list excluding that user
-  console.log("activeConnections: ", activeConnections)
-  if (!activeConnections[my_user_id]) {            
+
+  if (!activeConnections[my_user_id]) {
     activeConnections[my_user_id] = userInfo
   }
-  
+
   const updatedList = {};
   Object.keys(activeConnections).forEach(userID => {
     if (userID !== my_user_id) {
       updatedList[userID] = activeConnections[userID]
     }
   })
-  
+
   socket.emit('updated-friends-list', updatedList)
 
   socket.emit('your id', userInfo.username) //allows the client to display their own id
 
   socket.broadcast.emit('updated-friends-list', { //update all clients with the new user that just joined (for the chat feature)
-   [my_user_id] : userInfo
-  }) 
+    [my_user_id]: userInfo
+  })
 
-  socket.on('send message', ({recipient, message}) => {
-    
+  socket.on('send message', ({ recipient, message }) => {
+
     socket.to(recipient).emit('receive message', {
-      message, 
+      message,
       sender: userInfo.username
     })
   })
@@ -97,13 +100,13 @@ io.on('connection', (socket) => {
     delete activeConnections[my_user_id]
     console.log("active connections after delete: ", activeConnections)
     socket.broadcast.emit("delete user", my_user_id)
-  })  
+  })
 })
 
-app.get("/test", (req,res) => {
-  res.json({res:"check cookies"})
+app.get("/test", (req, res) => {
+  res.json({ res: "check cookies" })
 })
-  
+
 server.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)
 })

@@ -59,10 +59,6 @@ class Game extends Phaser.Scene {
   }
 
   create() {
-    const music = this.sound.add('background', {loop: true})
-    
-    music.play()
-
     this.username = sessionStorage.getItem("IGN")
     this.user_id = sessionStorage.getItem("user_id");
 
@@ -73,58 +69,62 @@ class Game extends Phaser.Scene {
       }
     })
     
-    let activeUser;
-    
-    $("#chat-side-bar form").on('submit', (event) => {
-      event.preventDefault();
-      let message = $('#chat-message').val()
-      if ($('#chat-message').val() && activeUser) {
-        $('#messages').append(`<li>${this.username}: ${message}</li`)
-        socket.emit('send message', {
-          recipient: activeUser,
-          message
-        })
-        $('#chat-message').val('')
-      } else {
-        alert("select a user first and then type your message")
-      }
-    })
-    
-    socket.on('updated-friends-list', usersList => {
-      console.log("users List: ", usersList)
-      Object.keys(usersList).forEach((user_id) => {
-        if (!document.getElementById(user_id) && user_id !== this.user_id) {
-          $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
-          $("#friends-list li").on("click", function (event) {
-            $("#friends-list ul").children().css("color", "black")
-            $(this).css("color", "red")
-            activeUser = event.target.id
+    socket.on('success', () => {
+      let activeUser;
+      $("#chat-side-bar form").on('submit', (event) => {
+        event.preventDefault();
+        let message = $('#chat-message').val()
+        if ($('#chat-message').val() && activeUser) {
+          $('#messages').append(`<li>${this.username}: ${message}</li`)
+          socket.emit('send message', {
+            recipient: activeUser,
+            message
           })
-        }
-      })
-    });
-
-    socket.on('receive message', data => {
-      $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
-    })
-    
-    socket.on('delete user', user_id => {
-      console.log("delete: ", user_id)
-      $(`#${user_id}`).remove()
-    })
-
-    /* socket.on('all players', playersList => {
-      Object.keys(playersList).forEach((player) => {
-        if(player !== this.user_id) {
-          this.addOtherPlayers(playersList[player])
+          $('#chat-message').val('')
         } else {
-          this.createPlayer(playersList[player])
+          alert("select a user first and then type your message")
         }
       })
-    })
-  */
-    
       
+      socket.on('updated-friends-list', usersList => {
+        console.log("users List: ", usersList)
+        Object.keys(usersList).forEach((user_id) => {
+          if (!document.getElementById(user_id) && user_id !== this.user_id) {
+            $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
+            $("#friends-list li").on("click", function (event) {
+              $("#friends-list ul").children().css("color", "black")
+              $(this).css("color", "red")
+              activeUser = event.target.id
+            })
+          }
+        })
+      });
+  
+      socket.on('receive message', data => {
+        $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
+      })
+      
+      socket.on('delete user', user_id => {
+        console.log("delete: ", user_id)
+        $(`#${user_id}`).remove()
+      })
+  
+      /* socket.on('all players', playersList => {
+        Object.keys(playersList).forEach((player) => {
+          if(player !== this.user_id) {
+            this.addOtherPlayers(playersList[player])
+          } else {
+            this.createPlayer(playersList[player])
+          }
+        })
+      })
+    */
+    })
+
+    socket.on('error', () => {
+      console.log("server refused connection")
+    })
+
    //disable key cap on all element so it would not steal the focus
     this.input.on('pointerdownoutside', () => {
       this.input.keyboard.disableGlobalCapture();
