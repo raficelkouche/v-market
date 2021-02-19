@@ -63,11 +63,14 @@ class Game extends Phaser.Scene {
     this.user_id = sessionStorage.getItem("user_id");
 
     const socket = io('http://localhost:3000', {
+      autoConnect: false,
       query: {
         user_id: this.user_id,
         username: this.username
       }
     })
+
+    socket.connect();
     
     socket.on('success', () => {
       let activeUser;
@@ -121,8 +124,13 @@ class Game extends Phaser.Scene {
     */
     })
 
-    socket.on('error', () => {
+    socket.on('connect_error', () => {
       console.log("server refused connection")
+    })
+
+    socket.on('disconnect', () => {
+      console.log("server shutdown")
+      socket.disconnect();
     })
 
    //disable key cap on all element so it would not steal the focus
