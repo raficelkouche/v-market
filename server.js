@@ -27,27 +27,15 @@ app.get('/', (req, res) => {
 })
 
 // stripe
-app.post('/create-checkout-session', async (req, res) => {
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: 'Stubborn Attachments',
-            images: ['https://i.imgur.com/EHyR2nP.png'],
-          },
-          unit_amount: 2000,
-        },
-        quantity: 1,
-      },
-    ],
-    mode: 'payment',
-    success_url: `http://localhost:${PORT}/`,
-    cancel_url: `http://localhost:${PORT}/`,
-  });
-  res.json({ id: session.id });
+// Token is created using Stripe Checkout or Elements!
+// Get the payment token ID submitted by the form:
+const token = request.body.stripeToken; // Using Express
+
+const charge = await stripe.charges.create({
+  amount: 999,
+  currency: 'usd',
+  description: 'Example charge',
+  source: token,
 });
 
 app.listen(PORT, () => {
