@@ -41,14 +41,46 @@ class Game extends Phaser.Scene {
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
-    this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, DOWN, SPACE, X") //WASD to move, M to toggle minimap
-    this.miniTog = this.input.keyboard.addKeys("M")
+    this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, SPACE, DOWN, X, M") //WASD to move, M to toggle minimap
     this.storeLoadCount = 0;
-    //get all store info
+    //disable key cap on all element so it would not steal the focus
   }
 
   create() {
+    /*
+    $('canvas').on('blur', () => {
+      console.log('brrrrrrrrr')
+    })
+    this.game.events.addListener(Phaser.Core.Events.FOCUS, (() => {
+      console.log('on')
+      for (const k of Object.keys(this.key)){
+        this.key[k].enabled = true
+      }
+    }), this);
+    this.game.events.on('blur', () => {
+      console.log('off')
+      for (const k of Object.keys(this.key)){
+        this.key[k].enabled = false
+      }
+    }, this)
+    */
+    this.input.on('pointerdownoutside', () => {
+      this.input.keyboard.disableGlobalCapture();
+      for (const k of Object.keys(this.key)) {
+        this.key[k].enabled = false;
+      } 
+    })
+    $('canvas').on('click', ()=>{ 
+      $(document.activeElement).blur();
+      this.input.keyboard.enableGlobalCapture();
+      for (const k of Object.keys(this.key)) {
+        this.key[k].enabled = true;
+      } 
+    })
     //draw back drop for player name, will refresh
+    this.gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
+    this.gra.alpha= .5;
+
     this.gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
     this.gra.alpha= .5;
 
@@ -204,8 +236,9 @@ class Game extends Phaser.Scene {
   }
   
   update() {
+
     //take player into store if space is press when overlap
-    if (this.key.SPACE.isDown && !this.enterStore) {
+    if (this.overlap && this.key.SPACE.isDown && !this.enterStore) {
       this.enterStore = true; //prevent event fire twice
       this.playerInfo.store_id = this.storeId;
       this.playerInfo.x = this.player.x;
