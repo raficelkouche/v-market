@@ -27,33 +27,6 @@
 
   <body id='game-container'>
     <script type="module" src="js/main.js"></script>
-    <script type="text/javascript">
-      var stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
-      var checkoutButton = document.getElementById('checkout-button');
-
-      //del if statment when checkout logic is finish
-      if (checkoutButton) {
-      checkoutButton.addEventListener('click', function() {
-        fetch('/create-checkout-session', {
-          method: 'POST',
-        })
-        .then(function(response) {
-          return response.json();
-        })
-        .then(function(session) {
-          return stripe.redirectToCheckout({ sessionId: session.id });
-        })
-        .then(function(result) {
-          if (result.error) {
-            alert(result.error.message);
-          }
-        })
-        .catch(function(error) {
-          console.error('Error:', error);
-        });
-      });
-      }
-    </script>
   </body>
   
 </html>

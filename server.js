@@ -27,27 +27,20 @@ app.get('/', (req, res) => {
 })
 
 // stripe
-app.post('/create-checkout-session', async (req, res) => {
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: 'T-shirt',
-          },
-          unit_amount: 2000,
-        },
-        quantity: 1,
-      },
-    ],
-    mode: 'payment',
-    success_url: 'https://example.com/success',
-    cancel_url: 'https://example.com/cancel',
-  });
-  res.json({ id: session.id });
-});
+// Token is created using Stripe Checkout or Elements!
+// Get the payment token ID submitted by the form:
+
+// const customer = await stripe.customers.create({
+//   email: 'customer@example.com',
+//   source: request.body.stripeToken,
+// });
+
+// const charge = await stripe.charges.create({
+//   customer: customer.id,
+//   description: 'Custom t-shirt',
+//   amount: order.amount,
+//   currency: 'usd',
+// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)

@@ -154,13 +154,6 @@ class Game extends Phaser.Scene {
     //add overlapArea detect
     this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
       this.storeId = y.name;
-      if (this.cursors.space.isDown) {
-        this.playerInfo.store_id = this.storeId;
-        this.playerInfo.x = this.player.x;
-        this.playerInfo.y = this.player.y;
-        this.playerInfo.storeInfo = this.storeInfo;
-        this.scene.start('store', this.playerInfo);
-      }
       /*
       check if the store exist, if do and name have not been display, add name and interactible msg on screen, and trigger display so it will only run once.
       if for some reason, player is still overlap, but name disspear, add it back.
@@ -174,6 +167,14 @@ class Game extends Phaser.Scene {
         this.helperMsg = this.add.text(y.x -32, y.y, `Space to interact`);
         this.add.text(y.x -32, y.y, `Space to interact`);
       } 
+      if (this.cursors.space.isDown) {
+        this.playerInfo.store_id = this.storeId;
+        this.playerInfo.x = this.player.x;
+        this.playerInfo.y = this.player.y;
+        this.playerInfo.storeInfo = this.storeInfo;
+        this.platerInfo.storeName = this.storeName._text
+        this.scene.start('store', this.playerInfo);
+      }
       this.overlap = true;
     }, undefined, this); //check overlap with store area, change overlap to true
 
@@ -247,7 +248,7 @@ class Game extends Phaser.Scene {
     }
 
     //update player name's place
-    this.playerName.x = this.player.x;  
+    this.playerName.x = this.player.x-20;  
     this.playerName.y = this.player.y+20;
     this.overlap = false; //update overlap check
   }
