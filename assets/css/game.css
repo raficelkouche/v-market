@@ -74,9 +74,3 @@ main {
   outline: none;
   color: rgb(18, 52, 1);
 }
-
-#top-nav-bar{
-  display: flex;
-  border: 4px solid green;
-  align-items: center;
-}

@@ -63,7 +63,7 @@ class Game extends Phaser.Scene {
     this.username = sessionStorage.getItem("IGN")
     this.user_id = sessionStorage.getItem("user_id");
 
-    const socket = io('http://localhost:3000', {
+    const socket = io('http://localhost:8000', {
       query: {
         user_id: this.user_id,
         username: this.username
