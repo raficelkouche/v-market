@@ -59,10 +59,7 @@ class Game extends Phaser.Scene {
   }
 
   create() {
-    const music = this.sound.add('background', {loop: true})
     
-    music.play()
-
     this.username = sessionStorage.getItem("IGN")
     this.user_id = sessionStorage.getItem("user_id");
 
