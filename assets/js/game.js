@@ -16,12 +16,11 @@ class Game extends Phaser.Scene {
       //guest: data.guest || false,
       //id: data.user_id,
       name: sessionStorage.getItem("IGN"),
-      guest: false,
+      guest: sessionStorage.getItem("guest") === "true",
       id: sessionStorage.getItem("user_id"),
       x: data.x || undefined,
       y: data.y || undefined
     }
-    this.storeInfo = data.storeInfo;
   }
 
   static player = Phaser.Physics.Arcade.Sprite;
@@ -43,7 +42,6 @@ class Game extends Phaser.Scene {
 
   preload() {
     //load all texture
-    console.log("store info", this.storeInfo)
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
@@ -51,14 +49,12 @@ class Game extends Phaser.Scene {
     this.load.audio('background', 'audio/TownTheme.mp3')
     this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, SPACE, DOWN, X, M") //WASD to move, M to toggle minimap
     this.storeLoadCount = 0;
-    //have to make the ajax call here since after checkout we come back to Game scene but it doesn't have the data from the login
-    /* $.ajax(`/stores`, { method: 'GET' })
-      .then((res) => {
-        this.storeInfo = Array.from(res)
-      }) */
+  
   }
 
   create() {
+    this.storeInfo = this.sys.game.globals.globalVars.storeData
+    
     this.username = sessionStorage.getItem("IGN")
     this.user_id = sessionStorage.getItem("user_id");
 

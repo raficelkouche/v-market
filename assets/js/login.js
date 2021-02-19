@@ -2,23 +2,12 @@ class Login extends Phaser.Scene {
   constructor() {
     super('Login')
   }
-
-  static storeInfo;
-
-  init() {
-
-    
-  }
+  
   preload() {
     
     this.load.html('loginForm', 'templates/login.html')
     this.load.image('background', 'maps/farmersMarket.jpeg')
-    //this will be used if page gets refreshed since we will start from login 
-    $.ajax(`/stores`, { method: 'GET' })
-      .then((res) => {
-        this.storeInfo = Array.from(res)
-      })
-    
+ 
   }
 
   create() {
@@ -106,12 +95,7 @@ class Login extends Phaser.Scene {
               sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
               sessionStorage.setItem("user_id", res.user_id)
               sessionStorage.setItem("guest", res.guest || false)
-              //ajax call to get the store information before switching scenes
-              $.ajax(`/stores`, {method: 'GET'})
-              .then((result) => {
-                res.storeInfo = Array.from(result)
-                this.scene.start('Game' , res);
-              })
+              this.scene.start('Game');
             }
           });
         }
