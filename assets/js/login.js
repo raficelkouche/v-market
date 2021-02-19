@@ -25,7 +25,11 @@ class Login extends Phaser.Scene {
     //target the log in as guest button
     $(document).off().on("click", '#confirm-button', () => {
       let name = {guest: true, name: $("#login").serialize().slice(5,-1).slice(0,-9)}
-      this.scene.start('Game' , name)
+      $.ajax(`/stores`, {method: 'GET'})
+      .then((result) => {
+        name.storeInfo = Array.from(result)
+        this.scene.start('Game' , name);
+      })
     })
 
     //when user click register on login
@@ -75,7 +79,12 @@ class Login extends Phaser.Scene {
               //add animation for box appear if have time
               $(`#loginInsert`).append(err);
             } else { //let user in game
-              this.scene.start('Game' , res);
+              $.ajax(`/stores`, {method: 'GET'})
+              .then((result) => {
+                res.storeInfo = Array.from(result)
+  
+                this.scene.start('Game' , res);
+              })
             }
           });
         }

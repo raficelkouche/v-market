@@ -79,7 +79,11 @@ class Register extends Phaser.Scene {
               </div>`
               $(`#RegisterInsert`).append(err)
             } else { // let user in game
-              this.scene.start('Game' , {name: res.name})
+              $.ajax(`/stores`, {method: 'GET'})
+              .then((result) => {
+                res.storeInfo = Array.from(result)
+                this.scene.start('Game' , res)
+              })
             }
           });
         }

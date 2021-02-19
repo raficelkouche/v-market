@@ -5,26 +5,26 @@ class Game extends Phaser.Scene {
   
   game ()
   {
-    //call on first scence to get data
+    //call on login/register scence to get data
     Phaser.Scene.call(this, { key: 'game' });
   }
   init(data)
   {
     //pass var from login scence
-    console.log('this is the data passed to make the player name')
-    console.log(data)
     this.playerInfo = {
       name: data.name.replace(/%20/g, " ").trim(), 
       guest: data.guest || false,
-      id: data.user_id
+      id: data.user_id,
+      x: data.x || undefined,
+      y: data.y || undefined
     }
+    this.storeInfo = data.storeInfo;
   }
 
   static player = Phaser.Physics.Arcade.Sprite;
   static playerName;
   static overlap = true;
   static inshop = false;
-  static storeInfo = [];
   static storeExistThisMap;
   static storeId;
   static storeLoadCount;
@@ -41,21 +41,16 @@ class Game extends Phaser.Scene {
     this.key = this.input.keyboard.addKeys("W, A, S, D, ESC")
     this.storeLoadCount = 0;
     //get all store info
-    $.ajax(`/stores`, {method: 'GET'})
-      .then((res) => this.storeInfo = Array.from(res))
   }
 
   create() {
-
+    console.log(this.storeInfo)
     let storeExist = {};
     this.storeExistThisMap = {};
-
     // get all store info to a more easy handle data type
     for (const store of this.storeInfo) { 
       storeExist[store.id] = store
     }
-    //remove as no longer needed, unless we make an other map
-    delete this.storeInfo 
 
     //make the map of this scence
     this.map = this.make.tilemap({ key: "map" });
@@ -134,7 +129,7 @@ class Game extends Phaser.Scene {
     });
 
     //add player sprite, animation and name
-    this.player = this.physics.add.sprite(400, 300, "fm_02")
+    this.player = this.physics.add.sprite( this.playerInfo.x ||400, this.playerInfo.y || 300, "fm_02")
     this.player.play('idle-d')
     this.playerName = this.add.text(this.player.x -60, this.player.y+32, `${this.playerInfo.name}`)
 
@@ -196,6 +191,16 @@ class Game extends Phaser.Scene {
   }
 
   update() {
+
+    if(this.key.ESC.isDown) {
+      console.log('pressed')
+      this.playerInfo.store_id = 1;
+      this.playerInfo.x = this.player.x;
+      this.playerInfo.y = this.player.y;
+      this.playerInfo.storeInfo = this.storeInfo;
+      this.scene.start('store', this.playerInfo);
+    }
+
     // testing cart
     let cart = [];
 

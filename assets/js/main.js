@@ -1,6 +1,7 @@
 import { Game } from './game.js'
 import { Login } from './login.js'
 import { Register } from './register.js'
+import { Store } from './store.js'
 
 const config = {
   type: Phaser.AUTO,
@@ -22,7 +23,7 @@ const config = {
       debug: false
     }
   },
-  scene: [Login, Register, Game]
+  scene: [Login, Register, Game, Store]
 };
 
 const startGame = new Phaser.Game(config)

@@ -1,6 +1,6 @@
 require('dotenv').config();
 const db = require('./db/helper')
-const PORT = 8001;
+const PORT = 3000;
 const ENV = process.env.ENV || "development";
 const express = require('express')
 const app = express()

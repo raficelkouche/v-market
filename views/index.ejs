@@ -31,6 +31,8 @@
       var stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
       var checkoutButton = document.getElementById('checkout-button');
 
+      //del if statment when checkout logic is finish
+      if (checkoutButton) {
       checkoutButton.addEventListener('click', function() {
         fetch('/create-checkout-session', {
           method: 'POST',
@@ -50,6 +52,7 @@
           console.error('Error:', error);
         });
       });
+      }
     </script>
   </body>
   
