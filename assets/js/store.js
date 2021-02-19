@@ -83,6 +83,14 @@ class Store extends Phaser.Scene {
           }
         }      
       } else { //if reloading from product detail
+        $('table').append(`
+        <colgroup>
+          <col class="product">
+          <col class="product">
+          <col class="product">
+          <col class="product">
+          <col class="product">
+        </colgroup>`);
         for(let x = 0; x < result.length / 4; x++) { //push item out 4 per line
           for (let i = 0; i < 4; i++) {
             if(result[i + x*4]) {
