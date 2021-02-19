@@ -41,9 +41,9 @@ io.on('connection', (socket) => {
     x: Math.floor(Math.random() * 300) + 40,
     y: Math.floor(Math.random() * 400) + 50
   }
+
   let my_user_id = userInfo.user_id
-  console.log("Room id is: ", my_user_id)
-  /* console.log(userInfo) */
+  
   socket.join(my_user_id) //this is the client's id
   
   /* const existingConnection = activeConnections.find( 
@@ -53,32 +53,24 @@ io.on('connection', (socket) => {
   if (!activeConnections[my_user_id]) {            
     activeConnections[my_user_id] = userInfo
   }
-  console.log("active connections: ", activeConnections)
+  
   const updatedList = {};
   Object.keys(activeConnections).forEach(userID => {
     if (userID !== my_user_id) {
-      console.log(`userID ${userID}, my_user_id${my_user_id}`)
       updatedList[userID] = activeConnections[userID]
     }
   })
-  console.log("updatedList: ", updatedList)
-
-  socket.emit('updated-users-list', updatedList)
-
-  /* socket.emit('updated-users-list', {
-    users: activeConnections.filter(
-      connection => connection.user_id !== userInfo.user_id
-    )
-  }) */
+  
+  socket.emit('updated-friends-list', updatedList)
 
   socket.emit('your id', userInfo.username) //allows the client to display their own id
 
-  socket.broadcast.emit('updated-users-list', {
+  socket.broadcast.emit('updated-friends-list', { //update all clients with the new user that just joined (for the chat feature)
    [my_user_id] : userInfo
-  }) //update all clients with the new user that just joined
+  }) 
 
   socket.on('send message', ({recipient, message}) => {
-    console.log("Sending to: ", recipient)
+    
     socket.to(recipient).emit('receive message', {
       message, 
       sender: userInfo.username
@@ -90,6 +82,12 @@ io.on('connection', (socket) => {
     activeConnections[my_user_id].y = movement.y
     socket.broadcast.emit('player moved', activeConnections[my_user_id])
   })
+
+  socket.broadcast.emit('new player', {
+    [my_user_id]: userInfo
+  }) //update all clients with the new user that just joined (for spwaning purposes)
+
+  socket.emit('all players', updatedList)
 
   socket.on('disconnect', () => {
     console.log("DELETING: ", my_user_id)

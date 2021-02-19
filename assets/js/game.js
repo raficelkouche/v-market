@@ -16,7 +16,8 @@ class Game extends Phaser.Scene {
   static storeLoadCount
   static storeName;
   static helperMsg;
-  
+  static user_id = sessionStorage.getItem("user_id");
+  static username = sessionStorage.getItem("IGN");
   
   preload() {
     //load all texture
@@ -37,8 +38,8 @@ class Game extends Phaser.Scene {
   create() {
     const socket = io('192.168.0.12:3000', {
       query: {
-        user_id: sessionStorage.getItem("user_id"),
-        username: sessionStorage.getItem("IGN")
+        user_id: this.user_id,
+        username: this.username
       }
     })
     let activeUser;
@@ -61,7 +62,7 @@ class Game extends Phaser.Scene {
       }
     })
 
-    socket.on('updated-users-list', usersList => {
+    socket.on('updated-friends-list', usersList => {
       console.log("users List: ", usersList)
       Object.keys(usersList).forEach((user_id) => {
         if (!document.getElementById(user_id)) {
@@ -84,9 +85,18 @@ class Game extends Phaser.Scene {
       console.log("delete: ", user_id)
       $(`#${user_id}`).remove()
     })
-    
-    
 
+    socket.on('all players', playersList => {
+      Object.keys(playersList).forEach((player) => {
+        if(player !== this.user_id) {
+          this.addOtherPlayers(playersList[player])
+        } else {
+          this.createPlayer(playersList[player])
+        }
+      })
+    })
+  
+    
     let storeExist = {};
     this.storeExistThisMap = {};
 
@@ -177,7 +187,7 @@ class Game extends Phaser.Scene {
     this.player = this.physics.add.sprite(400, 300, "fm_02")
     this.player.play('idle-d')
     //this.playerName = this.add.text(this.player.x, this.player.y+32, `${this.playerInfo.name}`)
-    this.playerName = this.add.text(this.player.x, this.player.y + 32, `${sessionStorage.getItem("IGN")}`)
+    this.playerName = this.add.text(this.player.x, this.player.y + 32, `${this.username}`)
     //add 3 camera, 1st to follow player, mini(2nd) for mini map, and 3rd for background when pause 
     //set camera to size of map, zoom in for better view, then make this follow player
    /*  this.cameras.main.setBounds(0, 0, 1920, 1920);
