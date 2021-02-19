@@ -172,7 +172,9 @@ class Game extends Phaser.Scene {
         this.playerInfo.x = this.player.x;
         this.playerInfo.y = this.player.y;
         this.playerInfo.storeInfo = this.storeInfo;
-        this.platerInfo.storeName = this.storeName._text
+        this.storeName
+          ? this.playerInfo.storeName = this.storeName._text
+          : this.playerInfo.storeName = null;
         this.scene.start('store', this.playerInfo);
       }
       this.overlap = true;
