@@ -36,26 +36,19 @@ app.get('/', (req, res) => {
 //chat testing routes and logic
 const activeConnections = {};
 
-io.use((socket, next) => {
-  if (activeConnections[socket.handshake.query.user_id]) {
-    console.log("connection already exists")
-    return next(new Error("connection already exists"))
-  } else {
-    console.log("Adding a new connection")
-    socket.emit("success")
-    return next();
-  }
-}).on('connection', (socket) => {
+io.on('connection', (socket) => {
+  
   const userInfo = {
     ...socket.handshake.query,
-    x: Math.floor(Math.random() * 300) + 40,
-    y: Math.floor(Math.random() * 400) + 50
   }
+ 
+  userInfo.x = Number(userInfo.x)
+  userInfo.y = Number(userInfo.y)
 
   let my_user_id = userInfo.user_id
-
+  
   socket.join(my_user_id) //this is the client's id
-
+  
   if (!activeConnections[my_user_id]) {
     activeConnections[my_user_id] = userInfo
   }
@@ -67,13 +60,19 @@ io.use((socket, next) => {
     }
   })
 
-  socket.emit('updated-friends-list', updatedList)
+  socket.emit('updated-friends-list', updatedList) //send this to the most recent client who joined
 
   socket.emit('your id', userInfo.username) //allows the client to display their own id
+
+  socket.emit('all players', updatedList) //send this to the most recent client who joined
 
   socket.broadcast.emit('updated-friends-list', { //update all clients with the new user that just joined (for the chat feature)
     [my_user_id]: userInfo
   })
+  
+  socket.broadcast.emit('new player', { //update all clients with the new user that just joined (for spawning purposes)
+    ...userInfo
+  }) 
 
   socket.on('send message', ({ recipient, message }) => {
 
@@ -89,16 +88,12 @@ io.use((socket, next) => {
     socket.broadcast.emit('player moved', activeConnections[my_user_id])
   })
 
-  socket.broadcast.emit('new player', {
-    [my_user_id]: userInfo
-  }) //update all clients with the new user that just joined (for spwaning purposes)
-
-  socket.emit('all players', updatedList)
+  socket.on('request all players', () => {
+    socket.emit('all players', updatedList)
+  })
 
   socket.on('disconnect', () => {
-    console.log("DELETING: ", my_user_id)
     delete activeConnections[my_user_id]
-    console.log("active connections after delete: ", activeConnections)
     socket.broadcast.emit("delete user", my_user_id)
   })
 })

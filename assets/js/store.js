@@ -14,8 +14,6 @@ class Store extends Phaser.Scene {
       name: data.name.replace(/%20/g, " ").trim(),
       guest: data.guest || false,
       id: data.user_id,
-      x: data.x,
-      y: data.y,
       storeInfo: data.storeInfo
     }
     this.storeName = data.storeName;
@@ -34,6 +32,8 @@ class Store extends Phaser.Scene {
   }
 
   create() {
+    
+    
     this.initload = true;
     let endOfStore = false;
     let storeProducts = [];
@@ -47,7 +47,6 @@ class Store extends Phaser.Scene {
       <p>Thanks for your support!</p>`;
       let pendingHTML = `<tr>`;
       if (result.length === 0) { //if no more item change button to msg
-        console.log("no item")
         endOfStore = true;
         $("#request-data").parent().html(outOfItem);
         return
@@ -137,7 +136,7 @@ class Store extends Phaser.Scene {
         })
       storeLoadCount++;
     }
-
+    console.log("scenes: ", this.scene.isActive("store"))
     const back = function (fromCart = false) {
       // remove the product-container and rebuild the products grid
       if (fromCart) {
@@ -258,7 +257,7 @@ class Store extends Phaser.Scene {
 
     //take user back to game.js if click top left to close
     $("#close-button").on("click", () => {
-      
+  
       this.scene.start('Game', this.playerInfo);
     })
 
