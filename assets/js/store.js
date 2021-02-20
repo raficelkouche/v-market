@@ -34,6 +34,7 @@ class Store extends Phaser.Scene {
   }
 
   create() {
+
     this.initload = true;
     let endOfStore = false;
     let storeProducts = [];

@@ -39,6 +39,7 @@ class Game extends Phaser.Scene {
   static user_id;
   static username;
   static gra;
+  static musicOn = false;
 
   preload() {
     //load all texture
@@ -52,7 +53,28 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+
+    
+    // works but not after a while
+    this.music = this.sound.add('background', {
+      loop: true,
+    })
+    //   // toggle music off or on
+    $('#music').on('click', () => {
+      if(!this.musicOn) {
+        this.music.play()
+        this.musicOn = true;
+        $('#music').html('<i class="fas fa-volume-mute"></i>')
+      } else {
+        this.music.pause()
+        this.musicOn = false;
+        $('#music').html('<i class="fas fa-volume-up"></i>')
+      }
+    })
+
     this.storeInfo = this.sys.game.globals.globalVars.storeData
+    console.log(this.storeInfo)
+    
     
     this.username = sessionStorage.getItem("IGN")
     this.user_id = sessionStorage.getItem("user_id");
