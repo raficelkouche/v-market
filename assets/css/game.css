@@ -38,10 +38,13 @@ main {
   border-bottom: solid 2px grey;
   padding: 10px;
   /* background-color: aquamarine; */
+  font-family: 'Didact Gothic', sans-serif;
 }
 
 #messages{
   list-style-type: none;
+  font-family: 'Didact Gothic', sans-serif;
+
 }
 #messages li{
   list-style-type: none;

@@ -111,8 +111,13 @@ class Game extends Phaser.Scene {
           if (!document.getElementById(user_id) && user_id !== this.user_id) {
             $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
             $("#friends-list li").on("click", function (event) {
+              $('#friends-list ul').children().removeAttr('style')
               $("#friends-list ul").children().css("color", "black")
-              $(this).css("color", "red")
+              // $(this).css("color", "red")
+              $(this).css("font-weight", "bold")
+              // $(this).addClass('selected-user')
+              // $(this).css("text-shadow", '#0C0 1px 0 10px')
+              $(this).css("text-shadow", '0px 5px 5px #5177B0')
               activeUser = event.target.id
             })
           }

@@ -1,0 +1,5 @@
+
+/* to change the friend list bullet */
+#chat-side-bar ul li::marker{
+  content: '🌎 ';
+}
