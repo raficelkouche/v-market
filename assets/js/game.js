@@ -74,7 +74,7 @@ class Game extends Phaser.Scene {
     })
     this.storeInfo = this.sys.game.globals.globalVars.storeData
     
-    const socket = io('http://localhost:3000', {
+    const socket = io('http://localhost:8000', {
       autoConnect: false,
       query: {
         user_id: this.playerInfo.id,
@@ -121,6 +121,7 @@ class Game extends Phaser.Scene {
             alert("select a user first and then type your message")
           }
         })
+      })
 
       
         socket.on('receive message', data => {
