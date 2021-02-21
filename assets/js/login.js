@@ -11,14 +11,19 @@ class Login extends Phaser.Scene {
   }
 
   create() {
-    
+    this.cameras.main.setBounds(0, 0, 1280, 960);
     //check if a user is already logged in
     $.ajax({
       method: 'GET',
       url: '/users/login'
     }).then(res => {
       if (res.user_ID) {
-        this.scene.start('Game', {storeInfo: this.storeInfo})
+        let scene = this.scene;
+        $('#loginInsert').addClass('fadeout')
+        this.cameras.main.fadeOut(250, 0, 0, 0)
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
+          scene.start('Game')
+        })
       }else{
         this.add.image(140, 0, 'background').setOrigin(0).setDepth(0);
         const form = this.add.dom(640, 480).createFromCache('loginForm')
@@ -38,7 +43,12 @@ class Login extends Phaser.Scene {
     $(document).off().on("click", '#confirm-button', () => {
       let name = {guest: true, name: $("#login").serialize().slice(5,-1).slice(0,-9)}
       name.storeInfo = Array.from(result)
-      this.scene.start('Game' , name);
+      let scene = this.scene;
+      $('#loginInsert').addClass('fadeout')
+      this.cameras.main.fadeOut(250, 0, 0, 0)
+      this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
+        scene.start('Game')
+      })
     })
 
     //when user click register on login
@@ -92,7 +102,12 @@ class Login extends Phaser.Scene {
               sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
               sessionStorage.setItem("user_id", res.user_id)
               sessionStorage.setItem("guest", res.guest || false)
-              this.scene.start('Game');
+              let scene = this.scene;
+              $('#loginInsert').addClass('fadeout')
+              this.cameras.main.fadeOut(250, 0, 0, 0)
+              this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
+                scene.start('Game')
+              })
             }
           });
         }

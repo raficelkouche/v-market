@@ -53,7 +53,6 @@ class Game extends Phaser.Scene {
 
   create() {
 
-    
     // works but not after a while
     this.sound.pauseOnBlur = false;
     this.music = this.sound.add('background', {
@@ -72,19 +71,12 @@ class Game extends Phaser.Scene {
         $('#music').html('<i class="fas fa-volume-up"></i>')
       }
     })
-
     this.storeInfo = this.sys.game.globals.globalVars.storeData
-    console.log(this.storeInfo)
-    
-    
-    this.username = this.playerInfo.name //use already init data
-    this.user_id = this.playerInfo.id
-
-    const socket = io('http://localhost:8000', {
+    const socket = io('http://localhost:3000', {
       autoConnect: false,
       query: {
-        user_id: this.user_id,
-        username: this.username
+        user_id: this.playerInfo.id,
+        username: this.playerInfo.name
       }
     })
 
@@ -142,7 +134,7 @@ class Game extends Phaser.Scene {
     */
     })
 
-    socket.on('connect_error', () => {
+    socket.on('connect_error', (x) => {
       console.log("server refused connection")
     })
 
@@ -151,6 +143,7 @@ class Game extends Phaser.Scene {
       socket.disconnect();
     })
 
+    
    //disable key cap on all element so it would not steal the focus
     this.input.on('pointerdownoutside', () => {
       this.input.keyboard.disableGlobalCapture();
@@ -158,6 +151,7 @@ class Game extends Phaser.Scene {
         this.key[k].enabled = false;
       } 
     })
+    
     $('canvas').on('click', ()=>{ 
       $(document.activeElement).blur();
       this.input.keyboard.enableGlobalCapture();
@@ -165,6 +159,8 @@ class Game extends Phaser.Scene {
         this.key[k].enabled = true;
       } 
     })
+    
+
     //draw back drop for player name, will refresh
     this.gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
     this.gra.alpha= .5;
@@ -443,6 +439,7 @@ class Game extends Phaser.Scene {
   }
 
   updateCamera(){ //setup cam to follow player
+    this.cameras.main.fadeIn(250, 0, 0, 0)
     this.cameras.main.setBounds(0, 0, 1920, 1920);
     this.cameras.main.setZoom(2);
     this.cameras.main.startFollow(this.player, true)
