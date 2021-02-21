@@ -44,7 +44,9 @@ class Game extends Phaser.Scene {
     //load all texture
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
+    this.load.spritesheet('fm_01', 'characters/fm_01.png', { frameWidth: 32, frameHeight: 32 })
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
+    this.load.spritesheet('m_01', 'characters/m_01.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
     this.load.audio('background', 'audio/TownTheme.mp3')
     this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, DOWN, SPACE, SHIFT X, M") //WASD to move, M to toggle minimap
@@ -222,51 +224,24 @@ class Game extends Phaser.Scene {
     this.groundLayer.setCollisionByProperty({ collides: true });
     this.cityObjLayer.setCollisionByProperty({ collides: true });
 
-    //make sprite anime
-    this.anims.create({
-      key: 'idle-u',
-      frames: this.anims.generateFrameNumbers('fm_02', { frames: [10] }),
-    });
-    this.anims.create({
-      key: 'idle-d',
-      frames: this.anims.generateFrameNumbers('fm_02', { frames: [1] }),
-    });
-    this.anims.create({
-      key: 'idle-l',
-      frames: this.anims.generateFrameNumbers('fm_02', { frames: [4] }),
-    });
-    this.anims.create({
-      key: 'idle-r',
-      frames: this.anims.generateFrameNumbers('fm_02', { frames: [7] }),
-    });
-    this.anims.create({
-      key: 'walk-u',
-      frames: this.anims.generateFrameNumbers('fm_02', { frames: [9, 10, 11] }),
-      frameRate: 7,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'walk-d',
-      frames: this.anims.generateFrameNumbers('fm_02', { frames: [0, 1, 2] }),
-      frameRate: 7,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'walk-l',
-      frames: this.anims.generateFrameNumbers('fm_02', { frames: [3, 4, 5] }),
-      frameRate: 7,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'walk-r',
-      frames: this.anims.generateFrameNumbers('fm_02', { frames: [6, 7, 8] }),
-      frameRate: 7,
-      repeat: -1
-    });
-
+    
     //add player sprite, animation and name
-    this.player = this.physics.add.sprite( this.playerInfo.x ||400, this.playerInfo.y || 300, "fm_02")
-    this.player.play('idle-d')
+    let rand = Math.floor(Math.random() * 3);
+    switch (rand) {
+      case 0:
+        rand = 'fm_01'
+        break;
+      case 1:
+        rand = 'fm_02'
+        break;
+      case 2:
+        rand = 'm_01'
+        break;
+    }
+    this.player = this.physics.add.sprite( this.playerInfo.x ||400, this.playerInfo.y || 300, rand)
+    //make sprite anime for added sprite
+    this.createSpriteAnimation(this.player.texture.key)
+    this.player.play(`idle-d-${this.player.texture.key}`)
     this.playerName = this.add.text(this.player.x -60, this.player.y+32, this.playerInfo.guest ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
     this.playerName.setDepth(9);
     this.playerNameBox = new Phaser.Geom.Rectangle(this.player.x - 3 - this.playerName.width / 2, this.playerName.y - this.playerName.height / 2, this.playerName.width + 6, this.playerName.height);
@@ -347,6 +322,49 @@ class Game extends Phaser.Scene {
 
   }
 
+  createSpriteAnimation(spriteName) {
+    this.anims.create({
+      key: `idle-u-${spriteName}`,
+      frames: this.anims.generateFrameNumbers(`${spriteName}`, { frames: [10] }),
+    });
+    this.anims.create({
+      key: `idle-d-${spriteName}`,
+      frames: this.anims.generateFrameNumbers(`${spriteName}`, { frames: [1] }),
+    });
+    this.anims.create({
+      key: `idle-l-${spriteName}`,
+      frames: this.anims.generateFrameNumbers(`${spriteName}`, { frames: [4] }),
+    });
+    this.anims.create({
+      key: `idle-r-${spriteName}`,
+      frames: this.anims.generateFrameNumbers(`${spriteName}`, { frames: [7] }),
+    });
+    this.anims.create({
+      key: `walk-u-${spriteName}`,
+      frames: this.anims.generateFrameNumbers(`${spriteName}`, { frames: [9, 10, 11] }),
+      frameRate: 7,
+      repeat: -1
+    });
+    this.anims.create({
+      key: `walk-d-${spriteName}`,
+      frames: this.anims.generateFrameNumbers(`${spriteName}`, { frames: [0, 1, 2] }),
+      frameRate: 7,
+      repeat: -1
+    });
+    this.anims.create({
+      key: `walk-l-${spriteName}`,
+      frames: this.anims.generateFrameNumbers(`${spriteName}`, { frames: [3, 4, 5] }),
+      frameRate: 7,
+      repeat: -1
+    });
+    this.anims.create({
+      key: `walk-r-${spriteName}`,
+      frames: this.anims.generateFrameNumbers(`${spriteName}`, { frames: [6, 7, 8] }),
+      frameRate: 7,
+      repeat: -1
+    });
+  }
+
   update() {
     
     //take player into store if space is press when overlap
@@ -366,30 +384,31 @@ class Game extends Phaser.Scene {
     this.player.setVelocity(0);
     //update player movement
     if (this.key.LEFT.isDown || this.key.A.isDown) {
-      this.player.setVelocityX(-150);if (this.player.anims.currentAnim.key === 'walk-l') { }
+      this.player.setVelocityX(-150);if (this.player.anims.currentAnim.key === `walk-l-${this.player.texture.key}`) { }
       else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
-        this.player.play('walk-l')
+        this.player.play(`walk-l-${this.player.texture.key}`)
+        console.log(this.anims)
       }
     }
     else if (this.key.RIGHT.isDown || this.key.D.isDown) {
       this.player.setVelocityX(150);
-      if (this.player.anims.currentAnim.key === 'walk-r') { }
+      if (this.player.anims.currentAnim.key === `walk-r-${this.player.texture.key}`) { }
       else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
-        this.player.play('walk-r')
+        this.player.play(`walk-r-${this.player.texture.key}`)
       }
     }
     if (this.key.UP.isDown || this.key.W.isDown) {
       this.player.setVelocityY(-150);
-      if (this.player.anims.currentAnim.key === 'walk-u') { }
+      if (this.player.anims.currentAnim.key === `walk-u-${this.player.texture.key}`) { }
       else {
-        this.player.play('walk-u')
+        this.player.play(`walk-u-${this.player.texture.key}`)
       }
     }
     else if (this.key.DOWN.isDown || this.key.S.isDown) {
       this.player.setVelocityY(150);
-      if (this.player.anims.currentAnim.key === 'walk-d') { }
+      if (this.player.anims.currentAnim.key === `walk-d-${this.player.texture.key}`) { }
       else {
-        this.player.play('walk-d')
+        this.player.play(`walk-d-${this.player.texture.key}`)
       }
     }
 
@@ -397,7 +416,7 @@ class Game extends Phaser.Scene {
     if (!this.key.DOWN.isDown && !this.key.UP.isDown && !this.key.RIGHT.isDown && !this.key.LEFT.isDown && !this.key.W.isDown && !this.key.A.isDown && !this.key.S.isDown && !this.key.D.isDown) {
       if (!this.player.anims.currentAnim.key.includes('idle')) {
         let newAnim = this.player.anims.currentAnim.key.split('-')
-        this.player.play("idle-" + newAnim[1])
+        this.player.play("idle-" + newAnim[1] + `-${this.player.texture.key}`)
       }
     }
 
@@ -410,13 +429,7 @@ class Game extends Phaser.Scene {
     }
     
     //update player name's place
-    this.playerName.x = this.player.x;  
-    this.playerName.y = this.playerInfo.guest ? this.player.y + 34 : this.player.y + 28; 
-    this.playerNameBox.x = this.playerName.x - 3 - this.playerName.width / 2
-    this.playerNameBox.y = this.playerName.y - this.playerName.height / 2
-    this.overlap = false; //update overlap check
-    this.gra.clear() //redraw the backdrop on name
-    this.gra.fillRectShape(this.playerNameBox);
+    this.updatePlayerGra()
   }
   
   updatePlayerGra() {
