@@ -94,3 +94,57 @@ main {
   outline: none;
   color: rgb(18, 52, 1);
 }
+
+#friends-list.disable{
+  height: 100%;
+  justify-content: center;
+}
+
+#messages.disable {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#Please-login {
+  text-align: center;
+}
+
+#login.in-game{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#chat-side-bar #messages form label {
+  text-align: center;
+}
+
+#chat-side-bar #messages form #name {
+  flex-grow: 0;
+  margin-bottom: 1rem;
+}
+
+#chat-side-bar #messages form #password {
+  flex-grow: 0;
+  margin-bottom: 1rem;
+}
+
+#chat-side-bar #messages form p{
+  height: 1.5rem;
+  width: 100%;
+  color: rgb(141, 24, 24);
+  text-align: center;
+  font-weight: 800;
+}
+
+#chat-side-bar #messages form div{
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#chat-side-bar #messages form div button {
+  text-align: center;
+  width: 30%;
+}

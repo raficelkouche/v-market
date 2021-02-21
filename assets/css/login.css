@@ -3,9 +3,20 @@
   height: 960px;
 }
 
+
 #RegisterInsert {
   width: 1280px;
   height: 960px;
+}
+
+#loginInsert.fadeout,
+#RegisterInsert.fadeout {
+  opacity: 0;
+  -webkit-animation: fadeout 0.25s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadeout 0.25s; /* Firefox < 16 */
+  -ms-animation: fadeout 0.25s; /* Internet Explorer */
+  -o-animation: fadeout 0.25s; /* Opera < 12.1 */
+  animation: fadeout 0.25s;
 }
 
 .login {
@@ -166,3 +177,7 @@ input:-webkit-autofill:active  {
   height: 3rem
 }
 
+@keyframes fadeout {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}

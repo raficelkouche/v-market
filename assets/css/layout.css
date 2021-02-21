@@ -6,6 +6,20 @@
   background: rgba(0, 0, 0, 0.2);
   width:1280px;
   height:960px;
+  -webkit-animation: fadein 0.25s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadein 0.25s; /* Firefox < 16 */
+  -ms-animation: fadein 0.25s; /* Internet Explorer */
+  -o-animation: fadein 0.25s; /* Opera < 12.1 */
+  animation: fadein 0.25s;
+}
+
+#backdrop.fadeout {
+  opacity: 0;
+  -webkit-animation: fadeout 0.25s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadeout 0.25s; /* Firefox < 16 */
+  -ms-animation: fadeout 0.25s; /* Internet Explorer */
+  -o-animation: fadeout 0.25s; /* Opera < 12.1 */
+  animation: fadeout 0.25s;
 }
 
 #store_banner {
@@ -77,10 +91,12 @@
   color: #111111;
 }
 
+/* too be added
 #search-bar {
-  /* to be added*/
+
   
 }
+*/
 
 #store-data {
   align-self: center;
@@ -176,9 +192,11 @@ td:hover{
   font-family: Arial;
 }
 
+/* 
 #request-data {
   
 }
+*/
 
 #customer {
   position:fixed;
@@ -224,4 +242,14 @@ td:hover{
   -webkit-user-select: none; /* Safari */
   user-select: none;
   font-size: 0.7rem;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeout {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
