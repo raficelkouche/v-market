@@ -338,6 +338,8 @@ class Game extends Phaser.Scene {
           .then( (res) => {
             sessionStorage.clear();
             $('#top-nav-bar').css('visibility', 'hidden')
+            $('#chat-side-bar').css('visibility', 'hidden')
+
             this.scene.start('Login')
           })
       })
