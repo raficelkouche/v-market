@@ -16,7 +16,6 @@ class Game extends Phaser.Scene {
       //guest: data.guest || false,
       //id: data.user_id,
       name: sessionStorage.getItem("IGN"),
-      guest: sessionStorage.getItem("guest") === "true",
       id: sessionStorage.getItem("user_id"),
       x: data.x || undefined,
       y: data.y || undefined
@@ -54,7 +53,7 @@ class Game extends Phaser.Scene {
   }
 
   create() {
-
+    console.log(this.playerInfo.id)
     // works but not after a while
     this.sound.pauseOnBlur = false;
     this.music = this.sound.add('background', {
@@ -74,6 +73,7 @@ class Game extends Phaser.Scene {
       }
     })
     this.storeInfo = this.sys.game.globals.globalVars.storeData
+    
     const socket = io('http://localhost:3000', {
       autoConnect: false,
       query: {
@@ -81,69 +81,70 @@ class Game extends Phaser.Scene {
         username: this.playerInfo.name
       }
     })
-
-    socket.connect();
+    if (this.playerInfo.id) {
+      socket.connect();
     
-    socket.on('success', () => {
-      let activeUser;
-      $("#chat-side-bar form").on('submit', (event) => {
-        event.preventDefault();
-        let message = $('#chat-message').val()
-        if ($('#chat-message').val() && activeUser) {
-          $('#messages').append(`<li>${this.username}: ${message}</li`)
-          socket.emit('send message', {
-            recipient: activeUser,
-            message
-          })
-          $('#chat-message').val('')
-        } else {
-          alert("select a user first and then type your message")
-        }
-      })
-      
-      socket.on('updated-friends-list', usersList => {
-        console.log("users List: ", usersList)
-        Object.keys(usersList).forEach((user_id) => {
-          if (!document.getElementById(user_id) && user_id !== this.user_id) {
-            $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
-            $("#friends-list li").on("click", function (event) {
-              $("#friends-list ul").children().css("color", "black")
-              $(this).css("color", "red")
-              activeUser = event.target.id
+      socket.on('success', () => {
+        let activeUser;
+        $("#chat-side-bar form").on('submit', (event) => {
+          event.preventDefault();
+          let message = $('#chat-message').val()
+          if ($('#chat-message').val() && activeUser) {
+            $('#messages').append(`<li>${this.username}: ${message}</li`)
+            socket.emit('send message', {
+              recipient: activeUser,
+              message
             })
-          }
-        })
-      });
-  
-      socket.on('receive message', data => {
-        $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
-      })
-      
-      socket.on('delete user', user_id => {
-        console.log("delete: ", user_id)
-        $(`#${user_id}`).remove()
-      })
-  
-      /* socket.on('all players', playersList => {
-        Object.keys(playersList).forEach((player) => {
-          if(player !== this.user_id) {
-            this.addOtherPlayers(playersList[player])
+            $('#chat-message').val('')
           } else {
-            this.createPlayer(playersList[player])
+            alert("select a user first and then type your message")
           }
         })
+
+        socket.on('updated-friends-list', usersList => {
+          console.log("users List: ", usersList)
+          Object.keys(usersList).forEach((user_id) => {
+            if (!document.getElementById(user_id) && user_id !== this.user_id) {
+              $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
+              $("#friends-list li").on("click", function (event) {
+                $("#friends-list ul").children().css("color", "black")
+                $(this).css("color", "red")
+                activeUser = event.target.id
+              })
+            }
+          })
+        });
+      
+        socket.on('receive message', data => {
+          $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
+        })
+
+        socket.on('delete user', user_id => {
+          console.log("delete: ", user_id)
+          $(`#${user_id}`).remove()
+        })
+      
+        /* socket.on('all players', playersList => {
+          Object.keys(playersList).forEach((player) => {
+            if(player !== this.user_id) {
+              this.addOtherPlayers(playersList[player])
+              } else {
+              this.createPlayer(playersList[player])
+            }
+          })
+        })
+      */
       })
-    */
-    })
 
-    socket.on('connect_error', (x) => {
-      console.log("server refused connection")
-    })
+      socket.on('connect_error', (x) => {
+        console.log("server refused connection")
+      })
 
-    socket.on('disconnect', () => {
-      console.log("server shutdown")
-      socket.disconnect();
-    })
+      socket.on('disconnect', () => {
+        console.log("server shutdown")
+        socket.disconnect();
+      })
+    }
 
     
    //disable key cap on all element so it would not steal the focus
@@ -154,7 +155,7 @@ class Game extends Phaser.Scene {
       } 
     })
     
-    $('canvas').on('click', ()=>{ 
+    $('canvas').off().on('click', ()=>{ 
       $(document.activeElement).blur();
       this.input.keyboard.enableGlobalCapture();
       for (const k of Object.keys(this.key)) {
@@ -224,8 +225,7 @@ class Game extends Phaser.Scene {
     this.groundLayer.setCollisionByProperty({ collides: true });
     this.cityObjLayer.setCollisionByProperty({ collides: true });
 
-    
-    //add player sprite, animation and name
+    //rand to be del, just for showcasing
     let rand = Math.floor(Math.random() * 3);
     switch (rand) {
       case 0:
@@ -238,11 +238,14 @@ class Game extends Phaser.Scene {
         rand = 'm_01'
         break;
     }
+
+    //add player sprite, animation and name
     this.player = this.physics.add.sprite( this.playerInfo.x ||400, this.playerInfo.y || 300, rand)
     //make sprite anime for added sprite
     this.createSpriteAnimation(this.player.texture.key)
+
     this.player.play(`idle-d-${this.player.texture.key}`)
-    this.playerName = this.add.text(this.player.x -60, this.player.y+32, this.playerInfo.guest ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
+    this.playerName = this.add.text(this.player.x -60, this.player.y+32, !(this.playerInfo.id) ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
     this.playerName.setDepth(9);
     this.playerNameBox = new Phaser.Geom.Rectangle(this.player.x - 3 - this.playerName.width / 2, this.playerName.y - this.playerName.height / 2, this.playerName.width + 6, this.playerName.height);
     this.gra.setDepth(8);
@@ -291,20 +294,84 @@ class Game extends Phaser.Scene {
       }
     }, this);
     // on navbar
-    $('#mini-map').on('click', () => {
+    $('#mini-map').off().on('click', () => {
       this.miniCam.setVisible(!this.miniCam.visible)
     })
 
     // show nav bar after login
     $('#top-nav-bar').css('visibility', 'visible')
 
-    if (sessionStorage.getItem('guest') === true) {
+    if (!this.playerInfo.id) {
+      //set up shown name
+      $('#IGN').removeClass() 
+      $('#IGN').addClass("btn btn-outline-secondary")
+      $('#IGN').attr("data-bs-toggle", '')
       document.getElementById('IGN').innerHTML = 'Guest';
       document.getElementById('user-session').innerHTML = 'Login';
+      $('#chat-side-bar').empty()
+      let login = `
+        <div id="friends-list" class="disable">
+          <h3 id='Please-login'>Please login to enjoy the full functionality</h3>
+        </div>
+        <div id="messages" class='disable'>
+          <form id='login' class='in-game'>
+            <label for="name">User Name</label>
+            <input type="text" id="name" name="name" placeholder="Your user name" required></input>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Your password" required></input>
+            <p class="err-msg"></p>
+            <div>
+              <button type="submit" class="btn btn-primary btn-lg" id="login-button">Login</button>
+              <button type="button"class="btn btn-success btn-lg" id="register-button">Register</button>
+            </div>
+          </form>
+        </div>
+        `
+      $('#chat-side-bar').append(login)
+      $("#login").off().on("submit", (e) => {
+        e.preventDefault();
+        let scene = this.scene
+        let music = this.music
+        this.playerInfo.x = this.player.x
+        this.playerInfo.y = this.player.y
+        let cam = this.cameras.main
+        let playerInfo = this.playerInfo
+        this.sys.game.globals.globalVars.login('Game')
+        .then((x) => {
+          music.destroy(); 
+          cam.fadeOut(250, 0, 0, 0)
+          cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+              scene.start('Game', playerInfo);
+            })
+          }
+        )
+      })
     } else {
+      $('#IGN').removeClass() 
+      $('#IGN').addClass("btn btn-outline-secondary dropdown-toggle")
+      $('#IGN').attr("data-bs-toggle", 'dropdown')
+      if(!$('#chat-message').length)  {
+        $('#chat-side-bar').empty()
+        let chat = `
+        <div id="friends-list">
+            <h3>Friends</h3>
+            <ul>
+            </ul>
+          </div>
+          <div id="messages">
+            <ul>
+            </ul>
+          </div>
+          <form>
+            <input type="text" name="chat-message" id="chat-message" autocomplete="off">
+            <button>Send</button>
+        </form>`;
+        $('#chat-side-bar').append(chat)
+      }
       document.getElementById('IGN').innerHTML = sessionStorage.getItem('IGN');
       document.getElementById('user-session').innerHTML = 'Logout';
-      $('#user-session').on('click', () => {
+      $('#user-session').off().on('click', () => {
+        socket.disconnect(true)
         console.log('logout clicked')
         $.ajax('users/logout', { method: 'POST'})
           .then( (res) => {
@@ -368,7 +435,7 @@ class Game extends Phaser.Scene {
   update() {
     
     //take player into store if space is press when overlap
-    if (this.overlap && this.key.SPACE.isDown && !this.enterStore) {
+    if (this.overlap && this.key.SPACE.isDown && !this.enterStore && this.playerInfo.id) {
       this.enterStore = true; //prevent event fire twice
       this.playerInfo.store_id = this.storeId;
       this.playerInfo.x = this.player.x;
@@ -434,7 +501,7 @@ class Game extends Phaser.Scene {
   
   updatePlayerGra() {
     this.playerName.x = this.player.x;  
-    this.playerName.y = this.playerInfo.guest ? this.player.y + 34 : this.player.y + 28; 
+    this.playerName.y = !(this.playerInfo.id) ? this.player.y + 34 : this.player.y + 28; 
     this.playerNameBox.x = this.playerName.x - 3 - this.playerName.width / 2
     this.playerNameBox.y = this.playerName.y - this.playerName.height / 2
     this.overlap = false; //update overlap check

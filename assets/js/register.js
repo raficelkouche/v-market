@@ -81,7 +81,6 @@ class Register extends Phaser.Scene {
             } else { // let user in game
               sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
               sessionStorage.setItem("user_id", res.user_id)
-              sessionStorage.setItem("guest", false) //will always be false cause user have register
               let scene = this.scene;
               $('#RegisterInsert').addClass('fadeout')
               this.cameras.main.fadeOut(250, 0, 0, 0)

@@ -41,9 +41,10 @@ class Login extends Phaser.Scene {
 
     //target the log in as guest button
     $(document).off().on("click", '#confirm-button', () => {
-      let name = {guest: true, name: $("#login").serialize().slice(5,-1).slice(0,-9)}
-      name.storeInfo = Array.from(result)
+      let name = $("#login").serialize().slice(5,-1).slice(0,-9)
       let scene = this.scene;
+      sessionStorage.setItem("IGN", name)
+      sessionStorage.setItem("user_id", "")
       $('#loginInsert').addClass('fadeout')
       this.cameras.main.fadeOut(250, 0, 0, 0)
       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
@@ -59,58 +60,17 @@ class Login extends Phaser.Scene {
     //user sub the login info
     $("#login").off().on("submit", (e) => {
       e.preventDefault();
-      if ($('.box').length) {
-        $('.box').remove()
-      }
-      let err = `
-      <div class="box err">
-        <div>Please input both field</div>
-      </div>`;
-      if (!$('#name').val()) { //User doesn't enter name
-        $(`#loginInsert`).append(err);
-      } else {
-        $.ajax("/users/login", {method: 'POST', data: $("#login").serialize()})
-          .then((res) => {
-            if(res.guest) { 
-              let confirm = `
-              <div class="box confirm">
-                <div>You sure you want to login as Guest?</div>
-                <button type="button" class="btn btn-primary btn-lg" id="confirm-button">Just let me in!</button>
-              </div>`
-              $(`#loginInsert`).append(confirm)
-            } else if(res.err === "user exist") { //Guest use already existed username
-              err = `
-              <div class="box err">
-                <div>User name already taken</div>
-              </div>`
-              $(`#loginInsert`).append(err);
-            } else if(res.err === "special character is not allow") { //Guest use special character in the name
-              err = `
-              <div class="box err">
-                <div>Special character is not allow</div>
-              </div>`
-              $(`#loginInsert`).append(err);
-            }else if(res.err) { // User name/password not match
-              err = `
-              <div class="box err">
-                <div>Invalid password & user combination</div>
-              </div>`
-              //add animation for box appear if have time
-              $(`#loginInsert`).append(err);
-            } else { //let user in game
-              //store user information in the session
-              sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
-              sessionStorage.setItem("user_id", res.user_id)
-              sessionStorage.setItem("guest", res.guest || false)
-              let scene = this.scene;
-              $('#loginInsert').addClass('fadeout')
-              this.cameras.main.fadeOut(250, 0, 0, 0)
-              this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
-                scene.start('Game')
-              })
-            }
-          });
+      let scene = this.scene;
+      let cam = this.cameras.main
+      this.sys.game.globals.globalVars.login().then(res => {
+        if (res) {
+          $('#LoginInsert').addClass('fadeout')
+          cam.fadeOut(250, 0, 0, 0)
+          cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+            scene.start('Game')
+          })
         }
+      })
     })
   }
 

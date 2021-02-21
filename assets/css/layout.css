@@ -91,10 +91,12 @@
   color: #111111;
 }
 
+/* too be added
 #search-bar {
-  /* to be added*/
+
   
 }
+*/
 
 #store-data {
   align-self: center;
@@ -190,9 +192,11 @@ td:hover{
   font-family: Arial;
 }
 
+/* 
 #request-data {
   
 }
+*/
 
 #customer {
   position:fixed;

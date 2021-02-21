@@ -41,7 +41,7 @@ module.exports = () => {
         db.userLogin(req.body.name)
         .then( result => {
           if (!result) { //if does not dup with existing user, let him in
-            res.json({guest : true});
+            res.json({user_id : null});
           } else { // return err if user exist
             res.json({err : 'user exist'});
           }
