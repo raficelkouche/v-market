@@ -34,6 +34,7 @@ class Store extends Phaser.Scene {
   }
 
   create() {
+
     this.initload = true;
     let endOfStore = false;
     let storeProducts = [];
@@ -375,6 +376,9 @@ class Store extends Phaser.Scene {
         }
         // checkout button function
         $('#checkout-button').on('click', () => {
+
+          console.log('checkout button hit!')
+          console.log(this.playerInfo.id)
           const data = {
             user_id: this.playerInfo.id,
             store_id: this.storeId,
@@ -459,6 +463,10 @@ class Store extends Phaser.Scene {
         })
       })
     })
+    $('#mini-map').on('click', () => {
+      this.miniCam.setVisible(!this.miniCam.visible)
+    })
+
     //close shop with ESC
     this.input.keyboard.on('keydown', function (event) {
       if (event.key === 'Escape') {

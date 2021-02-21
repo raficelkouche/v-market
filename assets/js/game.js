@@ -39,6 +39,7 @@ class Game extends Phaser.Scene {
   static user_id;
   static username;
   static gra;
+  static musicOn = false;
 
   preload() {
     //load all texture
@@ -52,12 +53,33 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+
+    
+    // works but not after a while
+    this.music = this.sound.add('background', {
+      loop: true,
+    })
+    //   // toggle music off or on
+    $('#music').on('click', () => {
+      if(!this.musicOn) {
+        this.music.play()
+        this.musicOn = true;
+        $('#music').html('<i class="fas fa-volume-mute"></i>')
+      } else {
+        this.music.pause()
+        this.musicOn = false;
+        $('#music').html('<i class="fas fa-volume-up"></i>')
+      }
+    })
+
     this.storeInfo = this.sys.game.globals.globalVars.storeData
+    console.log(this.storeInfo)
+    
     
     this.username = this.playerInfo.name //use already init data
     this.user_id = this.playerInfo.name.id
 
-    const socket = io('http://localhost:3000', {
+    const socket = io('http://localhost:8000', {
       autoConnect: false,
       query: {
         user_id: this.user_id,
@@ -296,6 +318,25 @@ class Game extends Phaser.Scene {
         this.miniCam.setVisible(!this.miniCam.visible)
       }
     }, this);
+    // on navbar
+    $('#mini-map').on('click', () => {
+      this.miniCam.setVisible(!this.miniCam.visible)
+    })
+
+    // show nav bar after login
+    $('#top-nav-bar').css('visibility', 'visible')
+
+    if (sessionStorage.getItem('guest') === true) {
+      document.getElementById('IGN').innerHTML = 'Guest';
+      document.getElementById('user-session').innerHTML = 'Login';
+    } else {
+      document.getElementById('IGN').innerHTML = sessionStorage.getItem('IGN');
+      document.getElementById('user-session').innerHTML = 'Logout';
+    }
+
+    // show chat bar after login
+    $('#chat-side-bar').css('visibility', 'visible')
+
   }
 
   update() {

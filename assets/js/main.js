@@ -28,6 +28,7 @@ const config = {
     target: 30,
     forceSetTimeOut: true
   },
+
   scene: [Login, Register, Game, Store]
 };
 

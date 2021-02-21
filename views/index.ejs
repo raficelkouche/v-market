@@ -26,12 +26,26 @@
     <link rel="stylesheet" href="/css/game.css" type="text/css" />
     <link rel="stylesheet" href="/css/product-details.css" type="text/css" />
     <link rel="stylesheet" href="/css/checkout.css" type="text/css" />
+    <link rel="stylesheet" href="/css/navbar.css" type="text/css" />
+
+
   </head>
 
   <body>
     <main>
-      <div id="top-nav-bar">
-        <h2>Nav Bar</h2>
+      <div id="top-nav-bar"> 
+        <div><img id='logo' src="https://see.fontimg.com/api/renderfont4/8VA2/eyJyIjoiZnMiLCJoIjo0NywidyI6MTAwMCwiZnMiOjQ3LCJmZ2MiOiIjMDAwMDAwIiwiYmdjIjoiI0ZGRkZGRiIsInQiOjF9/Vi1NYXJrZXQ/quite-magical-regular.png" alt="Cute fonts"></div>
+        <button id='user-session' class="btn btn-outline-secondary"></button>
+        <div class="dropdown">
+          <button id="IGN" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" href="#">Order History</a></li>
+            <li><a class="dropdown-item" href="#">Inventory</a></li>
+            <li><a class="dropdown-item" href="#">Account</a></li>
+          </ul>
+        </div>
+        <button id="mini-map"class="btn btn-outline-secondary"><i class="fas fa-map-marked-alt"></i> Mini-Map</button>
+        <button id="music" class="btn btn-outline-secondary"><i class="fas fa-volume-up"></i></button>
       </div>
       <div id="game-chat-container">
         <div id="game-container">
@@ -55,7 +69,7 @@
         </div>
       </div>
     </main>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
   </body>
   
 </html>
