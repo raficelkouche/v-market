@@ -1,0 +1,82 @@
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+#game-chat-container{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+#game-container{
+  border: 4px solid rgb(10, 10, 89);
+  width: 75%;
+  flex-basis: 75%;
+  height: 90vh;
+  background-color: black;
+}
+#chat-side-bar{
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 4px solid red;
+  flex-basis: 25%;
+  background-color: rgb(71, 71, 174);
+}
+
+#friends-list{
+  display:flex;
+  flex-direction: column;
+  flex-basis: 45%;
+  border-bottom: solid 2px red;
+  background-color: aquamarine;
+}
+
+#messages{
+  list-style-type: none;
+}
+#messages li{
+  list-style-type: none;
+  color: white;
+  background-color: darkslategrey;
+}
+
+#messages>li:nth-child(odd) {
+    background: #efefef;
+    color:rgb(10, 10, 89)
+  }
+
+#chat-side-bar form{
+  display: flex;
+  flex-direction: row;
+  
+}
+#chat-side-bar form input{
+  border: none;
+  padding: 0 1rem;
+  flex-grow: 1;
+  border-radius: 2rem;
+  margin: 0.25rem;
+}
+#chat-side-bar input:focus {
+  outline: none;
+}
+
+#chat-side-bar form button{
+  background: rgb(230, 186, 8);
+  border: none;
+  padding: 0 1rem;
+  margin: 0.25rem;
+  border-radius: 3px;
+  outline: none;
+  color: rgb(18, 52, 1);
+}
+
+#top-nav-bar{
+  display: flex;
+  border: 4px solid green;
+  align-items: center;
+}

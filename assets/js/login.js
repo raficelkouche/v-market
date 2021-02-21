@@ -2,18 +2,30 @@ class Login extends Phaser.Scene {
   constructor() {
     super('Login')
   }
-
+  
   preload() {
+    
     this.load.html('loginForm', 'templates/login.html')
     this.load.image('background', 'maps/farmersMarket.jpeg')
+ 
   }
 
   create() {
+    
+    //check if a user is already logged in
+    $.ajax({
+      method: 'GET',
+      url: '/users/login'
+    }).then(res => {
+      if (res.user_ID) {
+        this.scene.start('Game', {storeInfo: this.storeInfo})
+      }else{
+        this.add.image(140, 0, 'background').setOrigin(0).setDepth(0);
+        const form = this.add.dom(640, 480).createFromCache('loginForm')
+      }
+    }).catch(err => console.log(err))
 
-    this.add.image(140,0,'background').setOrigin(0).setDepth(0);
-    const form = this.add.dom(640,480).createFromCache('loginForm')
-
-  }
+}
 
   update(){
 
@@ -25,11 +37,8 @@ class Login extends Phaser.Scene {
     //target the log in as guest button
     $(document).off().on("click", '#confirm-button', () => {
       let name = {guest: true, name: $("#login").serialize().slice(5,-1).slice(0,-9)}
-      $.ajax(`/stores`, {method: 'GET'})
-      .then((result) => {
-        name.storeInfo = Array.from(result)
-        this.scene.start('Game' , name);
-      })
+      name.storeInfo = Array.from(result)
+      this.scene.start('Game' , name);
     })
 
     //when user click register on login
@@ -79,17 +88,18 @@ class Login extends Phaser.Scene {
               //add animation for box appear if have time
               $(`#loginInsert`).append(err);
             } else { //let user in game
-              $.ajax(`/stores`, {method: 'GET'})
-              .then((result) => {
-                res.storeInfo = Array.from(result)
-  
-                this.scene.start('Game' , res);
-              })
+              //store user information in the session
+              sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
+              sessionStorage.setItem("user_id", res.user_id)
+              sessionStorage.setItem("guest", res.guest || false)
+              this.scene.start('Game');
             }
           });
         }
     })
   }
+
 }
 
 export { Login }
+

@@ -2,16 +2,17 @@ import { Game } from './game.js'
 import { Login } from './login.js'
 import { Register } from './register.js'
 import { Store } from './store.js'
+import { Global } from './global.js'
 
 const config = {
   type: Phaser.AUTO,
-
+  
   scale: {
     mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_VERTICALLY,
+    autoCenter: Phaser.Scale.CENTER,
     width: 1280,
     height: 960,
-    parent: "#game-container"
+    parent: "game-container"
   },
   dom: {
     createContainer: true
@@ -30,4 +31,13 @@ const config = {
   scene: [Login, Register, Game, Store]
 };
 
-const startGame = new Phaser.Game(config)
+class NewGame extends Phaser.Game {
+  constructor() {
+    super(config);
+    const globalVars = new Global()
+    this.globals = {globalVars}
+  }
+}
+
+
+const startGame = new NewGame();
