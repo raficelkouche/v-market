@@ -33,7 +33,7 @@ class Store extends Phaser.Scene {
     this.key = this.input.keyboard.addKeys("ESC")
   }
 
-  create() {
+  create() {  
 
     this.initload = true;
     let endOfStore = false;
@@ -41,6 +41,14 @@ class Store extends Phaser.Scene {
     let cart = [];
     let storeLoadCount = 0;
     let storeID = this.storeId;
+
+    const exit = function (cam, info, scene) {
+      cam.main.fadeOut(250, 0, 0, 0)
+      $('#backdrop').addClass('fadeout')
+      cam.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
+        scene.start('Game', info);
+      })
+    }
 
     //addMoreItem, to run a html for Jquery to add
     const addMoreItem = function (result, reload = false) {
@@ -217,6 +225,8 @@ class Store extends Phaser.Scene {
 
     //set cam
     this.cameras.main.setBounds(320, 480, 1920, 1920);
+    this.cameras.main.fadeIn(250, 0, 0, 0)  
+    
     this.add.dom(960, 960).createFromCache('store_window'); //place dom in center/
     if ($("#customer-support")) {
       $("#backdrop").css('visibility', 'visible');
@@ -259,14 +269,14 @@ class Store extends Phaser.Scene {
 
     //take user back to game.js if click top left to close
     $("#close-button").on("click", () => {
-      
-      this.scene.start('Game', this.playerInfo);
+      exit(this.cameras, this.playerInfo, this.scene);
+      //this.scene.start('Game', this.playerInfo);
     })
 
     //customer support button action
     $("#customer-support").on("click", () => { //need to replace
-      
-      this.scene.start('Game', this.playerInfo);
+      exit(this.cameras, this.playerInfo, this.scene);
+      //this.scene.start('Game', this.playerInfo);
     })
 
     $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
@@ -425,8 +435,8 @@ class Store extends Phaser.Scene {
 
                 // add exit function for order confirmation page
                 $("#exit-button").on("click", () => {
-                  $("canvas").prev().children().remove() //remove the added dom
-                  this.scene.start('Game', this.playerInfo);
+                  exit(this.cameras, this.playerInfo, this.scene);
+                  //this.scene.start('Game', this.playerInfo);
                 })
 
                 // // add back function for order confimration page
@@ -470,7 +480,8 @@ class Store extends Phaser.Scene {
     //close shop with ESC
     this.input.keyboard.on('keydown', function (event) {
       if (event.key === 'Escape') {
-        this.scene.start('Game', this.playerInfo);
+        exit(this.cameras, this.playerInfo, this.scene);
+        //this.scene.start('Game', this.playerInfo);
       }
     }, this);
   }

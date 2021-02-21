@@ -70,8 +70,6 @@ class Game extends Phaser.Scene {
       }
     })
     this.storeInfo = this.sys.game.globals.globalVars.storeData
-    console.log(this.storeInfo)
-
     const socket = io('http://localhost:3000', {
       autoConnect: false,
       query: {
@@ -135,7 +133,6 @@ class Game extends Phaser.Scene {
     })
 
     socket.on('connect_error', (x) => {
-      console.log(x)
       console.log("server refused connection")
     })
 
@@ -154,7 +151,6 @@ class Game extends Phaser.Scene {
     })
     
     $('canvas').on('click', ()=>{ 
-      console.log($(document.activeElement));
       $(document.activeElement).blur();
       this.input.keyboard.enableGlobalCapture();
       for (const k of Object.keys(this.key)) {
@@ -430,6 +426,7 @@ class Game extends Phaser.Scene {
   }
 
   updateCamera(){ //setup cam to follow player
+    this.cameras.main.fadeIn(250, 0, 0, 0)
     this.cameras.main.setBounds(0, 0, 1920, 1920);
     this.cameras.main.setZoom(2);
     this.cameras.main.startFollow(this.player, true)
