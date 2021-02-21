@@ -37,11 +37,8 @@ class Login extends Phaser.Scene {
     //target the log in as guest button
     $(document).off().on("click", '#confirm-button', () => {
       let name = {guest: true, name: $("#login").serialize().slice(5,-1).slice(0,-9)}
-      $.ajax(`/stores`, {method: 'GET'})
-      .then((result) => {
-        name.storeInfo = Array.from(result)
-        this.scene.start('Game' , name);
-      })
+      name.storeInfo = Array.from(result)
+      this.scene.start('Game' , name);
     })
 
     //when user click register on login

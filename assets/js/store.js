@@ -298,7 +298,7 @@ class Store extends Phaser.Scene {
         `;
           $("#products").html(pendingHTML)
           // when clicking back to view the store again
-          $("#back-button").on("click", () => {
+          $("#back-button").off().on("click", () => {
             back();
             $("#request-data").off().on("click", () => { //wait for helper
               requestItemData(storeID);
@@ -426,26 +426,11 @@ class Store extends Phaser.Scene {
                 })
 
                 // // add back function for order confimration page
-                $("#back-button").on("click", () => {
-                  let storeID = this.storeId
-                  let storeLoadCount = 0
-
-                  // turn the checkout button on
-                  $('#checkout').css("visibility", "visible");
-                  // remove the product-container and rebuild the products grid
-                  $("#checkout-table").remove()
-                  $("#products").html("<div id='products-grid'></div>")
-                  $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
-                  $("table").append(addMoreItem(storeProducts))
-                  for (let product of storeProducts) {
-                    $(`#add-to-cart${product.id}`).on('click', function () {
-                      addToCart(product)
-                    })
-                  }
+                $("#back-button").off().on("click", () => {
+                  back(true);
                   // to load more products
                   $("#request-data").on("click", () => { //wait for helper
                     // console.log('storecount to load more after viewing one product')
-                    storeLoadCount++;
                     // console.log(storeLoadCount)
                     $.ajax(`/stores/${storeID}/${storeLoadCount}`, { method: 'GET' })//use ajax to handle request to the server
                       .then(function (result) {
@@ -477,7 +462,7 @@ class Store extends Phaser.Scene {
       }
 
       // return button to take back to store front
-      $("#back-button").on("click", () => {
+      $("#back-button").off().on("click", () => {
         back(true);
         // to load more products
         $("#request-data").on("click", () => { //wait for helper

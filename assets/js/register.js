@@ -79,14 +79,10 @@ class Register extends Phaser.Scene {
               </div>`
               $(`#RegisterInsert`).append(err)
             } else { // let user in game
-              $.ajax(`/stores`, {method: 'GET'})
-              .then((result) => {
-                res.storeInfo = Array.from(result)
-                sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
-                sessionStorage.setItem("user_id", res.user_id)
-                sessionStorage.setItem("guest", res.guest || false)
-                this.scene.start('Game' , res)
-              })
+              sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
+              sessionStorage.setItem("user_id", res.user_id)
+              sessionStorage.setItem("guest", false) //will always be false cause user have register
+              this.scene.start('Game' , res)
             }
           });
         }

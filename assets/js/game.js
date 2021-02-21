@@ -47,15 +47,15 @@ class Game extends Phaser.Scene {
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.html('store_window', 'templates/store_window.html');
     this.load.audio('background', 'audio/TownTheme.mp3')
-    this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, SPACE, DOWN, X, M") //WASD to move, M to toggle minimap
+    this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, DOWN, SPACE, SHIFT X, M") //WASD to move, M to toggle minimap
     this.storeLoadCount = 0;
   }
 
   create() {
     this.storeInfo = this.sys.game.globals.globalVars.storeData
     
-    this.username = sessionStorage.getItem("IGN")
-    this.user_id = sessionStorage.getItem("user_id");
+    this.username = this.playerInfo.name //use already init data
+    this.user_id = this.playerInfo.name.id
 
     const socket = io('http://localhost:3000', {
       autoConnect: false,
@@ -146,9 +146,6 @@ class Game extends Phaser.Scene {
     this.gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
     this.gra.alpha= .5;
 
-    this.gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
-    this.gra.alpha= .5;
-
     this.enterStore = false;
     this.storeNameThisMap = {};
     let storeExist = {};
@@ -170,7 +167,7 @@ class Game extends Phaser.Scene {
       a.setOrigin(0); //to replace auto offset
       a.body.width = area.width;
       a.body.height = area.height;
-      a.name = area.properties[0].value //add store_id as name to do ajax call, 
+      a.name = area.properties[0].value //add store_id as name to identify which store, 
       //please note, this store_id must be set as first custom_property in tile
       //overlap cb does not seems to return id for some reason, so use name
 
@@ -319,8 +316,7 @@ class Game extends Phaser.Scene {
     this.player.setVelocity(0);
     //update player movement
     if (this.key.LEFT.isDown || this.key.A.isDown) {
-      this.player.setVelocityX(-150);
-      if (this.player.anims.currentAnim.key === 'walk-l') { }
+      this.player.setVelocityX(-150);if (this.player.anims.currentAnim.key === 'walk-l') { }
       else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
         this.player.play('walk-l')
       }
@@ -356,11 +352,9 @@ class Game extends Phaser.Scene {
     }
 
     //if player LEFT the interactive area, remove shop name and interactible msg
-    
     if (!this.overlap && this.storeName) {
       this.storeName = null;
       this.storeNameThisMap[this.storeId].storeName.setDepth(-1);
-
       this.storeNameThisMap[this.storeId].helperMsg.setDepth(-1);
       this.storeNameThisMap[this.storeId].gra.setDepth(-1);
     }
@@ -375,6 +369,16 @@ class Game extends Phaser.Scene {
     this.gra.fillRectShape(this.playerNameBox);
   }
   
+  updatePlayerGra() {
+    this.playerName.x = this.player.x;  
+    this.playerName.y = this.playerInfo.guest ? this.player.y + 34 : this.player.y + 28; 
+    this.playerNameBox.x = this.playerName.x - 3 - this.playerName.width / 2
+    this.playerNameBox.y = this.playerName.y - this.playerName.height / 2
+    this.overlap = false; //update overlap check
+    this.gra.clear() //redraw the backdrop on name
+    this.gra.fillRectShape(this.playerNameBox);
+  }
+
   createPlayer(playerInfo) {
     this.player = this.physics.add.sprite(0, 0, "fm_02")
     this.container = this.add.container(playerInfo.x, playerInfo.y);
@@ -384,7 +388,7 @@ class Game extends Phaser.Scene {
     this.container.body.setCollideWorldBounds(true);
   }
 
-  updateCamera(){
+  updateCamera(){ //setup cam to follow player
     this.cameras.main.setBounds(0, 0, 1920, 1920);
     this.cameras.main.setZoom(2);
     this.cameras.main.startFollow(this.player, true)
