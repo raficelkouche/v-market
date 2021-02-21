@@ -328,6 +328,7 @@ class Game extends Phaser.Scene {
         </div>
         `
       $('#chat-side-bar').append(login)
+      $('input').on('focus', (x) => $('.err-msg').html(''))
       $("#login").off().on("submit", (e) => {
         e.preventDefault();
         let scene = this.scene
@@ -338,11 +339,13 @@ class Game extends Phaser.Scene {
         let playerInfo = this.playerInfo
         this.sys.game.globals.globalVars.login('Game')
         .then((x) => {
-          music.destroy(); 
-          cam.fadeOut(250, 0, 0, 0)
-          cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-              scene.start('Game', playerInfo);
-            })
+          if (x) {
+            music.destroy(); 
+            cam.fadeOut(250, 0, 0, 0)
+            cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+                scene.start('Game', playerInfo);
+              })
+            }
           }
         )
       })
