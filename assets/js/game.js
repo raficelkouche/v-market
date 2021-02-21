@@ -116,8 +116,8 @@ class Game extends Phaser.Scene {
               // $(this).css("color", "red")
               $(this).css("font-weight", "bold")
               // $(this).addClass('selected-user')
-              // $(this).css("text-shadow", '#0C0 1px 0 10px')
-              $(this).css("text-shadow", '0px 5px 5px #5177B0')
+              // $(this).css("text-shadow", '#0C0 1px 0 px')
+              $(this).css("text-shadow", '0px 5px 5px #53B051')
               activeUser = event.target.id
             })
           }

@@ -9,6 +9,8 @@ main {
   display: flex;
   flex-direction: row;
   width: 100%;
+  background-color: black;
+
 }
 
 #game-container{
@@ -28,6 +30,7 @@ main {
   background-image: url('/props/navbar-bkg.jpg');
   background-size: 1000px 1200px;
   visibility: hidden;
+  /* /* border-radius: 10px; tammys preferences */
 
 }
 
@@ -38,22 +41,31 @@ main {
   border-bottom: solid 2px grey;
   padding: 10px;
   /* background-color: aquamarine; */
-  font-family: 'Didact Gothic', sans-serif;
+  /* font-family: 'Didact Gothic', sans-serif; */
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: medium;
+}
+#friends-list > h3 {
+  font-family: 'Open Sans', sans-serif;
 }
 
 #messages{
   list-style-type: none;
-  font-family: 'Didact Gothic', sans-serif;
-
+  /* font-family: 'Didact Gothic', sans-serif; */
+  font-family: 'Source Sans Pro', sans-serif;
+  
 }
 #messages li{
   list-style-type: none;
+  padding-left: 15px;
   color: white;
   background-color: darkslategrey;
+  border-radius: 10px;
+  
 }
 
 #messages>li:nth-child(odd) {
-    background: #efefef;
+    background: #FFF;
     color:rgb(10, 10, 89)
   }
 
