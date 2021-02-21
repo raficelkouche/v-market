@@ -54,36 +54,29 @@ class Game extends Phaser.Scene {
 
   create() {
 
-    
     // works but not after a while
+    this.sound.pauseOnBlur = false;
     this.music = this.sound.add('background', {
       loop: true,
     })
-    //   // toggle music off or on
-    $('#music').on('click', () => {
-      if(!this.musicOn) {
-        this.music.play()
-        this.musicOn = true;
+    this.music.play()
+    // toggle music off or on
+    $('#music').off().on('click', () => {
+      this.music.setMute(!this.music.mute);
+      if(!this.music.mute) {
         $('#music').html('<i class="fas fa-volume-mute"></i>')
       } else {
-        this.music.pause()
-        this.musicOn = false;
         $('#music').html('<i class="fas fa-volume-up"></i>')
       }
     })
-
     this.storeInfo = this.sys.game.globals.globalVars.storeData
     console.log(this.storeInfo)
-    
-    
-    this.username = this.playerInfo.name //use already init data
-    this.user_id = this.playerInfo.name.id
 
-    const socket = io('http://localhost:8000', {
+    const socket = io('http://localhost:3000', {
       autoConnect: false,
       query: {
-        user_id: this.user_id,
-        username: this.username
+        user_id: this.playerInfo.id,
+        username: this.playerInfo.name
       }
     })
 
@@ -141,7 +134,8 @@ class Game extends Phaser.Scene {
     */
     })
 
-    socket.on('connect_error', () => {
+    socket.on('connect_error', (x) => {
+      console.log(x)
       console.log("server refused connection")
     })
 
@@ -150,6 +144,7 @@ class Game extends Phaser.Scene {
       socket.disconnect();
     })
 
+    
    //disable key cap on all element so it would not steal the focus
     this.input.on('pointerdownoutside', () => {
       this.input.keyboard.disableGlobalCapture();
@@ -157,13 +152,17 @@ class Game extends Phaser.Scene {
         this.key[k].enabled = false;
       } 
     })
+    
     $('canvas').on('click', ()=>{ 
+      console.log($(document.activeElement));
       $(document.activeElement).blur();
       this.input.keyboard.enableGlobalCapture();
       for (const k of Object.keys(this.key)) {
         this.key[k].enabled = true;
       } 
     })
+    
+
     //draw back drop for player name, will refresh
     this.gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
     this.gra.alpha= .5;
@@ -351,6 +350,7 @@ class Game extends Phaser.Scene {
       this.storeName
         ? this.playerInfo.storeName = this.storeName
         : this.playerInfo.storeName = null;
+      this.music.destroy();
       this.scene.start('store', this.playerInfo);
     }
 

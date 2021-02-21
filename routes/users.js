@@ -76,6 +76,7 @@ module.exports = () => {
 
   router.get("/login", (req, res) => {
     const user_ID = req.session.user_ID
+    console.log(req.session)
     if (user_ID) {
       res.json({user_ID})
     } else {
