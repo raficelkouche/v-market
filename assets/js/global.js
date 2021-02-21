@@ -1,6 +1,7 @@
 class Global {
   constructor() {
     this.storeData
+    this.musicIsMute = false;
     this.getStoreData()
   }
   

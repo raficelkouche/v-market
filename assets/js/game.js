@@ -60,10 +60,12 @@ class Game extends Phaser.Scene {
       loop: true,
     })
     // toggle music off or on
-    this.music.play()
-    
-    $('#music').on('click', () => {
-      this.music.setMute(!this.music.mute);
+    this.music.play();
+    this.music.setMute(this.sys.game.globals.globalVars.musicIsMute)
+
+    $('#music').off().on('click', () => {
+      this.music.setMute(!this.sys.game.globals.globalVars.musicIsMute);
+      this.sys.game.globals.globalVars.musicIsMute = !this.sys.game.globals.globalVars.musicIsMute;
       if(!this.music.mute) {
         $('#music').html('<i class="fas fa-volume-mute"></i>')
       } else {
@@ -338,7 +340,7 @@ class Game extends Phaser.Scene {
             sessionStorage.clear();
             $('#top-nav-bar').css('visibility', 'hidden')
             $('#chat-side-bar').css('visibility', 'hidden')
-
+            this.music.destroy();
             this.scene.start('Login')
           })
       })
