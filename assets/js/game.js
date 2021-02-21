@@ -39,7 +39,6 @@ class Game extends Phaser.Scene {
   static user_id;
   static username;
   static gra;
-  static musicOn = false;
 
   preload() {
     //load all texture
@@ -56,18 +55,18 @@ class Game extends Phaser.Scene {
 
     
     // works but not after a while
+    this.sound.pauseOnBlur = false;
     this.music = this.sound.add('background', {
       loop: true,
     })
-    //   // toggle music off or on
+    // toggle music off or on
+    this.music.play()
+    
     $('#music').on('click', () => {
-      if(!this.musicOn) {
-        this.music.play()
-        this.musicOn = true;
+      this.music.setMute(!this.music.mute);
+      if(!this.music.mute) {
         $('#music').html('<i class="fas fa-volume-mute"></i>')
       } else {
-        this.music.pause()
-        this.musicOn = false;
         $('#music').html('<i class="fas fa-volume-up"></i>')
       }
     })
@@ -77,7 +76,7 @@ class Game extends Phaser.Scene {
     
     
     this.username = this.playerInfo.name //use already init data
-    this.user_id = this.playerInfo.name.id
+    this.user_id = this.playerInfo.id
 
     const socket = io('http://localhost:8000', {
       autoConnect: false,
@@ -362,6 +361,7 @@ class Game extends Phaser.Scene {
       this.storeName
         ? this.playerInfo.storeName = this.storeName
         : this.playerInfo.storeName = null;
+      this.music.destroy();
       this.scene.start('store', this.playerInfo);
     }
 
