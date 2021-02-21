@@ -430,18 +430,7 @@ class Store extends Phaser.Scene {
                   back(true);
                   // to load more products
                   $("#request-data").on("click", () => { //wait for helper
-                    // console.log('storecount to load more after viewing one product')
-                    // console.log(storeLoadCount)
-                    $.ajax(`/stores/${storeID}/${storeLoadCount}`, { method: 'GET' })//use ajax to handle request to the server
-                      .then(function (result) {
-                        $("table").append(addMoreItem(result))
-                        for (let product of result) {
-                          $(`#add-to-cart${product.id}`).on('click', function () {
-                            addToCart(product)
-                          })
-                        }
-                      })
-
+                    requestItemData(storeID);
                   })
                 })
                 // if order was not processed
