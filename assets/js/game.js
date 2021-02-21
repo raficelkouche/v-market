@@ -332,6 +332,15 @@ class Game extends Phaser.Scene {
     } else {
       document.getElementById('IGN').innerHTML = sessionStorage.getItem('IGN');
       document.getElementById('user-session').innerHTML = 'Logout';
+      $('#user-session').on('click', () => {
+        console.log('logout clicked')
+        $.ajax('users/logout', { method: 'POST'})
+          .then( (res) => {
+            sessionStorage.clear();
+            $('#top-nav-bar').css('visibility', 'hidden')
+            this.scene.start('Login')
+          })
+      })
     }
 
     // show chat bar after login

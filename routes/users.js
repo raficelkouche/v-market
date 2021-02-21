@@ -83,6 +83,11 @@ module.exports = () => {
     }
   })
 
+  router.post('/logout', (req, res) => {
+    req.session = null;
+    res.redirect('..');
+  })
+
   // Orders routes
   router.post('/:user_id/orders', (req, res) => {
     // console.log('inside orders route')
