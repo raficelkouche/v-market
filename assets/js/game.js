@@ -189,6 +189,22 @@ class Game extends Phaser.Scene {
     //make the map of this scence
     this.map = this.make.tilemap({ key: "map" });
 
+    function hashCode(str) { // java String#hashCode
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+         hash = str.charCodeAt(i) + ((hash << 5) - hash); //get Char ASCII code + hash left shift 5 bit - origin
+      }
+      return hash;
+    } 
+  
+    function intToRGB(i){
+      let c = (i & 0x00FFFFFF) //bitwise and operator to get when when both binary = 1
+          .toString(16)
+          .toUpperCase();
+
+      return "00000".substring(0, 6 - c.length) + c; //if not enough padding, add 0 to that place
+    }
+
     //add object layer first. 
     let storesArea = this.map.getObjectLayer('StoreObj')['objects'];
     let storeAreaGroup = this.physics.add.staticGroup({});
@@ -211,7 +227,8 @@ class Game extends Phaser.Scene {
         this.storeNameThisMap[a.name].helperMsg = this.helperMsg = this.add.text(a.x + 48, a.y + 16, `Press 'Space'\nto interact`, {font: "bold", align: 'center'} ).setOrigin(0.5);
         this.storeNameThisMap[a.name].helperMsg.setDepth(0);
         //make graphic for this store
-        this.storeNameThisMap[a.name].gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
+        let color = '0x' + intToRGB(hashCode(`${this.storeExistThisMap[a.name].name}`));
+        this.storeNameThisMap[a.name].gra = this.add.graphics({ fillStyle: { color: `${color}` } });
         this.storeNameThisMap[a.name].gra.alpha= .35; 
         //Make Backdrop so text is easier to read
         this.storeNameThisMap[a.name].storeNameBox = new Phaser.Geom.Rectangle(this.storeNameThisMap[a.name].storeName.x - 5 - this.storeNameThisMap[a.name].storeName.width / 2, this.storeNameThisMap[a.name].storeName.y - this.storeNameThisMap[a.name].storeName.height / 2, this.storeNameThisMap[a.name].storeName.width + 10 , this.storeNameThisMap[a.name].storeName.height);
@@ -316,7 +333,7 @@ class Game extends Phaser.Scene {
       $('#IGN').addClass("btn btn-outline-secondary")
       $('#IGN').attr("data-bs-toggle", '')
       document.getElementById('IGN').innerHTML = 'Guest';
-      document.getElementById('user-session').innerHTML = 'Login';
+      document.getElementById('user-session').innerHTML = 'Disable';
       $('#chat-side-bar').empty()
       let login = `
         <div id="friends-list" class="disable">
@@ -331,7 +348,7 @@ class Game extends Phaser.Scene {
             <p class="err-msg"></p>
             <div>
               <button type="submit" class="btn btn-primary btn-lg" id="login-button">Login</button>
-              <button type="button"class="btn btn-success btn-lg" id="register-button">Register</button>
+              <button type="button" class="btn btn-success btn-lg" id="register-button">Register</button>
             </div>
           </form>
         </div>
@@ -350,13 +367,23 @@ class Game extends Phaser.Scene {
         .then((x) => {
           if (x) {
             music.destroy(); 
-            cam.fadeOut(250, 0, 0, 0)
+            cam.fadeOut(150, 0, 0, 0)
             cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
                 scene.start('Game', playerInfo);
               })
             }
           }
         )
+      })
+      $("#register-button").off().on("click", () => {
+        sessionStorage.clear();
+        $('#top-nav-bar').css('visibility', 'hidden')
+        $('#chat-side-bar').css('visibility', 'hidden')
+        this.music.destroy();
+        this.cameras.main.fadeOut(150, 0, 0, 0)
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+            this.scene.start('register');
+          })
       })
     } else {
       $('#IGN').removeClass() 
@@ -531,7 +558,7 @@ class Game extends Phaser.Scene {
   }
 
   updateCamera(){ //setup cam to follow player
-    this.cameras.main.fadeIn(250, 0, 0, 0)
+    this.cameras.main.fadeIn(150, 0, 0, 0)
     this.cameras.main.setBounds(0, 0, 1920, 1920);
     this.cameras.main.setZoom(2);
     this.cameras.main.startFollow(this.player, true)

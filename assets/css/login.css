@@ -12,11 +12,11 @@
 #loginInsert.fadeout,
 #RegisterInsert.fadeout {
   opacity: 0;
-  -webkit-animation: fadeout 0.25s; /* Safari, Chrome and Opera > 12.1 */
-  -moz-animation: fadeout 0.25s; /* Firefox < 16 */
-  -ms-animation: fadeout 0.25s; /* Internet Explorer */
-  -o-animation: fadeout 0.25s; /* Opera < 12.1 */
-  animation: fadeout 0.25s;
+  -webkit-animation: fadeout 0.15s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadeout 0.15s; /* Firefox < 16 */
+  -ms-animation: fadeout 0.15s; /* Internet Explorer */
+  -o-animation: fadeout 0.15s; /* Opera < 12.1 */
+  animation: fadeout 0.15s;
 }
 
 .login {

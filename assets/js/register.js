@@ -83,7 +83,7 @@ class Register extends Phaser.Scene {
               sessionStorage.setItem("user_id", res.user_id)
               let scene = this.scene;
               $('#RegisterInsert').addClass('fadeout')
-              this.cameras.main.fadeOut(250, 0, 0, 0)
+              this.cameras.main.fadeOut(150, 0, 0, 0)
               this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
                 scene.start('Game')
               })

@@ -43,7 +43,7 @@ class Store extends Phaser.Scene {
     let storeID = this.storeId;
 
     const exit = function (cam, info, scene) {
-      cam.main.fadeOut(250, 0, 0, 0)
+      cam.main.fadeOut(150, 0, 0, 0)
       $('#backdrop').addClass('fadeout')
       cam.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
         scene.start('Game', info);
@@ -225,7 +225,7 @@ class Store extends Phaser.Scene {
 
     //set cam
     this.cameras.main.setBounds(320, 480, 1920, 1920);
-    this.cameras.main.fadeIn(250, 0, 0, 0)  
+    this.cameras.main.fadeIn(150, 0, 0, 0)  
     
     this.add.dom(960, 960).createFromCache('store_window'); //place dom in center/
     if ($("#customer-support")) {
