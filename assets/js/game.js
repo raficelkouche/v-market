@@ -97,6 +97,7 @@ class Game extends Phaser.Scene {
             message
           })
           $('#chat-message').val('')
+          $('#messages').scrollTop($('#messages').height()); // to auto scroll down the messages
         } else {
           alert("select a user first and then type your message")
         }
@@ -129,6 +130,7 @@ class Game extends Phaser.Scene {
       
         socket.on('receive message', data => {
           $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
+          $('#messages').scrollTop($('#messages').height()); // to auto scroll down the messages
         })
 
         socket.on('delete user', user_id => {

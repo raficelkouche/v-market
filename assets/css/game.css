@@ -31,14 +31,13 @@ main {
   background-size: 1000px 1200px;
   visibility: hidden;
   /* /* border-radius: 10px; tammys preferences */
-
 }
 
 #friends-list{
   display:flex;
   flex-direction: column;
   flex-basis: 30%;
-  border-bottom: solid 2px grey;
+  /* border-bottom: solid 2px grey; */
   padding: 10px;
   /* background-color: aquamarine; */
   /* font-family: 'Didact Gothic', sans-serif; */
@@ -50,32 +49,47 @@ main {
 }
 
 #offline-friends {
-  border: 2px solid yellow;
+  /* border: 2px solid yellow; */
   padding: 10px;
   font-family: 'Source Sans Pro', sans-serif;
-
+}
+#chat {
+  display: flex;
+  align-self: flex-end;
+  position: relative;
+  bottom: 0em;
+  left: 0em;
+  max-height: 50%;
 
 }
 
+/* messages box */
 #messages{
   list-style-type: none;
   /* font-family: 'Didact Gothic', sans-serif; */
   font-family: 'Source Sans Pro', sans-serif;
-  
+  max-height: 400px;
+  overflow: hidden;
+  overflow-y: scroll;
+  margin: 2px;
 }
+
+
 #messages li{
   list-style-type: none;
   padding-left: 15px;
   color: white;
   background-color: darkslategrey;
   border-radius: 10px;
+  max-width: 95%;
+  overflow-wrap: break-word;
   
 }
 
 #messages>li:nth-child(odd) {
-    background: #FFF;
-    color:rgb(10, 10, 89)
-  }
+  background: #FFF;
+  color:rgb(10, 10, 89)
+}
 
 #chat-side-bar form{
   display: flex;
@@ -103,6 +117,9 @@ main {
   color: rgb(18, 52, 1);
 }
 
+
+/* Login on Side Chat bar if user not logged in */
+
 #friends-list.disable{
   height: 100%;
   justify-content: center;
@@ -113,6 +130,7 @@ main {
   display: flex;
   flex-direction: column;
 }
+
 
 #Please-login {
   text-align: center;
