@@ -159,27 +159,29 @@ class Game extends Phaser.Scene {
     }
 
     // add friends of user to list
-    $.ajax(`/users/${this.playerInfo.id}/friends`, { method: 'GET'} )
-      .then( result => {
-        console.log('this the result from ajax call')
-        console.log(result)
-        
-        // get names of users online
-        const onlineFriends = $('#friends-list ul').children().contents()
-        console.log(onlineFriends)
-        let online = [];
-        for (let i = 0; i < onlineFriends.length; i++) {
-          online.push(onlineFriends[i].data);
-        }
-        console.log(online);
-
-        // if user not online then add to friends list
-        for (let name of result) {
-          // need to check that player is not online by using 
-          if (!online.includes(name))
-          $('#offline-friends ul').append(`<li>${name}</li>`)
-        }
-      })
+    $(document).ready( () => {
+      $.ajax(`/users/${this.playerInfo.id}/friends`, { method: 'GET'} )
+        .then( result => {
+          console.log('this the result from ajax call')
+          console.log(result)
+          
+          // get names of users online
+          const onlineFriends = $('#friends-list ul').children().contents()
+          console.log(onlineFriends)
+          let online = [];
+          for (let i = 0; i < onlineFriends.length; i++) {
+            online.push(onlineFriends[i].data);
+          }
+          console.log(online);
+  
+          // if user not online then add to friends list
+          for (let name of result) {
+            // need to check that player is not online by using 
+            if (!online.includes(name))
+            $('#offline-friends ul').append(`<li>${name}</li>`)
+          }
+        })
+    })
 
     
    //disable key cap on all element so it would not steal the focus

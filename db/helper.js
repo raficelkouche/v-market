@@ -117,47 +117,6 @@ const orderNew = function(order) { //make new user
 }
 exports.orderNew = orderNew;
 
-// kinda gets name but not really lol - becasue of loop
-// const getFriends = function(user_id) {
-//   return pool.query(`
-//   SELECT friend_id
-//   FROM friends
-//   WHERE user_id = $1
-//   `, [user_id])
-//   .then(res => {
-//     console.log('result from get friends db call')
-//     console.log(res.rows)
-//     const friendsArr = res.rows;
-//     let friendsName = []
-//     // get the name of friends from the user id
-//     for (let friend of friendsArr) {
-//       pool.query(`
-//       SELECT name
-//       FROM users
-//       WHERE id = $1
-//       `, [friend.friend_id])
-//       .then( result => {
-//         friendsName.push(result.rows[0])
-//         console.log(friendsName)
-//       })
-//     }
-//     return friendsName
-//     // console.log('this is the friends name')
-//     // console.log(friendsName)
-//   })
-// }
-// exports.getFriends = getFriends;
-
-const getNamefromID = function(user_id) {
-  return pool.query(`
-  SELECT name 
-  FROM users
-  where id = $1
-  `, [user_id])
-  .then( res => res.rows[0])
-}
-
-
 const getFriends = function(user_id) {
   return pool.query(`
   SELECT *
