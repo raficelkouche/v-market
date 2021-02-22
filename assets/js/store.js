@@ -13,7 +13,7 @@ class Store extends Phaser.Scene {
     this.playerInfo = {
       name: data.name.replace(/%20/g, " ").trim(),
       guest: data.guest || false,
-      id: data.user_id,
+      id: data.id,
       x: data.x,
       y: data.y,
       storeInfo: data.storeInfo
