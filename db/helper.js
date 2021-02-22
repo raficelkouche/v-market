@@ -41,7 +41,7 @@ exports.userLoginWithEmail = userLoginWithEmail;
 
 const getAllStores = function() { // should take in a map_id as arg if want to make this game have more then 1 map
   return pool.query(`
-  SELECT name, description, id
+  SELECT name, description, id, email, phone
   FROM stores;`)
   .then(res => res.rows);
 }
