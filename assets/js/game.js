@@ -121,6 +121,8 @@ class Game extends Phaser.Scene {
             alert("select a user first and then type your message")
           }
         })
+
+        
       })
 
       
@@ -160,7 +162,20 @@ class Game extends Phaser.Scene {
       .then( result => {
         console.log('this the result from ajax call')
         console.log(result)
+        
+        // get names of users online
+        const onlineFriends = $('#friends-list ul').children().contents()
+        console.log(onlineFriends)
+        let online = [];
+        for (let i = 0; i < onlineFriends.length; i++) {
+          online.push(onlineFriends[i].data);
+        }
+        console.log(online);
+
+        // if user not online then add to friends list
         for (let name of result) {
+          // need to check that player is not online by using 
+          if (!online.includes(name))
           $('#offline-friends ul').append(`<li>${name}</li>`)
         }
       })
