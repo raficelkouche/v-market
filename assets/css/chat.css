@@ -1,5 +1,9 @@
 
 /* to change the friend list bullet */
-#chat-side-bar ul li::marker{
+#friends-list ul li::marker{
   content: '🌎 ';
+}
+
+#offline-friends ul li::marker{
+  content: '💤 ';
 }

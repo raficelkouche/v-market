@@ -100,6 +100,17 @@ module.exports = () => {
       })
   })
 
+  
+  // get Friends for user
+  router.get('/:user_id/friends', (req, res) => {
+    console.log('this the data given to ajax call')
+    console.log(req.session.user_ID) // the user id
+    db.getFriends(req.session.user_ID)
+      .then(result => {
+        res.json(result)
+      })
+  })
+  
   return router;
 }
 

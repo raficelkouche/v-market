@@ -155,6 +155,16 @@ class Game extends Phaser.Scene {
       })
     }
 
+    // add friends of user to list
+    $.ajax(`/users/${this.playerInfo.id}/friends`, { method: 'GET'} )
+      .then( result => {
+        console.log('this the result from ajax call')
+        console.log(result)
+        for (let name of result) {
+          $('#offline-friends ul').append(`<li>${name}</li>`)
+        }
+      })
+
     
    //disable key cap on all element so it would not steal the focus
     this.input.on('pointerdownoutside', () => {
