@@ -1,3 +1,4 @@
+console.log("target: ", window.globalVariables.testVariable)
 class Store extends Phaser.Scene {
   constructor() {
     super('store');
@@ -257,15 +258,31 @@ class Store extends Phaser.Scene {
 
     //take user back to game.js if click top left to close
     $("#close-button").on("click", () => {
-  
+      
       this.scene.start('Game', this.playerInfo);
     })
 
     //customer support button action
-    $("#customer-support").on("click", () => { //need to replace
-      
-      this.scene.start('Game', this.playerInfo);
-    })
+    /* $("#customer-support").on("click", () => { //need to replace
+      $("#store-data").append(`
+      <div class="in-game-video-call-container" >
+        <video autoplay="true" muted class="in-game-local-video" id="in-game-local-video"></video>
+        <video autoplay="true" muted class="in-game-remote-video" id="in-game-remote-video"></video>
+      </div>
+      `)
+      //local video
+      const inGameVideo = document.getElementById("in-game-local-video")
+      if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+          .then(function (stream) {
+            inGameVideo.srcObject = stream;
+          })
+          .catch(function (error) {
+            console.log("Something went wrong!", error);
+          });
+      }
+      //this.scene.start('Game', this.playerInfo)
+    }); */
 
     $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
       // console.log('after single product')

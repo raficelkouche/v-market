@@ -95,7 +95,6 @@ class Login extends Phaser.Scene {
               sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
               sessionStorage.setItem("user_id", res.user_id)
               sessionStorage.setItem("guest", res.guest || false)
-              //this.sys.game.globals.globalVars.createNewSocket()
               this.scene.start('Game');
             }
           });

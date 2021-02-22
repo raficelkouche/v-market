@@ -6,19 +6,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!--scripts to load jQuery, Phaser, Stripe and Socket.io-->
+    <!--scripts to load jQuery, Phaser, Stripe,Socket.io and PeerJS-->
     <script src="//cdn.jsdelivr.net/npm/phaser@3.52.0/dist/phaser.js"></script>
     <script src="vendor/jquery-3.5.1.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
+    <script defer src="/socket.io/socket.io.js"></script>
     <script defer src="https://js.stripe.com/v3/"></script>
+    <script defer src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    
 
     <!-- font for store name -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Carter+One&family=El+Messiri:wght@700&display=swap" rel="stylesheet">    
     <!-- for shopping cart icon -->
     <script defer src="https://kit.fontawesome.com/db457e5834.js" crossorigin="anonymous"></script>
+    
     
     <!-- custom style sheets-->
     <link rel="stylesheet" href="/css/login.css" type="text/css" />
@@ -32,6 +33,12 @@
     <main>
       <div id="top-nav-bar">
         <h2>Nav Bar</h2>
+      </div>
+      <div class="in-game-video-call-container">
+        <video muted class="in-game-local-video" id="in-game-local-video"></video>
+        <video class="in-game-remote-video" id="in-game-remote-video"></video>
+        <button id="start-call">Call Now</button>
+        <button id="end-call">End Call</button>
       </div>
       <div id="game-chat-container">
         <div id="game-container">

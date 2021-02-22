@@ -1,8 +1,95 @@
+
+window.globalVariables = {
+  testVariable: 123
+}
+let targetUser = null;
+let peerID = null;
+let myPeer = null;
+let call = null;
+
+const coordinates = {
+  x: Math.floor(Math.random() * 500) + 40,
+  y: Math.floor(Math.random() * 600) + 50
+}
+
+const socket = io('/', {
+  autoConnect: false,
+  query: {
+    x: coordinates.x,
+    y: coordinates.y
+  }
+}) 
+
+socket.on('updated-friends-list', usersList => {
+  Object.keys(usersList).forEach((user_id) => {
+    if (!document.getElementById(user_id)) {
+      $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
+      $("#friends-list li").on("click", (event) => {
+        $("#friends-list ul").children().css("color", "black")
+        $(event.target).css("color", "red")
+        targetUser = event.target.id
+        console.log(targetUser)
+      })
+    }
+  })
+});
+
+socket.on('recieve message', data => {
+  $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
+})
+
+socket.on('disconnect', (user_id) => {
+  console.log("server shutdown")
+  socket.disconnect();
+})
+
+socket.on('connect_error', error => {
+  console.log("server error: ", error)
+})
+
+$("#chat-side-bar form").on('submit', (event) => {
+  event.preventDefault();
+  let message = $('#chat-message').val()
+  if ($('#chat-message').val() && targetUser) {
+    $('#messages').append(`<li>${sessionStorage.getItem("IGN")}: ${message}</li`)
+    socket.emit('send message', {
+      recipient: targetUser,
+      message
+    })
+    $('#chat-message').val('')
+  } else {
+    alert("select a user first and then type your message")
+  }
+})
+
+function sendRecieveStreams(remoteUserID, stream) {
+  //call the other user and send the local stream
+  call = myPeer.call(remoteUserID, stream)
+
+  //setup handlers to recieve the remote stream
+  const remoteVideo = document.getElementById("in-game-remote-video")
+  call.on('stream', remoteUserVideoStream => {
+    addVideoStream(remoteVideo, remoteUserVideoStream)
+  })  
+}
+
+function addVideoStream(video, stream){
+  video.srcObject = stream
+  video.addEventListener('loadedmetadata', () => {
+    video.play()
+  })
+}
+
+function error(error) {
+  console.warn("Error occured: ", error)
+};
+
+
+//The code below will handle the game scene
 class Game extends Phaser.Scene {
   constructor() {
     super('Game');
   }
-  
   game ()
   {
     //call on login/register scence to get data
@@ -12,15 +99,13 @@ class Game extends Phaser.Scene {
   {
     //pass var from login scence
     this.playerInfo = {
-      //name: data.name.replace(/%20/g, " ").trim(), 
-      //guest: data.guest || false,
-      //id: data.user_id,
       name: sessionStorage.getItem("IGN"),
       guest: sessionStorage.getItem("guest") === "true",
       id: sessionStorage.getItem("user_id"),
       x: data.x || undefined,
       y: data.y || undefined
     }
+    
   }
 
   static player;
@@ -36,14 +121,12 @@ class Game extends Phaser.Scene {
   static storeNameThisMap;
   static storeName;
   static helperMsg;
-  static user_id;
-  static username;
   static gra;
   static otherPlayers;
   static playerInfo;
   static storesArea;
   static storeAreaGroup;
-  static socket;
+  
 
   preload() {
     //load all texture
@@ -55,118 +138,150 @@ class Game extends Phaser.Scene {
     this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, SPACE, DOWN, X, M") //WASD to move, M to toggle minimap
     this.storeLoadCount = 0;
     this.player = undefined;
-  
   }
 
   create() {
     this.storeInfo = this.sys.game.globals.globalVars.storeData
     this.otherPlayers = this.physics.add.group();
-    this.username = sessionStorage.getItem("IGN")
-    this.user_id = sessionStorage.getItem("user_id");
-    //this.socket = this.sys.game.globals.globalVars.getSocket()
-    //this.coordinates = this.sys.game.globals.globalVars.getCoordinates()
-    this.coordinates = { ...this.sys.game.globals.globalVars.coordinates}
     this.player = Phaser.Physics.Arcade.Sprite
     
     this.createMap()
     this.createAnimations()
-    this.createPlayer(this.coordinates)
+    this.createPlayer(coordinates)
     this.updateCamera()
     this.createOverlap()
     this.addMiniMap()
     
-    if (!this.sys.game.globals.globalVars.connectionEstablished) {
+    socket.on('all players', playersList => {
+      Object.keys(playersList).forEach((player) => {
+        this.sys.game.globals.globalVars.playersList[player] = playersList[player]
+        this.addOtherPlayers(playersList[player])
+      })
+    })
 
-      this.socket = io('192.168.0.12:3000', {
-        autoConnect: false,
-        query: {
-          user_id: this.user_id,
-          username: this.username,
-          x: this.coordinates.x,
-          y: this.coordinates.y
-        }
-      }) 
+    socket.on('new player', playerInfo => {
+      this.sys.game.globals.globalVars.playersList[playerInfo.user_id] = playerInfo
+      this.addOtherPlayers(playerInfo)
+    })
 
-      this.sys.game.globals.globalVars.socket = this.socket
-
-      let activeUser;
-      $("#chat-side-bar form").on('submit', (event) => {
-        event.preventDefault();
-        let message = $('#chat-message').val()
-        if ($('#chat-message').val() && activeUser) {
-          $('#messages').append(`<li>${this.username}: ${message}</li`)
-          this.socket.emit('send message', {
-            recipient: activeUser,
-            message
-          })
-          $('#chat-message').val('')
-        } else {
-          alert("select a user first and then type your message")
+    socket.on('player moved', data => {
+      this.otherPlayers.getChildren().forEach((player) => {
+        if (player.player_id === data.user_id) {
+          player.setPosition(data.x, data.y)
         }
       })
-  
-      this.socket.on('updated-friends-list', usersList => {
-        //console.log("updated friends list received", usersList)
-        Object.keys(usersList).forEach((user_id) => {
-          if (!document.getElementById(user_id)) {
-            $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
-            $("#friends-list li").on("click", function (event) {
-              $("#friends-list ul").children().css("color", "black")
-              $(this).css("color", "red")
-              activeUser = event.target.id
-            })
-          }
-        })
-      });
-  
-      this.socket.on('receive message', data => {
+    })
+
+    socket.on('delete user', user_id => {
+      $(`#${user_id}`).remove()
+      this.otherPlayers.getChildren().forEach((player) => {
+        if (user_id === player.player_id) {
+          player.destroy()
+        }
+      })
+    })
+
+    socket.connect(); //delayed socket connection until all handlers have been registered
+
+    socket.emit("update-user-details", {
+      username: this.playerInfo.name,
+      user_id: this.playerInfo.id
+    })
+
+    myPeer = new Peer(undefined, { //peer connection for video chatting, has to be after socket.connect()
+      host: '/',
+      port: '3001'
+    })
+
+    myPeer.on('open', id => {
+      peerID = id;
+    })
+
+    const inGameLocalVideo = document.getElementById("in-game-local-video")
+    const remoteVideo = document.getElementById("in-game-remote-video")
+
+    socket.on('call-request-recieved', data => {
+      console.log("call request recieved: ", data)
+      $('main').append(`
+            <div class="call-notification"> 
+              <div> User ${data.username} is calling ...</div>
+              <button id="accept-button">accept</button>
+              <button id="decline-button">decline</button>
+            </div>
+          `)
+      $('main').on('click', '#accept-button', () => {
+        $('.call-notification').remove();
         
-        $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
-      })
-  
-      this.socket.on('delete user', user_id => {
-        $(`#${user_id}`).remove()
-        this.otherPlayers.getChildren().forEach((player) => {
-          if (user_id === player.player_id) {
-            player.destroy()
-          }
+        navigator.mediaDevices.getUserMedia({video: true, audio: true})
+        .then(stream => {
+          addVideoStream(inGameLocalVideo, stream)
+          
+          myPeer.on('call', call => {
+            call.answer(stream) //answer the call and send local stream
+
+            call.on('stream', remoteUserVideoStream => {
+              addVideoStream(remoteVideo, remoteUserVideoStream)
+            })
+          })
+          socket.emit('user-accepted-call', peerID)
         })
-      })
-  
-      this.socket.on('all players', playersList => {
-        Object.keys(playersList).forEach((player) => {
-          this.sys.game.globals.globalVars.playersList[player] = playersList[player]
-          this.addOtherPlayers(playersList[player])
-        })
-      })
-  
-      this.socket.on('new player', playerInfo => {
-        this.sys.game.globals.globalVars.playersList[playerInfo.user_id] = playerInfo
-        this.addOtherPlayers(playerInfo)
-      })
-  
-      this.socket.on('player moved', data => {
-        this.otherPlayers.getChildren().forEach((player) => {
-          if (player.player_id === data.user_id) {
-            player.setPosition(data.x, data.y)
-          }
-        })
-      })
-  
-      this.socket.on('disconnect', (user_id) => {
-        console.log("server shutdown")
-        this.socket.disconnect();
-      })
-      
-      this.socket.on('connect_error', error => {
-        console.log("server error: ", error)
       })
 
-      this.socket.connect();
-    }
+    })
 
+    $('main').on('click', '#decline-button', () => {
+      socket.emit('user-declined-call')
+      $('.call-notification').remove()
+    })
+    
+    $('#end-call').on('click', () => {
+      socket.emit('call-ended')
+    })
+
+    socket.on('call-ended', () => {
+      console.log("ending call")
+      myPeer.destroy()
+      inGameLocalVideo.srcObject.getTracks().forEach(track => track.stop())
+      remoteVideo.srcObject.getTracks().forEach(track => track.stop())
+      inGameLocalVideo.remove()
+      remoteVideo.remove()
+    })
+
+    socket.on('call-declined', () => {
+      inGameLocalVideo.srcObject.getTracks().forEach(track => track.stop())
+      inGameLocalVideo.remove()
+    })
+    
+    $("#start-call").on("click", (event) => {
+      if (!call) {      //avoid calling the user while a call is ongoing
+        if (targetUser) {
+          socket.emit('call-request', {
+            peerID,
+            targetUser
+          })
+          
+          navigator.mediaDevices.getUserMedia({ video: true, audio: true})
+          .then(stream => {
+            addVideoStream(inGameLocalVideo, stream)
+            
+            socket.on("call-accepted", peerID => {
+              sendRecieveStreams(peerID, stream)
+            })
+          })
+          
+        }
+        else {
+          alert("click on user first")
+        }
+      }
+      else {
+        alert("already in another call!")
+      }
+    });
+
+
+    //If the player goes to the store and then comes back
     if(this.sys.game.globals.globalVars.connectionEstablished){
-      //this.socket.emit("request all players")
       const playersList = this.sys.game.globals.globalVars.playersList
       Object.keys(playersList).forEach((player) => {
         this.addOtherPlayers(playersList[player])
@@ -236,8 +351,8 @@ class Game extends Phaser.Scene {
       if (this.overlap && this.key.SPACE.isDown && !this.enterStore) {
         this.enterStore = true; //prevent event fire twice
         this.playerInfo.store_id = this.storeId;
-        this.sys.game.globals.globalVars.coordinates.x = this.player.x;
-        this.sys.game.globals.globalVars.coordinates.y = this.player.y;
+        coordinates.x = this.player.x;
+        coordinates.y = this.player.y;
         this.playerInfo.storeInfo = this.storeInfo;
         this.storeName
           ? this.playerInfo.storeName = this.storeName
@@ -311,7 +426,7 @@ class Game extends Phaser.Scene {
         const x = this.player.x
         const y = this.player.y
         if(x !== this.player.currentPosition.x || y !== this.player.currentPosition.y) {
-          this.socket.emit('user movement', { x,y })
+          socket.emit('user movement', { x,y })
         }
       }
   
@@ -324,6 +439,7 @@ class Game extends Phaser.Scene {
   }
   
   createPlayer(playerInfo){
+    console.log("Adding player at: ", playerInfo.x, playerInfo.y)
     this.player = this.physics.add.sprite(playerInfo.x, playerInfo.y, "fm_02")
     this.player.play('idle-d')
     this.playerName = this.add.text(this.player.x - 60, this.player.y + 32, this.playerInfo.guest ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, { font: "bold", align: 'center' }).setOrigin(0.5)
@@ -492,7 +608,6 @@ class Game extends Phaser.Scene {
       this.sys.game.globals.globalVars.playersList[player.player_id].y = player.y
     })
   }
-
-}
+};
 
 export { Game }
