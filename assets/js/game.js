@@ -75,7 +75,7 @@ class Game extends Phaser.Scene {
     })
     this.storeInfo = this.sys.game.globals.globalVars.storeData
     
-    const socket = io('http://localhost:8000', {
+    const socket = io('http://localhost:3000', {
       autoConnect: false,
       query: {
         user_id: this.playerInfo.id,
@@ -327,7 +327,7 @@ class Game extends Phaser.Scene {
     this.miniCam = this.cameras.add(1030, 0, 250, 250);
     this.miniCam.setBounds(0, 0, 1920, 1920)
     this.miniCam.zoom = 0.35;
-    this.miniCam.startFollow(this.player, true)
+    this.miniCam.startFollow(this.container, true)
     
     //add overlapArea detect
     this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
