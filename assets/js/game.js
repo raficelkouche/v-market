@@ -25,6 +25,7 @@ class Game extends Phaser.Scene {
   static player = Phaser.Physics.Arcade.Sprite;
   static playerName;
   static playerNameBox;
+  static container;
   static overlap = true;
   static inshop = false;
   static enterStore; //to prevent scence change fire more then once
@@ -198,7 +199,7 @@ class Game extends Phaser.Scene {
     } 
   
     function intToRGB(i){
-      let c = (i & 0x00FFFFFF) //bitwise and operator to get when when both binary = 1
+      let c = (i & 0x00FFFFFF) //bitwise and operator to get when when both binary = 1 0x to show it is in hexdecimal
           .toString(16)
           .toUpperCase();
 
@@ -266,22 +267,32 @@ class Game extends Phaser.Scene {
     }
 
     //add player sprite, animation and name
-    this.player = this.physics.add.sprite( this.playerInfo.x ||400, this.playerInfo.y || 300, rand)
     //make sprite anime for added sprite
+
+    this.createPlayer();
+    /*
     this.createSpriteAnimation(this.player.texture.key)
-
     this.player.play(`idle-d-${this.player.texture.key}`)
-    this.playerName = this.add.text(this.player.x -60, this.player.y+32, !(this.playerInfo.id) ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
+    this.playerName = this.add.text(0, 32, !(this.playerInfo.id) ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
     this.playerName.setDepth(9);
-    this.playerNameBox = new Phaser.Geom.Rectangle(this.player.x - 3 - this.playerName.width / 2, this.playerName.y - this.playerName.height / 2, this.playerName.width + 6, this.playerName.height);
+    this.playerNameBox = new Phaser.Geom.Rectangle( -(this.playerName.width + 6) / 2 ,  32 -  this.playerName.height / 2, this.playerName.width + 6, this.playerName.height);
     this.gra.setDepth(8);
+    
+    // put player inside a container
+    this.container = this.add.container(this.playerInfo.x ||400, this.playerInfo.y || 300);
+    this.container.setSize(32,32);
+    this.container.add(this.player)
+    this.container.add(this.gra)
+    this.container.add(this.playerName)
+    this.physics.world.enable(this.container);
+    */
 
+    
     //add 3 camera, 1st to follow player, mini(2nd) for mini map, and 3rd for background when pause 
     //set camera to size of map, zoom in for better view, then make this follow player
    /*  this.cameras.main.setBounds(0, 0, 1920, 1920);
     this.cameras.main.setZoom(3);
     this.cameras.main.startFollow(this.player, true) */
-    this.updateCamera()
 
     //make 'mini map' and place to top RIGHT, set bound of map, zoom out so it is mini, and set to follow player
     this.miniCam = this.cameras.add(1030, 0, 250, 250);
@@ -306,12 +317,11 @@ class Game extends Phaser.Scene {
 
     //add collider with player
     // this.physics.add.collider(this.player, this.wallLayer);
-    this.physics.add.collider(this.player, this.groundLayer)
-    this.physics.add.collider(this.player, this.cityObjLayer)
+    this.physics.add.collider(this.container, this.groundLayer)
+    this.physics.add.collider(this.container, this.cityObjLayer)
 
     this.physics.world.bounds.width = this.map.widthInPixels;
     this.physics.world.bounds.height = this.map.heightInPixels;
-    this.player.body.setCollideWorldBounds(true); 
     
     // toggle mini map
     this.input.keyboard.on('keydown', function (event) {
@@ -333,7 +343,7 @@ class Game extends Phaser.Scene {
       $('#IGN').addClass("btn btn-outline-secondary")
       $('#IGN').attr("data-bs-toggle", '')
       document.getElementById('IGN').innerHTML = 'Guest';
-      document.getElementById('user-session').innerHTML = 'Disable';
+      document.getElementById('user-session').innerHTML = 'Home Page';
       $('#chat-side-bar').empty()
       let login = `
         <div id="friends-list" class="disable">
@@ -359,8 +369,8 @@ class Game extends Phaser.Scene {
         e.preventDefault();
         let scene = this.scene
         let music = this.music
-        this.playerInfo.x = this.player.x
-        this.playerInfo.y = this.player.y
+        this.playerInfo.x = this.container.x
+        this.playerInfo.y = this.container.y
         let cam = this.cameras.main
         let playerInfo = this.playerInfo
         this.sys.game.globals.globalVars.login('Game')
@@ -477,8 +487,8 @@ class Game extends Phaser.Scene {
     if (this.overlap && this.key.SPACE.isDown && !this.enterStore && this.playerInfo.id) {
       this.enterStore = true; //prevent event fire twice
       this.playerInfo.store_id = this.storeId;
-      this.playerInfo.x = this.player.x;
-      this.playerInfo.y = this.player.y;
+      this.playerInfo.x = this.container.x;
+      this.playerInfo.y = this.container.y;
       this.playerInfo.storeInfo = this.storeInfo;
       this.storeName
         ? this.playerInfo.storeName = this.storeName
@@ -487,31 +497,31 @@ class Game extends Phaser.Scene {
       this.scene.start('store', this.playerInfo);
     }
 
-    this.player.setVelocity(0);
+    this.container.body.setVelocity(0);
     //update player movement
     if (this.key.LEFT.isDown || this.key.A.isDown) {
-      this.player.setVelocityX(-150);if (this.player.anims.currentAnim.key === `walk-l-${this.player.texture.key}`) { }
+      this.container.body.setVelocityX(-150);
+      if (this.player.anims.currentAnim.key === `walk-l-${this.player.texture.key}`) { }
       else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
         this.player.play(`walk-l-${this.player.texture.key}`)
-        console.log(this.anims)
       }
     }
     else if (this.key.RIGHT.isDown || this.key.D.isDown) {
-      this.player.setVelocityX(150);
+      this.container.body.setVelocityX(150);
       if (this.player.anims.currentAnim.key === `walk-r-${this.player.texture.key}`) { }
       else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
         this.player.play(`walk-r-${this.player.texture.key}`)
       }
     }
     if (this.key.UP.isDown || this.key.W.isDown) {
-      this.player.setVelocityY(-150);
+      this.container.body.setVelocityY(-150);
       if (this.player.anims.currentAnim.key === `walk-u-${this.player.texture.key}`) { }
       else {
         this.player.play(`walk-u-${this.player.texture.key}`)
       }
     }
     else if (this.key.DOWN.isDown || this.key.S.isDown) {
-      this.player.setVelocityY(150);
+      this.container.body.setVelocityY(150);
       if (this.player.anims.currentAnim.key === `walk-d-${this.player.texture.key}`) { }
       else {
         this.player.play(`walk-d-${this.player.texture.key}`)
@@ -539,29 +549,40 @@ class Game extends Phaser.Scene {
   }
   
   updatePlayerGra() {
-    this.playerName.x = this.player.x;  
-    this.playerName.y = !(this.playerInfo.id) ? this.player.y + 34 : this.player.y + 28; 
-    this.playerNameBox.x = this.playerName.x - 3 - this.playerName.width / 2
-    this.playerNameBox.y = this.playerName.y - this.playerName.height / 2
+    //this.playerName.x = this.player.x;  
+    //this.playerName.y = !(this.playerInfo.id) ? this.player.y + 34 : this.player.y + 28; 
+    //this.playerNameBox.x = this.playerName.x - 3 - this.playerName.width / 2
+    //this.playerNameBox.y = this.playerName.y - this.playerName.height / 2
     this.overlap = false; //update overlap check
-    this.gra.clear() //redraw the backdrop on name
-    this.gra.fillRectShape(this.playerNameBox);
+    //this.gra.clear() //redraw the backdrop on name
+    //this.gra.fillRectShape(this.playerNameBox);
   }
 
   createPlayer(playerInfo) {
     this.player = this.physics.add.sprite(0, 0, "fm_02")
-    this.container = this.add.container(playerInfo.x, playerInfo.y);
+    this.createSpriteAnimation(this.player.texture.key)
+    this.player.play(`idle-d-${this.player.texture.key}`)
+    this.playerName = this.add.text(0, 32, !(this.playerInfo.id) ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
+    this.playerName.setDepth(9);
+    this.playerNameBox = new Phaser.Geom.Rectangle( -(this.playerName.width + 6) / 2 ,  32 -  this.playerName.height / 2, this.playerName.width + 6, this.playerName.height);
+    this.gra.setDepth(8);
+    // put player inside a container
+    this.container = this.add.container(this.playerInfo.x ||400, this.playerInfo.y || 300);
     this.container.setSize(32,32);
-    this.physics.world.enable(this.container)
+    this.container.add(this.player)
+    this.container.add(this.gra)
+    this.container.add(this.playerName)
+    this.physics.world.enable(this.container);
     this.updateCamera();
     this.container.body.setCollideWorldBounds(true);
+    this.gra.fillRectShape(this.playerNameBox);
   }
 
   updateCamera(){ //setup cam to follow player
     this.cameras.main.fadeIn(150, 0, 0, 0)
     this.cameras.main.setBounds(0, 0, 1920, 1920);
     this.cameras.main.setZoom(2);
-    this.cameras.main.startFollow(this.player, true)
+    this.cameras.main.startFollow(this.container.body, true)
   }
 
 }
