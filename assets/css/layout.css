@@ -6,20 +6,20 @@
   background: rgba(0, 0, 0, 0.2);
   width:1280px;
   height:960px;
-  -webkit-animation: fadein 0.25s; /* Safari, Chrome and Opera > 12.1 */
-  -moz-animation: fadein 0.25s; /* Firefox < 16 */
-  -ms-animation: fadein 0.25s; /* Internet Explorer */
-  -o-animation: fadein 0.25s; /* Opera < 12.1 */
-  animation: fadein 0.25s;
+  -webkit-animation: fadein 0.15s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadein 0.15s; /* Firefox < 16 */
+  -ms-animation: fadein 0.15s; /* Internet Explorer */
+  -o-animation: fadein 0.15s; /* Opera < 12.1 */
+  animation: fadein 0.15s;
 }
 
 #backdrop.fadeout {
   opacity: 0;
-  -webkit-animation: fadeout 0.25s; /* Safari, Chrome and Opera > 12.1 */
-  -moz-animation: fadeout 0.25s; /* Firefox < 16 */
-  -ms-animation: fadeout 0.25s; /* Internet Explorer */
-  -o-animation: fadeout 0.25s; /* Opera < 12.1 */
-  animation: fadeout 0.25s;
+  -webkit-animation: fadeout 0.15s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadeout 0.15s; /* Firefox < 16 */
+  -ms-animation: fadeout 0.15s; /* Internet Explorer */
+  -o-animation: fadeout 0.15s; /* Opera < 12.1 */
+  animation: fadeout 0.15s;
 }
 
 #store_banner {

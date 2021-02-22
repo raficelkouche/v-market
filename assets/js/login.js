@@ -20,7 +20,7 @@ class Login extends Phaser.Scene {
       if (res.user_ID) {
         let scene = this.scene;
         $('#loginInsert').addClass('fadeout')
-        this.cameras.main.fadeOut(250, 0, 0, 0)
+        this.cameras.main.fadeOut(150, 0, 0, 0)
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
           scene.start('Game')
         })
@@ -46,7 +46,7 @@ class Login extends Phaser.Scene {
       sessionStorage.setItem("IGN", name)
       sessionStorage.setItem("user_id", "")
       $('#loginInsert').addClass('fadeout')
-      this.cameras.main.fadeOut(250, 0, 0, 0)
+      this.cameras.main.fadeOut(150, 0, 0, 0)
       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam,   effect) => {
         scene.start('Game')
       })
@@ -65,7 +65,7 @@ class Login extends Phaser.Scene {
       this.sys.game.globals.globalVars.login().then(res => {
         if (res) {
           $('#LoginInsert').addClass('fadeout')
-          cam.fadeOut(250, 0, 0, 0)
+          cam.fadeOut(150, 0, 0, 0)
           cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
             scene.start('Game')
           })
