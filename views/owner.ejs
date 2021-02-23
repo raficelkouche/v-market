@@ -48,12 +48,14 @@
                 <col class="product-name">
                 <col class="product-price">
                 <col class="product-quan">
+                <col class="product-sold">
               </colgroup>
               <tr>
                 <th style='text-align: center;'>Product Pricture</th>
                 <th>Name</th>
                 <th>Price</th>
                 <th>Quantity</th>
+                <th>Sold</th>
               </tr>
               <% for (const item of result) {%>
                 <tr>
@@ -61,6 +63,7 @@
                   <td style='height: 5rem; padding: 0;'><%= item.item_name%></td>
                   <td style='height: 5rem; padding: 0;'>$<%= item.item_price%></td>
                   <td style='height: 5rem; padding: 0; text-align: center;'><%= item.item_quantity%></td>
+                  <td style='height: 5rem; padding: 0; text-align: center;'><%= item.item_sold%></td>
                 </tr>
               <% } %>
             </table>

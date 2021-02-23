@@ -128,6 +128,15 @@ module.exports = () => {
     if(req.session.owner_id) {
       db.getStoreByUser(user_id)
       .then(result => {
+        result.sort((a, b) => {
+          let keyA = new Date(a.product_id),
+          keyB = new Date(b.product_id);
+          // Compare the 2 dates
+          if (keyA < keyB) return -1;
+          if (keyA > keyB) return 1;
+          return 0;
+        });
+        console.log(result)
         const templateVars = {result}
         res.render('owner', templateVars)
       })

@@ -88,6 +88,7 @@ const orderNew = function(order) { //make new user
   // get user id make a new order with store id
   // using the order id make line items with order id, product id
   // make the order -> use order id
+  console.log(order)
   return pool.query(`
   INSERT INTO orders (store_id, user_id, total_price) 
   VALUES ($1, $2, $3)
@@ -104,12 +105,17 @@ const orderNew = function(order) { //make new user
         pool.query(`
         INSERT INTO lineItems (order_id, product_id, quantity, total_price)
         VALUES ($1, $2, $3, $4)
-        returning id;
-      `,[res.rows[0].order_id, order.cart[i].product_id, 1, order.cart[i].price])
-        .then(res => {
-          // check if each line was entered
-          // console.log('this the result from adding lineitems')
-          // console.log(res)
+        returning *;
+      `,[res.rows[0].id, order.cart[i].id, 1, order.cart[i].price])
+        .then(res => { // no time, this will have to do for now
+          console.log(res.rows)
+          pool.query(`
+          update products
+          set quantity = quantity - 1
+          where id = $1
+          returning *;
+          `,[order.cart[i].id])
+          .then(x => console.log(x.rows))
       })
     }
 
@@ -139,13 +145,16 @@ const getFriends = function(user_id) {
 }
 exports.getFriends = getFriends;
 
-const getStoreByUser = function(user_id) {
+const getStoreByUser = function(user_id) { //need to update when lineitem is fix
   return pool.query(`
-  select s.name as store_name, s.banner_img as store_banner, p.thumbnail as item_photo, p.name as item_name, p.quantity as item_quantity, p.price as item_price
+  select s.name as store_name, s.banner_img as store_banner, p.thumbnail as item_photo, p.name as item_name, p.quantity as item_quantity, p.price as item_price, p.id as product_id, count(l.*) as item_sold
   from users u
   join stores s on s.owner_id = u.id
   join products p on p.store_id = s.id
-  where u.id = $1;`, [user_id])
+  left join lineItems l on p.id = l.product_id
+  where u.id = $1
+  group by s.name, s.banner_img, p.thumbnail, p.name, p.quantity, p.price, p.id
+  ;`, [user_id])
   .then(res => res.rows)
 }
 exports.getStoreByUser = getStoreByUser;
