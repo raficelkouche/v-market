@@ -138,3 +138,14 @@ const getFriends = function(user_id) {
 
 }
 exports.getFriends = getFriends;
+
+const getStoreByUser = function(user_id) {
+  return pool.query(`
+  select s.name as store_name, s.banner_img as store_banner, p.thumbnail as item_photo, p.name as item_name, p.quantity as item_quantity, p.price as item_price
+  from users u
+  join stores s on s.owner_id = u.id
+  join products p on p.store_id = s.id
+  where u.id = $1;`, [user_id])
+  .then(res => res.rows)
+}
+exports.getStoreByUser = getStoreByUser;

@@ -121,6 +121,17 @@ module.exports = () => {
   })
 
   // get Friends for user
+  router.get('/:user_id', (req, res) => {
+    const user_id = req.params.user_id;
+    db.getStoreByUser(user_id)
+    .then(result => {
+      const templateVars = {result}
+      res.render('owner', templateVars)
+    })
+    // console.log('this the data given to ajax call')
+    // console.log(req.session.user_ID) // the user id
+  })
+  
 
   return router;
 }

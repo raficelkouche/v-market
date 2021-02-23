@@ -412,7 +412,7 @@ class Game extends Phaser.Scene {
                   scene.start('Game', playerInfo);
                 })
             } else if (res && res.owner) {
-              console.log('to owner')
+              window.location.href = `/users/${res.id}`;
             }
           }
         )

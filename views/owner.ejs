@@ -16,22 +16,74 @@
     <!-- font for friends list -->
     <!-- for shopping cart icon -->
     <!-- custom style sheets-->
-    <link rel="stylesheet" href="/css/login.css" type="text/css" />
-    <link rel="stylesheet" href="/css/layout.css" type="text/css" />
-    <link rel="stylesheet" href="/css/game.css" type="text/css" />
-    <link rel="stylesheet" href="/css/product-details.css" type="text/css" />
-    <link rel="stylesheet" href="/css/checkout.css" type="text/css" />
-    <link rel="stylesheet" href="/css/navbar.css" type="text/css" />
-    <link rel="stylesheet" href="/css/chat.css" type="text/css" />
+    <link rel="stylesheet" href="/css/owner.css" type="text/css" />
 
 
   </head>
-
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Carter+One&display=swap');
+    </style>
   <body>
+    <%- include('partials/_header') %>
     <main>
-      <p>AAAAAAAAAAAAAAAAAAAAAAAA</p>
+      <div style='width: 100%; 
+        height: 10rem; 
+        background-image:url(<%= result[0].store_banner%>);   
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;'>
+        <h1 style='
+        color: #bbbbbb;
+        align-self: center;
+        -webkit-user-select: none;
+        user-select: none;
+        font-family: Carter One, cursive;'>
+        <%= result[0].store_name%></h1>
+      </div>
+      <div>
+          <div id='products-grid'>
+            <table>
+              <colgroup>
+                <col id="product-photo">
+                <col class="product-name">
+                <col class="product-price">
+                <col class="product-quan">
+              </colgroup>
+              <tr>
+                <th style='text-align: center;'>Product Pricture</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+              </tr>
+              <% for (const item of result) {%>
+                <tr>
+                  <td style='width: 20%; height: 5rem; padding: 0;'><img style="width: 100%; height: 100%; object-fit: contain;"src='<%= item.item_photo%>'></td>
+                  <td style='height: 5rem; padding: 0;'><%= item.item_name%></td>
+                  <td style='height: 5rem; padding: 0;'>$<%= item.item_price%></td>
+                  <td style='height: 5rem; padding: 0; text-align: center;'><%= item.item_quantity%></td>
+                </tr>
+              <% } %>
+            </table>
+          </div>
+          <footer>
+          </footer>
+        
+      </div>
+      <div id="customer" style='right: 4%'>
+        
+        <p>Need 
+Help?</p>
+        <div id="customer-support">
+        </div>
+        <p>Click for 
+Customer
+Support</p>
+      </div>
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+      <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
   </body>
   
 </html>

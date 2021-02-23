@@ -107,13 +107,6 @@ app.get("/test", (req, res) => {
   res.json({ res: "check cookies" })
 })
 
-app.get('/users/:user_id', (req, res) => {
-  console.log('aaaa')
-  // console.log('this the data given to ajax call')
-  // console.log(req.session.user_ID) // the user id
-  res.render('owner')
-})
-
 
 server.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)

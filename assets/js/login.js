@@ -73,7 +73,6 @@ class Login extends Phaser.Scene {
             scene.start('Game')
           })
         } else if (res && res.owner) {
-          console.log(res)
           window.location.href = `/users/${res.id}`;
         }
       })

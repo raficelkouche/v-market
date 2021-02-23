@@ -1,0 +1,252 @@
+/* this have to change to inline style from phase to*/
+#backdrop {
+  visibility: hidden;
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  width:1280px;
+  height:960px;
+  -webkit-animation: fadein 0.15s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadein 0.15s; /* Firefox < 16 */
+  -ms-animation: fadein 0.15s; /* Internet Explorer */
+  -o-animation: fadein 0.15s; /* Opera < 12.1 */
+  animation: fadein 0.15s;
+}
+
+#backdrop.fadeout {
+  opacity: 0;
+  -webkit-animation: fadeout 0.15s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadeout 0.15s; /* Firefox < 16 */
+  -ms-animation: fadeout 0.15s; /* Internet Explorer */
+  -o-animation: fadeout 0.15s; /* Opera < 12.1 */
+  animation: fadeout 0.15s;
+}
+
+#store_banner {
+  position:fixed;
+  top: 5%;
+  left: 5%;
+  width: 90%;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height:15%; 
+}
+
+#store_banner > h1 {
+  color: #bbbbbb;
+  align-self: center;
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
+  /* Change the font for the store to look nicer */
+  /* font-family:'Monaco, Helvetica, sans-serif';
+  border: 2px solid red; */
+  font-family: 'Carter One', cursive;
+}
+
+#store_banner > header {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  background:rgba(116, 1, 113, 0.8);
+  display: flex;
+  justify-content: flex-end;
+  height: 20%;
+  width: 100%;
+}
+
+#close-button {
+  background: rgba(255, 0, 0, 0.6);
+  border-top-right-radius: 0.5rem;
+  height: 100%;
+  width: 3.8%;
+  display: flex;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+#close-button > div {
+  height: 70%;
+  width: 70%;
+  background-image: url(/icon/close.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-top: 0.2rem;
+  align-self: center;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
+}
+
+#close-button:hover {
+  background: rgba(255, 0, 0, 1);
+  cursor: pointer;
+}
+#close-button:hover > span {
+  color: #111111;
+}
+
+/* too be added
+#search-bar {
+
+  
+}
+*/
+
+#store-data {
+  align-self: center;
+  width:90%; 
+  height:90%; 
+  border-radius: 0.5rem;
+  background: white;
+  box-shadow: 10px 10px 10px rgba(0,0,0,0.5);
+}
+
+#products {
+  display: flex;
+  position:fixed;
+  bottom: 5%;
+  left: 5%;
+  width: 90%;
+  height: 75%;
+  overflow: auto;
+}
+
+#products-grid {
+  margin-left: 2%;
+  width: 88%;
+  justify-content: space-between;
+}
+
+#products-grid > table {
+  margin-top: 1rem;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 1rem 2rem;
+}
+
+.product {
+  background-color: #f3f3f3;
+  height: 80px;
+}
+
+td {
+  height:18rem;
+  width:24%;
+}
+
+.thumbnail{
+  object-fit: contain;
+  width: 90%;
+  height: 65%;
+  margin-top: 10%;
+  margin-left: 5%;
+  margin-right: 5%;
+  border:0;
+}
+
+
+
+.description{
+  align-self: center;
+  justify-self: center;
+  width: 90%;
+  height: 25%;
+  margin: 5%;
+}
+
+.product-name {
+  width: 100%;
+  height: 60%;
+  font-family: Arial;
+  text-align: center;
+  overflow: hidden;
+  font-size: 1.5rem;
+}
+
+.price {
+  width: 100%;
+  height: 40%;
+  text-align: center;
+  font-family: Arial;
+  font-weight: bold;
+}
+
+#products-grid > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  align-content: center;
+  justify-content: center;
+  padding-bottom: 2rem;
+  font-weight: bold;
+  font-family: Arial;
+}
+
+/* 
+#request-data {
+  
+}
+*/
+
+#customer {
+  position:fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  top: 30%;
+  right: 8%;
+  /* need to change for responsive */
+}
+
+#customer > div {
+  align-self: center;
+  height: 3.5rem;
+  width: 3.5rem;
+  border-radius: 0.8rem;
+  background-image: url(/icon/phone.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: #bbbbbb;
+  border: black solid 0.25rem ;
+  opacity: 0.5;
+}
+
+#customer > div:hover {
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+#customer > div:active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+#customer > p {
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  white-space: pre;
+  overflow: auto;
+  text-align: center;
+  font-size: small;
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
+  font-size: 0.7rem;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeout {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
