@@ -60,15 +60,21 @@ class Login extends Phaser.Scene {
     //user sub the login info
     $("#login").off().on("submit", (e) => {
       e.preventDefault();
+      console.log('login click')
       let scene = this.scene;
       let cam = this.cameras.main
-      this.sys.game.globals.globalVars.login().then(res => {
-        if (res) {
+      this.sys.game.globals.globalVars.login()
+      .then(res => {
+        console.log(res)
+        if (res === true) {
           $('#LoginInsert').addClass('fadeout')
           cam.fadeOut(150, 0, 0, 0)
           cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
             scene.start('Game')
           })
+        } else if (res && res.owner) {
+          console.log(res)
+          window.location.href = `/users/${res.id}`;
         }
       })
     })

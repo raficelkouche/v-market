@@ -5,6 +5,6 @@ INSERT INTO stores (owner_id, name, description, banner_img, email, phone) VALUE
 INSERT INTO stores (owner_id, name, description, banner_img, email, phone) VALUES (2, 'Coffee Time', 'beverages', 'https://i.imgur.com/FpytYYZ.jpeg', 'Coffeetime@email.com', '416-987-4321');
 INSERT INTO stores (owner_id, name, description, banner_img, email, phone) VALUES (2, 'Fun Fun Socks', 'garments', 'https://i.imgur.com/Utf47dQ.jpeg', 'Funfunsocks@email.com', '416-987-4321');
 INSERT INTO stores (owner_id, name, description, banner_img, email, phone) VALUES (3, 'Floral', 'beverages', 'https://i.imgur.com/QALgrNJ.jpeg', 'Floral@email.com', '416-987-4321');
-INSERT INTO stores (owner_id, name, description, banner_img, email, phone) VALUES (1, 'Pineapple', 'electronics', 'https://i.imgur.com/eBX75aS.jpeg', 'Pineapple@email.com', '416-987-4321');
+INSERT INTO stores (owner_id, name, description, banner_img, email, phone) VALUES (2, 'Pineapple', 'electronics', 'https://i.imgur.com/eBX75aS.jpeg', 'Pineapple@email.com', '416-987-4321');
 INSERT INTO stores (owner_id, name, description, banner_img, email, phone) VALUES (4, 'Candle Light', 'electronics', 'https://i.imgur.com/iOIjxsO.jpeg', 'Candlelight@email.com', '416-987-4321');
 INSERT INTO stores (owner_id, name, description, banner_img, email, phone) VALUES (2, 'Tech Shack', 'electronics', 'https://i.imgur.com/QXplKS4.jpeg', 'techshack@email.com', '416-987-4321');

@@ -23,18 +23,20 @@ exports.userNew = userNew;
 const userLogin = function(IGN) {
   //console.log(IGN.toLowerCase())
   return pool.query(`
-  select * 
-  from users
-  where lower(gaming_name) = lower($1);`, [IGN])
+  select u.* , s.name as store_name
+  from users u
+  left join stores s on s.owner_id = u.id
+  where lower(u.gaming_name) = lower($1);`, [IGN])
   .then(res => res.rows[0]);
 }
 exports.userLogin = userLogin;
 
 const userLoginWithEmail = function(email) {
   return pool.query(`
-  select * 
-  from users
-  where lower(email) = lower($1);`, [email])
+  select u.* , s.name as store_name
+  from users u
+  left join stores s on s.owner_id = u.id
+  where lower(u.email) = lower($1);`, [email])
   .then(res => res.rows[0]);
 }
 exports.userLoginWithEmail = userLoginWithEmail;

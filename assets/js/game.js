@@ -403,13 +403,16 @@ class Game extends Phaser.Scene {
         let cam = this.cameras.main
         let playerInfo = this.playerInfo
         this.sys.game.globals.globalVars.login('Game')
-        .then((x) => {
-          if (x) {
-            music.destroy(); 
-            cam.fadeOut(150, 0, 0, 0)
-            cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-                scene.start('Game', playerInfo);
-              })
+        .then((res) => {
+          console.log(res)
+            if (res === true) {
+              music.destroy(); 
+              cam.fadeOut(150, 0, 0, 0)
+              cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+                  scene.start('Game', playerInfo);
+                })
+            } else if (res && res.owner) {
+              console.log('to owner')
             }
           }
         )

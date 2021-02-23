@@ -3,32 +3,41 @@ const router = express.Router();
 const db = require('../db/helper');
 const bcrypt = require('bcrypt');
 const salt = bcrypt.genSaltSync(10);
+
 module.exports = () => {
 
-  let isEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+  let isEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   let specialCharacter = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
   let englishCharacter = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?0-9]+/;
 
   router.post('/login', (req, res) => {
-    if (isEmail.test(req.body.name) && req.body.password) { //if user use email
+    if (isEmail.test(req.body.name)) { //if user use email
       db.userLoginWithEmail(req.body.name)
       .then( result => {
+        console.log(result)
         if (!result) {//cannot find user in db
           res.json({err: 'user'})
         } else if(!bcrypt.compareSync(req.body.password, result.password)) {//passsword does not match with record
           res.json({err: 'password'})
+        } else if(result.store_name) {//passsword does not match with record
+          result.owner = true
+          res.json(result)
         } else { //pass IGN to game
           req.session.user_ID = result.id
           res.json({name: result.gaming_name, user_id: result.id});
         }
       })
     } else if (req.body.password){ //if user try to log in
+      console.log('using username')
       db.userLogin(req.body.name)
         .then( result => {
           if (!result) { //cannot find user in db
             res.json({err: 'user'})
           } else if(!bcrypt.compareSync(req.body.password, result.password)) { //passsword does not match with record
             res.json({err: 'password'})
+          } else if(result.store_name) {//passsword does not match with record
+            result.owner = true
+            res.json(result)
           } else { //pass IGN to game
             req.session.user_ID = result.id
             res.json({name: result.gaming_name, user_id: result.id});
@@ -110,7 +119,9 @@ module.exports = () => {
         res.json(result)
       })
   })
-  
+
+  // get Friends for user
+
   return router;
 }
 

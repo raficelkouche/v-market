@@ -32,10 +32,11 @@ class Global {
         appendIfOnLogin(err);
         return;
       } else {
-
+        console.log($("#login").serialize())
       return  ($.ajax("/users/login", {method: 'POST', data: $("#login").serialize()})
           .then((res) => {
-            if(!res.user_id && !res.err) { 
+            console.log(res)
+            if(!res.user_id && !res.err && !res.owner) { 
               let confirm = `
               <div class="box confirm">
                 <div>You sure you want to login as Guest?</div>
@@ -54,7 +55,7 @@ class Global {
                 <div>Special character is not allow</div>
               </div>`
               appendIfOnLogin(err);
-            }else if(res.err) { // User name/password not match
+            } else if(res.err) { // User name/password not match
               err = `
               <div class="box err">
                 <div>Invalid password & user combination</div>
@@ -64,6 +65,8 @@ class Global {
                 console.log('in password')
                 $('.err-msg').html('Invalid password & user combination')
               };
+            } else if(res.owner) { // User name/password not match
+              return res
             } else { //let user in game
               //store user information in the session
               sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
