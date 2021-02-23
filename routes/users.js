@@ -136,7 +136,6 @@ module.exports = () => {
           if (keyA > keyB) return 1;
           return 0;
         });
-        console.log(result)
         const templateVars = {result}
         res.render('owner', templateVars)
       })
