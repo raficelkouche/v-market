@@ -21,6 +21,7 @@ module.exports = () => {
           res.json({err: 'password'})
         } else if(result.store_name) {//passsword does not match with record
           result.owner = true
+          req.session.owner_id = result.id
           res.json(result)
         } else { //pass IGN to game
           req.session.user_ID = result.id
@@ -37,6 +38,7 @@ module.exports = () => {
             res.json({err: 'password'})
           } else if(result.store_name) {//passsword does not match with record
             result.owner = true
+            req.session.owner_id = result.id
             res.json(result)
           } else { //pass IGN to game
             req.session.user_ID = result.id
@@ -123,11 +125,15 @@ module.exports = () => {
   // get Friends for user
   router.get('/:user_id', (req, res) => {
     const user_id = req.params.user_id;
-    db.getStoreByUser(user_id)
-    .then(result => {
-      const templateVars = {result}
-      res.render('owner', templateVars)
-    })
+    if(req.session.owner_id) {
+      db.getStoreByUser(user_id)
+      .then(result => {
+        const templateVars = {result}
+        res.render('owner', templateVars)
+      })
+    } else {
+      res.redirect('/')
+    }
     // console.log('this the data given to ajax call')
     // console.log(req.session.user_ID) // the user id
   })
