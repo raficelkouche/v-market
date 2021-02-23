@@ -394,7 +394,7 @@ class Store extends Phaser.Scene {
                   data-name="V-Market"
                   data-description="Purchase for ${this.storeName}"
                   data-amount="{${total}}"
-                  data-currency="usd">
+                  data-currency="cad">
                 </script>
               </form>
             </div>
@@ -463,7 +463,18 @@ class Store extends Phaser.Scene {
               `)
                 $('tbody').append(orderList(orderItems))
                 $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
-
+                // hide order confirmation until after credit card
+                $('#products').css('visibility', 'hidden')
+                // once the credit form opens, keep checking unttil it closes
+                const checkoutRefresh = setInterval(() => {
+                  const stripe = $('iframe')
+                  // console.log(stripe.length)
+                  if(stripe.length === 1) {
+                    $('#products').css('visibility', 'visible')
+                    clearInterval(checkoutRefresh)
+                  }  
+                }, 500)
+                
                 // add exit function for order confirmation page
                 $("#exit-button").on("click", () => {
                   exit(this.cameras, this.playerInfo, this.scene);
