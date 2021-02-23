@@ -42,7 +42,7 @@ class Game extends Phaser.Scene {
 
   preload() {
     //load all texture
-    this.load.tilemapTiledJSON("map", "maps/vMarket3.json")
+    this.load.tilemapTiledJSON("map", "maps/vMarket4.json")
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_01', 'characters/fm_01.png', { frameWidth: 32, frameHeight: 32 })
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
