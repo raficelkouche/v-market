@@ -29,7 +29,7 @@ class Login extends Phaser.Scene {
         })
       } else {
         // this.add.image(140, 0, 'background1').setOrigin(0).setDepth(0);
-        const form = this.add.dom(640, 480).createFromCache('loginForm')
+        const form = this.add.dom(840, 580).createFromCache('loginForm')
       }
     }).catch(err => console.log(err))
 
