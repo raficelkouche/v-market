@@ -48,10 +48,6 @@ class Game extends Phaser.Scene {
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_01', 'characters/fm_01.png', { frameWidth: 32, frameHeight: 32 })
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
-<<<<<<< HEAD
-=======
-    this.load.spritesheet('fm_01', 'characters/fm_01.png', { frameWidth: 32, frameHeight: 32 })
->>>>>>> b29f57ebfde1a9ce321933b61f46d78d4e0ec228
     this.load.spritesheet('m_01', 'characters/m_01.png', { frameWidth: 32, frameHeight: 32 })
     this.spriteArr = ['fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01'];
     this.load.html('store_window', 'templates/store_window.html');
@@ -70,7 +66,7 @@ class Game extends Phaser.Scene {
       loop: true,
     })
     // toggle music off or on
-    //this.music.play();
+    this.music.play();
     this.music.setMute(this.sys.game.globals.globalVars.musicIsMute)
 
     this.createMap()
@@ -92,51 +88,34 @@ class Game extends Phaser.Scene {
     })
 
     socket.on('player moved', data => {
-<<<<<<< HEAD
       if (this.otherPlayers.children) {
         this.otherPlayers.getChildren().forEach((player) => {
           if (player.list[0].player_id === data.user_id) {
-            player.setPosition(data.x + 16, data.y + 16) // offset container
+            player.setPosition(data.x, data.y) // offset container
           }
-          if (data.deltaX > 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
+          if(data.deltaX  > 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
             player.list[0].play(`walk-r-${player.list[0].texture.key}`)
           } else if (data.deltaX < 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-l-${player.list[0].texture.key}`) {
-          player.list[0].play(`walk-l-${player.list[0].texture.key}`)
-        }
-        if (data.deltaY > 0 && player.list[0].anims.currentAnim.key != `walk-d-${player.list[0].texture.key}`) {
-=======
-      this.otherPlayers.getChildren().forEach((player) => {
-        if (player.list[0].player_id === data.user_id) {
-          player.setPosition(data.x, data.y) // offset container
-        }
-        if(data.deltaX  > 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
-          player.list[0].play(`walk-r-${player.list[0].texture.key}`)
-        } else if (data.deltaX < 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-l-${player.list[0].texture.key}`) {
-          player.list[0].play(`walk-l-${player.list[0].texture.key}`)
-        }
-        if(data.deltaY  > 0  && player.list[0].anims.currentAnim.key != `walk-d-${player.list[0].texture.key}`) {
->>>>>>> b29f57ebfde1a9ce321933b61f46d78d4e0ec228
-          player.list[0].play(`walk-d-${player.list[0].texture.key}`)
-        } else if (data.deltaY < 0 && player.list[0].anims.currentAnim.key != `walk-u-${player.list[0].texture.key}`) {
-          player.list[0].play(`walk-u-${player.list[0].texture.key}`)
-        }
-        if (data.deltaX === 0 && data.deltaY === 0) {
-          if (!player.list[0].anims.currentAnim.key.includes('idle')) {
-            let newAnim = player.list[0].anims.currentAnim.key.split('-')
-            player.list[0].play("idle-" + newAnim[1] + `-${player.list[0].texture.key}`)
+            player.list[0].play(`walk-l-${player.list[0].texture.key}`)
           }
-        }
-      })
-    }
+          if(data.deltaY  > 0  && player.list[0].anims.currentAnim.key != `walk-d-${player.list[0].texture.key}`) {
+            player.list[0].play(`walk-d-${player.list[0].texture.key}`)
+          } else if (data.deltaY < 0 && player.list[0].anims.currentAnim.key != `walk-u-${player.list[0].texture.key}`) {
+            player.list[0].play(`walk-u-${player.list[0].texture.key}`)
+          }
+          if (data.deltaX === 0 && data.deltaY === 0) {
+            if (!player.list[0].anims.currentAnim.key.includes('idle')) {
+              let newAnim = player.list[0].anims.currentAnim.key.split('-')
+              player.list[0].play("idle-" + newAnim[1] + `-${player.list[0].texture.key}`)
+            }
+          }
+        })
+      }
   })
 
     socket.on('delete user', userInfo => {
       this.otherPlayers.getChildren().forEach((player) => {
-<<<<<<< HEAD
         if (userInfo.user_id === player.list[0].player_id) {
-=======
-        if (user_id === player.list[0].player_id) {
->>>>>>> b29f57ebfde1a9ce321933b61f46d78d4e0ec228
           player.destroy()
         }
       })
@@ -194,7 +173,6 @@ class Game extends Phaser.Scene {
       }
     }, this);
 
-<<<<<<< HEAD
     // on navbar
     $('#mini-map').off().on('click', () => {
       this.miniCam.setVisible(!this.miniCam.visible)
@@ -344,64 +322,6 @@ class Game extends Phaser.Scene {
       if (this.player.anims.currentAnim.key === `walk-u-${this.player.texture.key}`) { }
       else {
         this.player.play(`walk-u-${this.player.texture.key}`)
-=======
-  update() {
-    //console.log(this.otherPlayers)
-    if (true) {
-      //take player into store if space is press when overlap
-      if (this.overlap && this.key.SPACE.isDown && !this.enterStore) {
-        this.enterStore = true; //prevent event fire twice
-        this.playerInfo.store_id = this.storeId;
-        coordinates.x = this.playerContainer.body.x + 16;
-        coordinates.y = this.playerContainer.body.y + 16;
-        this.playerInfo.storeInfo = this.storeInfo;
-        this.storeName
-          ? this.playerInfo.storeName = this.storeName
-          : this.playerInfo.storeName = null;
-        this.sys.game.globals.globalVars.connectionEstablished = true;
-        this.storeOtherPlayersPositions()
-        this.scene.start('store', this.playerInfo);
-      }
-  
-      this.playerContainer.body.setVelocity(0);
-
-      //update player movement
-      if (this.key.LEFT.isDown || this.key.A.isDown) {
-        this.playerContainer.body.setVelocityX(-150);
-        if (this.player.anims.currentAnim.key === `walk-l-${this.player.texture.key}`) { }
-        else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
-          this.player.play(`walk-l-${this.player.texture.key}`)
-        }
-      }
-      else if (this.key.RIGHT.isDown || this.key.D.isDown) {
-        this.playerContainer.body.setVelocityX(150);
-        if (this.player.anims.currentAnim.key === `walk-r-${this.player.texture.key}`) { }
-        else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
-          this.player.play(`walk-r-${this.player.texture.key}`)
-        }
-      }
-      if (this.key.UP.isDown || this.key.W.isDown) {
-        this.playerContainer.body.setVelocityY(-150);
-        if (this.player.anims.currentAnim.key === `walk-u-${this.player.texture.key}`) { }
-        else {
-          this.player.play(`walk-u-${this.player.texture.key}`)
-        }
-      }
-      else if (this.key.DOWN.isDown || this.key.S.isDown) {
-        this.playerContainer.body.setVelocityY(150);
-        if (this.player.anims.currentAnim.key === `walk-d-${this.player.texture.key}`) { }
-        else {
-          this.player.play(`walk-d-${this.player.texture.key}`)
-        }
-      }
-  
-      //if player does not move, play idle anime
-      if (!this.key.DOWN.isDown && !this.key.UP.isDown && !this.key.RIGHT.isDown && !this.key.LEFT.isDown && !this.key.W.isDown && !this.key.A.isDown && !this.key.S.isDown && !this.key.D.isDown) {
-        if (!this.player.anims.currentAnim.key.includes('idle')) {
-          let newAnim = this.player.anims.currentAnim.key.split('-')
-          this.player.play("idle-" + newAnim[1] + `-${this.player.texture.key}`)
-        }
->>>>>>> b29f57ebfde1a9ce321933b61f46d78d4e0ec228
       }
     }
     else if (this.key.DOWN.isDown || this.key.S.isDown) {
@@ -410,7 +330,6 @@ class Game extends Phaser.Scene {
       else {
         this.player.play(`walk-d-${this.player.texture.key}`)
       }
-<<<<<<< HEAD
     }
 
     //if player does not move, play idle anime
@@ -444,35 +363,6 @@ class Game extends Phaser.Scene {
       } else if (this.playerContainer.moving) {
         this.playerContainer.moving = false;
         socket.emit('user movement', { x, y })
-=======
-      
-      //update player name's place
-      //this.playerName.x = this.player.x;  
-      //this.playerName.y = this.playerInfo.guest ? this.player.y + 34 : this.player.y + 28; 
-      //this.playerNameBox.x = this.playerName.x - 3 - this.playerName.width / 2
-      //this.playerNameBox.y = this.playerName.y - this.playerName.height / 2
-      this.overlap = false; //update overlap check
-      //this.gra.clear() //redraw the backdrop on name
-      //this.gra.fillRectShape(this.playerNameBox);
-
-      //emit the player's movement to other clients
-      if (this.playerContainer.body.currentPosition){
-        const x = this.playerContainer.body.x + 16
-        const y = this.playerContainer.body.y + 16
-        if(x !== this.playerContainer.body.currentPosition.x || y !== this.playerContainer.body.currentPosition.y) {
-          this.playerContainer.moving = true;
-          socket.emit('user movement', { x,y })
-        } else if (this.playerContainer.moving) {
-          this.playerContainer.moving = false;
-          socket.emit('user movement', { x,y })
-        }
-      }
-  
-      //store the current player's position
-      this.playerContainer.body.currentPosition = {
-        x: this.playerContainer.body.x,
-        y: this.playerContainer.body.y
->>>>>>> b29f57ebfde1a9ce321933b61f46d78d4e0ec228
       }
     }
 
@@ -484,7 +374,6 @@ class Game extends Phaser.Scene {
   }
   
   createPlayer(playerInfo){
-<<<<<<< HEAD
     this.player = this.physics.add.sprite(0, 0, "fm_02")
     this.createSpriteAnimation(this.player.texture.key)
     this.player.play(`idle-d-${this.player.texture.key}`)
@@ -520,8 +409,7 @@ class Game extends Phaser.Scene {
   }
 
   addOtherPlayers(playerInfo) {
-    //const player = this.physics.add.sprite(0, 0, this.spriteArr.shift())
-    const player = this.physics.add.sprite(0, 0, 'fm_01')
+    const player = this.physics.add.sprite(0, 0, this.spriteArr.shift())
     this.createSpriteAnimation(player.texture.key)
     player.play(`idle-d-${player.texture.key}`)
     player.player_id = playerInfo.user_id
@@ -557,80 +445,6 @@ class Game extends Phaser.Scene {
     this.physics.add.collider(this.otherPlayers, this.groundLayer)
     player.body.setImmovable(true);
     player.body.setCollideWorldBounds(true) */
-=======
-    this.player = this.physics.add.sprite(0, 0, 'fm_02')
-    this.createSpriteAnimation(this.player.texture.key)
-    this.player.play(`idle-d-${this.player.texture.key}`)
-
-    const playerName = this.add.text(0, 32, !(this.playerInfo.id) ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
-    playerName.setDepth(9);
-
-    const playerNameBox = new Phaser.Geom.Rectangle( -(playerName.width + 6) / 2 ,  32 -  playerName.height / 2, playerName.width + 6, playerName.height);
-    const gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
-    gra.alpha= .5;
-    gra.setDepth(8);
-    // put player inside a container
-    this.playerContainer = this.add.container(playerInfo.x, playerInfo.y);
-    this.playerContainer.setSize(32,32);
-    this.playerContainer.add(this.player)
-    this.playerContainer.add(gra)
-    this.playerContainer.add(playerName)
-    this.playerContainer.moving = false;
-    this.physics.world.enable(this.playerContainer);
-    this.updateCamera();
-    this.playerContainer.body.setCollideWorldBounds(true);
-    gra.fillRectShape(playerNameBox);
-
-    /*
-    this.player.play('idle-d')
-    this.playerName = this.add.text(this.player.x - 60, this.player.y + 32, this.playerInfo.guest ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, { font: "bold", align: 'center' }).setOrigin(0.5)
-    this.playerName.setDepth(9);
-    this.playerNameBox = new Phaser.Geom.Rectangle(this.player.x - 3 - this.playerName.width / 2, this.playerName.y - this.playerName.height / 2, this.playerName.width + 6, this.playerName.height);
-    
-    this.gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
-    this.gra.alpha = .5;
-    this.gra.setDepth(8);
-    */
-    this.physics.add.collider(this.playerContainer, this.groundLayer)
-    this.physics.add.collider(this.playerContainer, this.cityObjLayer)
-    
-    //i would say that this is not need... but since we don't have a large user base right now... meh
-    this.physics.add.collider(this.playerContainer, this.otherPlayers)
-  }
-
-  addOtherPlayers(playerInfo) {
-    const player = this.physics.add.sprite(0, 0, this.spriteArr.shift())
-    this.createSpriteAnimation(player.texture.key)
-    player.play(`idle-d-${player.texture.key}`)
-    player.player_id = playerInfo.user_id
-    player.player_name = playerInfo.username
-
-
-    const playerName = this.add.text(0, 32, !(player.player_id) ? `GUEST\n${player.player_name}` : `${player.player_name}`, {font: "bold", align:'center'}).setOrigin(0.5)
-    playerName.setDepth(6);
-
-    const playerNameBox = new Phaser.Geom.Rectangle( -(playerName.width + 6) / 2 ,  32 -  playerName.height / 2, playerName.width + 6, playerName.height);
-    const gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
-    gra.alpha= .5;
-    gra.setDepth(5);
-
-    const playerContainer = this.add.container(playerInfo.x, playerInfo.y);
-    playerContainer.setSize(32,32);
-    playerContainer.add(player)
-    playerContainer.add(gra)
-    playerContainer.add(playerName)
-    gra.fillRectShape(playerNameBox);
-
-
-    this.otherPlayers.add(playerContainer)
-
-    //player.play('walk-u')
-    playerContainer.body.setImmovable(true);
-    //Already handle by other users's PC 
-    //this.physics.add.collider(this.otherPlayers, this.cityObjLayer)
-    //this.physics.add.collider(this.otherPlayers, this.groundLayer)
-    //playerContainer.body.setCollideWorldBounds(true)
->>>>>>> b29f57ebfde1a9ce321933b61f46d78d4e0ec228
   }
 
   updateCamera(){
@@ -770,13 +584,8 @@ class Game extends Phaser.Scene {
 
   /* storeOtherPlayersPositions() {
     this.otherPlayers.getChildren().forEach((player) => {
-<<<<<<< HEAD
       this.sys.game.globals.globalVars.playersList[player.list[0].player_id].x = player.x//offset since container is center in the mid
       this.sys.game.globals.globalVars.playersList[player.list[0].player_id].y = player.y//offset since container is center in the mid
-=======
-      this.sys.game.globals.globalVars.playersList[player.list[0].player_id].x = player.x + 16 //offset since container is center in the mid
-      this.sys.game.globals.globalVars.playersList[player.list[0].player_id].y = player.y + 16 //offset since container is center in the mid
->>>>>>> b29f57ebfde1a9ce321933b61f46d78d4e0ec228
     })
   } */
   
