@@ -104,4 +104,50 @@
 - https://phasertutorials.com/how-to-create-a-phaser-3-mmorpg-part-1/
 - https://phaser.io/examples/v3/view/game-objects/dom-element/form-input
 
+## PRESENTATION
+1. Hello everyone, thank you for joining us on demo day. Before we begin, we would first like to thank the mentors and instructors at LHL who have helped us along our journey.
+
+2. My name is Tammy, and before lighthouse labs, I was a production supervisor at a food manufacturing facility. This project wouldnt be what it is without my group members, Wilkie and Rafic.
+
+3. Wilkie and Rafic to do introductions.
+
+4. A. (last person introduced will continue).. We are presenting to you V-Market. A virtual marketplace that redfines online shopping. It brings buyers and sellers together on a 2D map to simulate the real-life experience. 
+
+4. B. The inspiration for the project comes from Gather town. We wanted to challenge ourselves with what we have learned and play with new libraries like Phaser and Socket. Being able to apply what we have learned from LHL and integrating with a new model like a game platform has introduced us to new challenges.
+
+(who will move around and who will talk?)
+
+DEMO WALKTHTHROUGH
+
+5. (Landing page -> login, -> walk around and talk about navbar features?) 
+
+6. (second player joins, show chat feature, player goes to store and buy)
+
+7. (showcase video chat feature?)
+
+-- OR ------
+
+5. (landing page -> login -> navbar quick -> go to shop and purchase)
+
+6. (have a second user login -> meet up with the other player -> showcase chat)
+
+7. (showcase video feature?)
+
+TEAMWORK
+Not sure if you wanna say waht each one did or just a generalization of how we divided the work. You probably have a better description than I can think of.
+
+8. As a team, we divided the work through features as well as strengths and weaknesses . For myself(Tammy), I mainly focused on the ecommerce client side of the project as well as some front-end UI design and game map
+
+9. Wilke - game set up and logic, bug master, ecommerce vendor side
+
+10. Rafic - integration of backend set up of sockets and webcams
+
+Further developments:
+It could be one person talking:
+11. In the future, we would like to expand and add more features to the user (order history, coupon backpack, favorite list), features for the vendor (give more control?)
+what else?
+
+
+
+
 
