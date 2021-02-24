@@ -78,9 +78,22 @@ class Game extends Phaser.Scene {
 
     socket.on('player moved', data => {
       this.otherPlayers.getChildren().forEach((player) => {
-        console.log(player.x)
+        console.log(player.list[0].texture.key)
         if (player.list[0].player_id === data.user_id) {
           player.setPosition(data.x + 16, data.y + 16) // offset container
+        }
+        if(data.deltaX  > 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
+          player.list[0].play(`walk-r-${player.list[0].texture.key}`)
+        } else if (data.deltaX < 0  && player.list[0].anims.currentAnim.key != `walk-l-${player.list[0].texture.key}`) {
+          player.list[0].play(`walk-l-${player.list[0].texture.key}`)
+        }
+        if(data.deltaY  > 0  && player.list[0].anims.currentAnim.key != `walk-d-${player.list[0].texture.key}`) {
+          player.list[0].play(`walk-d-${player.list[0].texture.key}`)
+        } else if (data.deltaY < 0 && player.list[0].anims.currentAnim.key != `walk-u-${player.list[0].texture.key}`) {
+          player.list[0].play(`walk-u-${player.list[0].texture.key}`)
+        }
+        if (data.deltaX === 0 && data.deltaY === 0) {
+          console.log('he stop')
         }
       })
     })
@@ -273,6 +286,7 @@ class Game extends Phaser.Scene {
   addOtherPlayers(playerInfo) {
     console.log(playerInfo)
     const player = this.physics.add.sprite(0, 0, "fm_02")
+    player.play(`idle-d-${player.texture.key}`)
     player.setTint(Math.random() * 0xffffff)
     player.player_id = playerInfo.user_id
     player.player_name = playerInfo.username
