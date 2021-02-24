@@ -63,7 +63,6 @@ function error(error) {
 
 async function getFriendsList(userID) {
   friendsList = await $.ajax(`/users/${userID}/friends`, { method: 'GET' })
-  updateFriendsList()
   friendsList.forEach(friend => {
     $('#offline-friends ul').append(`<li>${friend}</li>`)
   })
