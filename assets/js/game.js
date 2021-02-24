@@ -341,28 +341,28 @@ class Game extends Phaser.Scene {
 
     //update player movement
     if (this.key.LEFT.isDown || this.key.A.isDown) {
-      this.playerContainer.body.setVelocityX(-150);
+      this.playerContainer.body.setVelocityX(-250);
       if (this.player.anims.currentAnim.key === `walk-l-${this.player.texture.key}`) { }
       else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
         this.player.play(`walk-l-${this.player.texture.key}`)
       }
     }
     else if (this.key.RIGHT.isDown || this.key.D.isDown) {
-      this.playerContainer.body.setVelocityX(150);
+      this.playerContainer.body.setVelocityX(250);
       if (this.player.anims.currentAnim.key === `walk-r-${this.player.texture.key}`) { }
       else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
         this.player.play(`walk-r-${this.player.texture.key}`)
       }
     }
     if (this.key.UP.isDown || this.key.W.isDown) {
-      this.playerContainer.body.setVelocityY(-150);
+      this.playerContainer.body.setVelocityY(-250);
       if (this.player.anims.currentAnim.key === `walk-u-${this.player.texture.key}`) { }
       else {
         this.player.play(`walk-u-${this.player.texture.key}`)
       }
     }
     else if (this.key.DOWN.isDown || this.key.S.isDown) {
-      this.playerContainer.body.setVelocityY(150);
+      this.playerContainer.body.setVelocityY(250);
       if (this.player.anims.currentAnim.key === `walk-d-${this.player.texture.key}`) { }
       else {
         this.player.play(`walk-d-${this.player.texture.key}`)

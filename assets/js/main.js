@@ -25,7 +25,7 @@ const config = {
     }
   },
   fps: {
-    target: 30,
+    target: 60,
     forceSetTimeOut: true
   },
 
