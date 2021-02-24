@@ -23,6 +23,7 @@ class Game extends Phaser.Scene {
     
   }
 
+  static spriteArr;
   static player;
   static playerContainer;
   static overlap = true;
@@ -46,6 +47,9 @@ class Game extends Phaser.Scene {
     this.load.tilemapTiledJSON("map", "maps/vMarket2.json")
     this.load.image('tile', 'maps/vMarketTilesCROPPED.png')
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
+    this.load.spritesheet('fm_01', 'characters/fm_01.png', { frameWidth: 32, frameHeight: 32 })
+    this.load.spritesheet('m_01', 'characters/m_01.png', { frameWidth: 32, frameHeight: 32 })
+    this.spriteArr = ['fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01'];
     this.load.html('store_window', 'templates/store_window.html');
     this.load.audio('background', 'audio/TownTheme.mp3')
     this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, SPACE, DOWN, X, M") //WASD to move, M to toggle minimap
@@ -78,7 +82,6 @@ class Game extends Phaser.Scene {
 
     socket.on('player moved', data => {
       this.otherPlayers.getChildren().forEach((player) => {
-        console.log(player.list[0].texture.key)
         if (player.list[0].player_id === data.user_id) {
           player.setPosition(data.x + 16, data.y + 16) // offset container
         }
@@ -251,7 +254,7 @@ class Game extends Phaser.Scene {
   }
   
   createPlayer(playerInfo){
-    this.player = this.physics.add.sprite(0, 0, "fm_02")
+    this.player = this.physics.add.sprite(0, 0, 'fm_02')
     this.createSpriteAnimation(this.player.texture.key)
     this.player.play(`idle-d-${this.player.texture.key}`)
 
@@ -292,10 +295,9 @@ class Game extends Phaser.Scene {
   }
 
   addOtherPlayers(playerInfo) {
-    console.log(playerInfo)
-    const player = this.physics.add.sprite(0, 0, "fm_02")
+    const player = this.physics.add.sprite(0, 0, this.spriteArr.shift())
+    this.createSpriteAnimation(player.texture.key)
     player.play(`idle-d-${player.texture.key}`)
-    player.setTint(Math.random() * 0xffffff)
     player.player_id = playerInfo.user_id
     player.player_name = playerInfo.username
 
@@ -318,7 +320,7 @@ class Game extends Phaser.Scene {
 
     this.otherPlayers.add(playerContainer)
 
-    player.play('walk-u')
+    //player.play('walk-u')
     playerContainer.body.setImmovable(true);
     //Already handle by other users's PC 
     //this.physics.add.collider(this.otherPlayers, this.cityObjLayer)
@@ -461,8 +463,8 @@ class Game extends Phaser.Scene {
 
   storeOtherPlayersPositions() {
     this.otherPlayers.getChildren().forEach((player) => {
-      this.sys.game.globals.globalVars.playersList[player.list[0].player_id].x = player.x
-      this.sys.game.globals.globalVars.playersList[player.list[0].player_id].y = player.y
+      this.sys.game.globals.globalVars.playersList[player.list[0].player_id].x = player.x + 16 //offset since container is center in the mid
+      this.sys.game.globals.globalVars.playersList[player.list[0].player_id].y = player.y + 16 //offset since container is center in the mid
     })
   }
 };
