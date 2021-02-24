@@ -93,7 +93,10 @@ class Game extends Phaser.Scene {
           player.list[0].play(`walk-u-${player.list[0].texture.key}`)
         }
         if (data.deltaX === 0 && data.deltaY === 0) {
-          console.log('he stop')
+          if (!player.list[0].anims.currentAnim.key.includes('idle')) {
+            let newAnim = player.list[0].anims.currentAnim.key.split('-')
+            player.list[0].play("idle-" + newAnim[1] + `-${player.list[0].texture.key}`)
+          }
         }
       })
     })
@@ -231,6 +234,10 @@ class Game extends Phaser.Scene {
         const x = this.playerContainer.body.x
         const y = this.playerContainer.body.y
         if(x !== this.playerContainer.body.currentPosition.x || y !== this.playerContainer.body.currentPosition.y) {
+          this.playerContainer.moving = true;
+          socket.emit('user movement', { x,y })
+        } else if (this.playerContainer.moving) {
+          this.playerContainer.moving = false;
           socket.emit('user movement', { x,y })
         }
       }
@@ -261,6 +268,7 @@ class Game extends Phaser.Scene {
     this.playerContainer.add(this.player)
     this.playerContainer.add(gra)
     this.playerContainer.add(playerName)
+    this.playerContainer.moving = false;
     this.physics.world.enable(this.playerContainer);
     this.updateCamera();
     this.playerContainer.body.setCollideWorldBounds(true);
