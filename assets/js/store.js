@@ -279,6 +279,7 @@ class Store extends Phaser.Scene {
     $("#customer-support").on("click", () => { //need to replace
       console.log(this.storeEmail)
       console.log(this.storePhone)
+      $('#checkout').css("visibility", "hidden");
       $('#products').html(`
         <div id='support-message'>
           <h3> Customer Support</h3>
@@ -302,6 +303,7 @@ class Store extends Phaser.Scene {
       `)
       $("#back-button").off().on("click", () => {
         back();
+        $('#checkout').css("visibility", "visible");
         $("#request-data").off().on("click", () => { //wait for helper
           requestItemData(storeID);
         })
