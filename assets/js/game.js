@@ -82,9 +82,9 @@ class Game extends Phaser.Scene {
         if (player.list[0].player_id === data.user_id) {
           player.setPosition(data.x + 16, data.y + 16) // offset container
         }
-        if(data.deltaX  > 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
+        if(data.deltaX  > 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
           player.list[0].play(`walk-r-${player.list[0].texture.key}`)
-        } else if (data.deltaX < 0  && player.list[0].anims.currentAnim.key != `walk-l-${player.list[0].texture.key}`) {
+        } else if (data.deltaX < 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-l-${player.list[0].texture.key}`) {
           player.list[0].play(`walk-l-${player.list[0].texture.key}`)
         }
         if(data.deltaY  > 0  && player.list[0].anims.currentAnim.key != `walk-d-${player.list[0].texture.key}`) {

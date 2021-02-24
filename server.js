@@ -100,7 +100,6 @@ io.on('connection', (socket) => {
     socket.on('user movement', (movement) => {
       let deltaX = Number(movement.x) - Number(activeConnections[my_user_id].x)
       let deltaY = (Number(movement.y) - Number(activeConnections[my_user_id].y))
-      console.log(`Delta X:  ${deltaX}   Delta Y : ${deltaY}`);
       activeConnections[my_user_id].x = movement.x
       activeConnections[my_user_id].y = movement.y
       activeConnections[my_user_id].deltaX = deltaX
