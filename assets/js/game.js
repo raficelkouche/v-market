@@ -64,7 +64,7 @@ class Game extends Phaser.Scene {
       loop: true,
     })
     // toggle music off or on
-    this.music.play();
+    //this.music.play();
     this.music.setMute(this.sys.game.globals.globalVars.musicIsMute)
 
     $('#music').off().on('click', () => {
@@ -316,7 +316,8 @@ class Game extends Phaser.Scene {
       this.playerInfo.storeEmail = this.storeInfo[this.storeId - 1].email;
       this.playerInfo.storePhone = this.storeInfo[this.storeId - 1].phone;
       this.sys.game.globals.globalVars.connectionEstablished = true;
-      //this.storeOtherPlayersPositions()
+      
+      this.music.destroy();
       this.scene.start('store', this.playerInfo);
     }
 
