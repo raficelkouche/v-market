@@ -102,7 +102,16 @@ class Game extends Phaser.Scene {
 
     socket.on('new player', playerInfo => {
       this.sys.game.globals.globalVars.playersList[playerInfo.user_id] = playerInfo
-      this.addOtherPlayers(playerInfo)
+      if(this.otherPlayers.getChildren().length === 0) {
+        this.addOtherPlayers(playerInfo)
+      }
+      for (const player of this.otherPlayers.getChildren()) {
+        if (player.list[0].player_id === playerInfo.user_id){
+          break;
+        } else {
+          this.addOtherPlayers(playerInfo)
+        }
+      }
     })
 
     socket.on('player moved', data => {
