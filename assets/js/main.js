@@ -6,7 +6,7 @@ import { Global } from './global.js'
 
 const config = {
   type: Phaser.AUTO,
-  
+
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER,
@@ -21,13 +21,14 @@ const config = {
     default: 'arcade',
     arcade: {
       gravity: { y: 0 },
-      debug: false
+      debug: true
     }
   },
   fps: {
     target: 30,
     forceSetTimeOut: true
   },
+
   scene: [Login, Register, Game, Store]
 };
 
@@ -35,7 +36,7 @@ class NewGame extends Phaser.Game {
   constructor() {
     super(config);
     const globalVars = new Global()
-    this.globals = {globalVars}
+    this.globals = { globalVars }
   }
 }
 

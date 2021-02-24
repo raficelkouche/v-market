@@ -28,14 +28,31 @@
     <link rel="stylesheet" href="/css/game.css" type="text/css" />
     <link rel="stylesheet" href="/css/product-details.css" type="text/css" />
     <link rel="stylesheet" href="/css/checkout.css" type="text/css" />
+    <link rel="stylesheet" href="/css/navbar.css" type="text/css" />
+    <link rel="stylesheet" href="/css/support-message.css" type="text/css" />
+    <link rel="stylesheet" href="/css/chat.css" type="text/css" />
   </head>
 
   <body>
     <main>
       <div id="top-nav-bar">
-        <h2>Nav Bar</h2>
+        <div><img id='logo'
+            src="https://see.fontimg.com/api/renderfont4/8VA2/eyJyIjoiZnMiLCJoIjo0NywidyI6MTAwMCwiZnMiOjQ3LCJmZ2MiOiIjMDAwMDAwIiwiYmdjIjoiI0ZGRkZGRiIsInQiOjF9/Vi1NYXJrZXQ/quite-magical-regular.png"
+            alt="Cute fonts"></div>
+        <button id='user-session' class="btn btn-outline-secondary"></button>
+        <div class="dropdown">
+          <button id="IGN" aria-expanded="false"></button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" href="#">Order History</a></li>
+            <li><a class="dropdown-item" href="#">Inventory</a></li>
+            <li><a class="dropdown-item" href="#">Account</a></li>
+          </ul>
+        </div>
+        <button type='button' id="mini-map" class="btn btn-outline-secondary"><i class="fas fa-map-marked-alt"></i>
+          Mini-Map</button>
+        <button type='button' id="music" class="btn btn-outline-secondary"><i class="fas fa-volume-up"></i></button>
+        </div>
       </div>
-      <div class="in-game-video-call-container"></div>
       <div id="game-chat-container">
         <div id="game-container">
           <script type="module" src="js/main.js"></script>
@@ -43,8 +60,14 @@
         <div id="chat-side-bar">
           <div id="friends-list">
             <h3>Friends</h3>
+            <ul>
+            </ul>
           </div>
-        
+          <div id="offline-friends">
+            <h6><b>Offline</b></h6>
+            <ul>
+            </ul>
+          </div>
         </div>
       </div>
     </main>

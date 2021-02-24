@@ -1,0 +1,22 @@
+#support-message {
+  width: 50%;
+  padding: 10px;
+  /* margin-left: 25%; */
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#support-message ul {
+  /* margin-left: 10%; */
+  width: 50%;
+  font-size: small;
+}
+
+#support-message ul li::marker{
+  content: ' ';
+}
+
+#support-message button {
+  margin-top: 10px;
+}

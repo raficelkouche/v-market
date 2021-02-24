@@ -113,3 +113,23 @@ const orderNew = function(order) { //make new user
   });
 }
 exports.orderNew = orderNew;
+
+const getFriends = function (user_id) {
+  return pool.query(`
+  SELECT *
+  FROM friends
+  JOIN users
+  ON friends.friend_id = users.id
+  WHERE user_id = $1
+  `, [user_id])
+    .then(res => {
+      const friendsArr = res.rows
+      const friendsNames = []
+      for (let friend of friendsArr) {
+        friendsNames.push(friend.gaming_name)
+      }
+      return friendsNames
+    })
+
+}
+exports.getFriends = getFriends;

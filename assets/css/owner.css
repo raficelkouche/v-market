@@ -118,7 +118,7 @@
 
 #products-grid {
   margin-left: 2%;
-  width: 88%;
+  width: 68%;
   justify-content: space-between;
 }
 
@@ -149,10 +149,7 @@ td {
   border:0;
 }
 
-td:hover{
-  cursor: pointer;
-  box-shadow: 0 0 11px rgba(33, 33, 33, .2);
-}
+
 
 .description{
   align-self: center;
@@ -241,14 +238,4 @@ td:hover{
   -webkit-user-select: none; /* Safari */
   user-select: none;
   font-size: 0.7rem;
-}
-
-@keyframes fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes fadeout {
-  from { opacity: 1; }
-  to   { opacity: 0; }
 }

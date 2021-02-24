@@ -2,6 +2,7 @@ let call = null;
 let myPeer = null;
 let peerID = null;
 let chatRecieverID = null;
+let friendsList = null;
 
 const coordinates = {
   x: Math.floor(Math.random() * 500) + 40,
@@ -59,6 +60,16 @@ function error(error) {
   console.warn("Error occured: ", error)
 };
 
+async function getFriendsList (userID) {
+  friendsList = await $.ajax(`/users/${userID}/friends`, { method: 'GET' })
+  
+  friendsList.forEach(friend => {
+    $('#offline-friends ul').append(`<li>${friend}</li>`)
+  })
+}
+
+
+
 //Text chat feature
 socket.on('recieve message', data => {
   //don't add a notification button if one exists already
@@ -67,7 +78,7 @@ socket.on('recieve message', data => {
   }
   //Add a new container only if it doesn't exist and hide it
   if (!document.getElementById(`messages-from-${data.sender.user_id}`)){
-    $('#friends-list').after(`
+    $('#offline-friends').after(`
     <div class="chat-container" id='messages-from-${data.sender.user_id}'>
       <div class="message-history">
         <ul></ul>
@@ -78,11 +89,12 @@ socket.on('recieve message', data => {
       </form>
     </div>
     `)
+    
     $(`#messages-from-${data.sender.user_id}`).hide()
   } 
     
   $(`#messages-from-${data.sender.user_id} .message-history ul`).append(`<li>${data.sender.username}: ${data.message}</li`)
-  
+  $('.message-history').scrollTop($('.message-history').height());
 })
 
 //event handler for clicking on a 'new message' notification
@@ -104,7 +116,7 @@ $('main').on('click', '#start-chat', (event) => {
   
   //add a container to hold messages and the texting-form if it doesn't exist
   if (!document.getElementById(`messages-from-${chatRecieverID}`)) {
-    $('#friends-list').after(`
+    $('#offline-friends').after(`
     <div class="chat-container" id='messages-from-${chatRecieverID}'>
       <div class="message-history">
         <ul></ul>
@@ -135,6 +147,7 @@ $('main').on('submit', "#chat-side-bar form" , (event) => {
     })
 
     $(`#messages-from-${chatRecieverID} input`).val('')
+    $('.message-history').scrollTop($('.message-history').height())
 
   } else {
     alert("select a user first and then type your message")
@@ -153,7 +166,8 @@ $("main").on("click", "#start-call", (event) => {
       peerID,
       targetUser
     })
-
+    //add a video container
+    $('#game-chat-container').prepend(`<div class="in-game-video-call-container"></div>`)
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
         //add the local cam stream
@@ -187,7 +201,7 @@ socket.on('call-request-recieved', data => {
   
   $('main').on('click', '#accept-button', () => {
     $('.call-notification').remove();
-    
+    $('#game-chat-container').prepend(`<div class="in-game-video-call-container"></div>`)
     navigator.mediaDevices.getUserMedia({video: true, audio: true})
     .then(stream => {
       //add the local video stream
@@ -225,6 +239,7 @@ $('main').on('click', '#decline-button', () => {
 $('main').on('click', '#end-call', () => {
   socket.emit('call-ended')
   $('.friend-container').children('#start-call').attr("disabled", false)
+  $('.in-game-video-call-container').remove()
 
 })
 
@@ -237,17 +252,25 @@ socket.on('connect_error', error => {
 });
 
 socket.on('updated-friends-list', usersList => {
+  const offlineFriends = [...friendsList]
+
   Object.keys(usersList).forEach((user_id) => {
-    
+    let username = usersList[user_id].username
+
     if (!document.getElementById(user_id)) {
-      $("#friends-list").append(`
-      <div class="friend-container" id="${user_id}" style="display: flex;">
-        <div>${usersList[user_id].username}</div>
+      $("#friends-list ul").append(`
+      <li class="friend-container" id="${user_id}">
+        ${username}
         <button id="start-call">call</button>
         <button id="start-chat">chat</button>
-      </div>
+      </li>
       `)
     }
+
+    if(friendsList.includes(username)) {
+      $('#offline-friends ul').children(`li:contains("${username}")`).remove()
+    }
+
   })
 });
 
@@ -269,7 +292,8 @@ socket.on('call-ended', () => {
     remoteVideo.srcObject.getTracks().forEach(track => track.stop())
   }
   //remove the local and remote video containers
-  $('.in-game-video-call-container').children().remove()
+  //$('.in-game-video-call-container').children().remove()
+  $('.in-game-video-call-container').remove()
   $('main').off('click', '#accept-button')
   $('main').off('click', '#decline-button')
 });
@@ -279,12 +303,22 @@ socket.on('call-declined', () => {
   if(inGameLocalVideo.srcObject){
     inGameLocalVideo.srcObject.getTracks().forEach(track => track.stop())
   }
-  $('.in-game-video-call-container').children().remove()
+  //$('.in-game-video-call-container').children().remove()
+  $('.in-game-video-call-container').remove()
   //re-enable the call button for the caller
   $('.friend-container').children('#start-call').attr("disabled", false)
   $('main').off('click', '#accept-button')
   $('main').off('click', '#decline-button')
 });
 
+socket.on('delete user', userInfo => {
+  $('#friends-list').find(`#${userInfo.user_id}`).remove()
+
+  if(friendsList.includes(userInfo.username)) {
+    $('#offline-friends ul').prepend(`<li>${userInfo.username}</li>`)
+  }
+  
+})
+
 //variables to be used by other modules
-window.allGlobalVars = { socket, coordinates, connectSocket }
+window.allGlobalVars = { socket, coordinates, connectSocket, getFriendsList }

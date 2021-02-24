@@ -83,6 +83,11 @@ module.exports = () => {
     }
   })
 
+  router.post('/logout', (req, res) => {
+    req.session = null;
+    res.redirect('..');
+  })
+
   // Orders routes
   router.post('/:user_id/orders', (req, res) => {
     // console.log('inside orders route')
@@ -94,10 +99,20 @@ module.exports = () => {
       })
   })
 
+  // get Friends for user
+  router.get('/:user_id/friends', (req, res) => {
+    // console.log('this the data given to ajax call')
+    // console.log(req.session.user_ID) // the user id
+    db.getFriends(req.session.user_ID)
+      .then(result => {
+        res.json(result)
+      })
+  })
+
   return router;
 }
 
-//bcrypt.compareSync(req.body.password, users[userid].password)
+
 
 
 

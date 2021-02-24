@@ -98,8 +98,12 @@ io.on('connection', (socket) => {
     })
     
     socket.on('user movement', (movement) => {
+      let deltaX = Number(movement.x) - Number(activeConnections[my_user_id].x)
+      let deltaY = (Number(movement.y) - Number(activeConnections[my_user_id].y))
       activeConnections[my_user_id].x = movement.x
       activeConnections[my_user_id].y = movement.y
+      activeConnections[my_user_id].deltaX = deltaX
+      activeConnections[my_user_id].deltaY = deltaY
       socket.broadcast.emit('player moved', activeConnections[my_user_id])
     })
     
@@ -130,7 +134,10 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
       delete activeConnections[my_user_id]
       console.log(`player ${my_user_id} has left`)
-      socket.broadcast.emit("delete user", my_user_id)
+      socket.broadcast.emit("delete user", {
+        username: userInfo.username,
+        user_id: my_user_id
+      })
     })
   })
 });

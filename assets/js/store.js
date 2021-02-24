@@ -13,11 +13,15 @@ class Store extends Phaser.Scene {
     this.playerInfo = {
       name: data.name.replace(/%20/g, " ").trim(),
       guest: data.guest || false,
-      id: data.user_id,
+      id: data.id,
+      x: data.x,
+      y: data.y,
       storeInfo: data.storeInfo
     }
     this.storeName = data.storeName;
     this.storeId = data.store_id;
+    this.storeEmail = data.storeEmail;
+    this.storePhone = data.storePhone;
   }
 
   static initload;
@@ -32,8 +36,7 @@ class Store extends Phaser.Scene {
   }
 
   create() {
-    
-    
+
     this.initload = true;
     let endOfStore = false;
     let storeProducts = [];
@@ -41,12 +44,21 @@ class Store extends Phaser.Scene {
     let storeLoadCount = 0;
     let storeID = this.storeId;
 
+    const exit = function (cam, info, scene) {
+      cam.main.fadeOut(150, 0, 0, 0)
+      $('#backdrop').addClass('fadeout')
+      cam.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+        scene.start('Game', info);
+      })
+    }
+
     //addMoreItem, to run a html for Jquery to add
     const addMoreItem = function (result, reload = false) {
       let outOfItem = `<p>There is no more listing from this vendor at the moment...</p>
       <p>Thanks for your support!</p>`;
       let pendingHTML = `<tr>`;
       if (result.length === 0) { //if no more item change button to msg
+        console.log("no item")
         endOfStore = true;
         $("#request-data").parent().html(outOfItem);
         return
@@ -136,7 +148,7 @@ class Store extends Phaser.Scene {
         })
       storeLoadCount++;
     }
-    console.log("scenes: ", this.scene.isActive("store"))
+
     const back = function (fromCart = false) {
       // remove the product-container and rebuild the products grid
       if (fromCart) {
@@ -215,6 +227,8 @@ class Store extends Phaser.Scene {
 
     //set cam
     this.cameras.main.setBounds(320, 480, 1920, 1920);
+    this.cameras.main.fadeIn(150, 0, 0, 0)
+
     this.add.dom(960, 960).createFromCache('store_window'); //place dom in center/
     if ($("#customer-support")) {
       $("#backdrop").css('visibility', 'visible');
@@ -257,31 +271,44 @@ class Store extends Phaser.Scene {
 
     //take user back to game.js if click top left to close
     $("#close-button").on("click", () => {
-      
-      this.scene.start('Game', this.playerInfo);
+      exit(this.cameras, this.playerInfo, this.scene);
+      //this.scene.start('Game', this.playerInfo);
     })
 
     //customer support button action
-    /* $("#customer-support").on("click", () => { //need to replace
-      $("#store-data").append(`
-      <div class="in-game-video-call-container" >
-        <video autoplay="true" muted class="in-game-local-video" id="in-game-local-video"></video>
-        <video autoplay="true" muted class="in-game-remote-video" id="in-game-remote-video"></video>
-      </div>
+    $("#customer-support").on("click", () => { //need to replace
+      console.log(this.storeEmail)
+      console.log(this.storePhone)
+      $('#products').html(`
+        <div id='support-message'>
+          <h3> Customer Support</h3>
+          <p> Hello ${this.playerInfo.name}, </p>
+          <p> Thank you for reaching out to us. </p>
+          <p> Currently, we do not have a representative online right now. Please refer to the contact information below if you require any assistance. </p>
+          <p> <b>Email</b>: <a href="mailto:${this.storeEmail}">${this.storeEmail}</a></p>
+          <p> <b>Phone</b>: <a href="tel:${this.storePhone}">${this.storePhone}</a></p>
+          <ul id="hours-op">
+            Hours of Operation 
+            <li> Monday: 9:00 am - 5:00 pm </li>
+            <li> Tuesday: 9:00 am - 5:00 pm </li>
+            <li> Wednesday: 9:00 am - 5:00 pm </li>
+            <li> Thursday: 9:00 am - 5:00 pm </li>
+            <li> Friday: 9:00 am - 5:00 pm </li>
+            <li> Saturday: Closed </li>
+            <li> Sunday: Closed </li>
+          </ul>
+          <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+        </div>
       `)
-      //local video
-      const inGameVideo = document.getElementById("in-game-local-video")
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-          .then(function (stream) {
-            inGameVideo.srcObject = stream;
-          })
-          .catch(function (error) {
-            console.log("Something went wrong!", error);
-          });
-      }
-      //this.scene.start('Game', this.playerInfo)
-    }); */
+      $("#back-button").off().on("click", () => {
+        back();
+        $("#request-data").off().on("click", () => { //wait for helper
+          requestItemData(storeID);
+        })
+      })
+
+      // exit(this.cameras, this.playerInfo, this.scene);
+    })
 
     $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
       // console.log('after single product')
@@ -313,7 +340,7 @@ class Store extends Phaser.Scene {
         `;
           $("#products").html(pendingHTML)
           // when clicking back to view the store again
-          $("#back-button").on("click", () => {
+          $("#back-button").off().on("click", () => {
             back();
             $("#request-data").off().on("click", () => { //wait for helper
               requestItemData(storeID);
@@ -367,7 +394,7 @@ class Store extends Phaser.Scene {
                   data-name="V-Market"
                   data-description="Purchase for ${this.storeName}"
                   data-amount="{${total}}"
-                  data-currency="usd">
+                  data-currency="cad">
                 </script>
               </form>
             </div>
@@ -390,6 +417,9 @@ class Store extends Phaser.Scene {
         }
         // checkout button function
         $('#checkout-button').on('click', () => {
+
+          console.log('checkout button hit!')
+          console.log(this.playerInfo.id)
           const data = {
             user_id: this.playerInfo.id,
             store_id: this.storeId,
@@ -433,45 +463,30 @@ class Store extends Phaser.Scene {
               `)
                 $('tbody').append(orderList(orderItems))
                 $('tbody').append(`<tr id="line-item-row"><td colspan="3" id="order-total">Order Total</td><td style="width: 20%">$${total}</td></tr>`)
+                // hide order confirmation until after credit card
+                $('#products').css('visibility', 'hidden')
+                // once the credit form opens, keep checking unttil it closes
+                const checkoutRefresh = setInterval(() => {
+                  const stripe = $('iframe')
+                  // console.log(stripe.length)
+                  if (stripe.length === 1) {
+                    $('#products').css('visibility', 'visible')
+                    clearInterval(checkoutRefresh)
+                  }
+                }, 500)
 
                 // add exit function for order confirmation page
                 $("#exit-button").on("click", () => {
-                  $("canvas").prev().children().remove() //remove the added dom
-                  this.scene.start('Game', this.playerInfo);
+                  exit(this.cameras, this.playerInfo, this.scene);
+                  //this.scene.start('Game', this.playerInfo);
                 })
 
                 // // add back function for order confimration page
-                $("#back-button").on("click", () => {
-                  let storeID = this.storeId
-                  let storeLoadCount = 0
-
-                  // turn the checkout button on
-                  $('#checkout').css("visibility", "visible");
-                  // remove the product-container and rebuild the products grid
-                  $("#checkout-table").remove()
-                  $("#products").html("<div id='products-grid'></div>")
-                  $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
-                  $("table").append(addMoreItem(storeProducts))
-                  for (let product of storeProducts) {
-                    $(`#add-to-cart${product.id}`).on('click', function () {
-                      addToCart(product)
-                    })
-                  }
+                $("#back-button").off().on("click", () => {
+                  back(true);
                   // to load more products
                   $("#request-data").on("click", () => { //wait for helper
-                    // console.log('storecount to load more after viewing one product')
-                    storeLoadCount++;
-                    // console.log(storeLoadCount)
-                    $.ajax(`/stores/${storeID}/${storeLoadCount}`, { method: 'GET' })//use ajax to handle request to the server
-                      .then(function (result) {
-                        $("table").append(addMoreItem(result))
-                        for (let product of result) {
-                          $(`#add-to-cart${product.id}`).on('click', function () {
-                            addToCart(product)
-                          })
-                        }
-                      })
-
+                    requestItemData(storeID);
                   })
                 })
                 // if order was not processed
@@ -492,7 +507,7 @@ class Store extends Phaser.Scene {
       }
 
       // return button to take back to store front
-      $("#back-button").on("click", () => {
+      $("#back-button").off().on("click", () => {
         back(true);
         // to load more products
         $("#request-data").on("click", () => { //wait for helper
@@ -500,10 +515,15 @@ class Store extends Phaser.Scene {
         })
       })
     })
+    $('#mini-map').on('click', () => {
+      this.miniCam.setVisible(!this.miniCam.visible)
+    })
+
     //close shop with ESC
     this.input.keyboard.on('keydown', function (event) {
       if (event.key === 'Escape') {
-        this.scene.start('Game', this.playerInfo);
+        exit(this.cameras, this.playerInfo, this.scene);
+        //this.scene.start('Game', this.playerInfo);
       }
     }, this);
   }
