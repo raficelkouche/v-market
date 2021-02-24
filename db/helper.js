@@ -87,7 +87,6 @@ const orderNew = function(order) { //make new user
   // get user id make a new order with store id
   // using the order id make line items with order id, product id
   // make the order -> use order id
-  console.log(order)
   return pool.query(`
   INSERT INTO orders (store_id, user_id, total_price) 
   VALUES ($1, $2, $3)
@@ -107,14 +106,12 @@ const orderNew = function(order) { //make new user
         returning *;
       `,[res.rows[0].id, order.cart[i].id, 1, order.cart[i].price])
         .then(res => { // no time, this will have to do for now
-          console.log(res.rows)
           pool.query(`
           update products
           set quantity = quantity - 1
           where id = $1
           returning *;
           `,[order.cart[i].id])
-          .then(x => console.log(x.rows))
       })
     }
 

@@ -58,7 +58,6 @@ class Store extends Phaser.Scene {
       <p>Thanks for your support!</p>`;
       let pendingHTML = `<tr>`;
       if (result.length === 0) { //if no more item change button to msg
-        console.log("no item")
         endOfStore = true;
         $("#request-data").parent().html(outOfItem);
         return
@@ -277,8 +276,6 @@ class Store extends Phaser.Scene {
 
     //customer support button action
     $("#customer-support").on("click", () => { //need to replace
-      console.log(this.storeEmail)
-      console.log(this.storePhone)
       $('#checkout').css("visibility", "hidden");
       $('#products').html(`
         <div id='support-message'>
@@ -313,12 +310,9 @@ class Store extends Phaser.Scene {
     })
 
     $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
-      // console.log('after single product')
-      // console.log($(x.currentTarget).attr('value'))
       $("#products-grid").remove(); //remove info from products page and start to load detail
       $.ajax(`/stores/${storeID}/products/${$(x.currentTarget).attr('value')}`, { method: 'GET' })
         .then(function (result) {
-          // console.log(result)
           let pendingHTML = `
         <div id="product-container">
           <div id='products-img'>
@@ -419,9 +413,6 @@ class Store extends Phaser.Scene {
         }
         // checkout button function
         $('#checkout-button').on('click', () => {
-
-          console.log('checkout button hit!')
-          console.log(this.playerInfo.id)
           const data = {
             user_id: this.playerInfo.id,
             store_id: this.storeId,

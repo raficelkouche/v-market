@@ -2,7 +2,7 @@ let call = null;
 let myPeer = null;
 let peerID = null;
 let chatRecieverID = null;
-let friendsList = null;
+let offlineFriends = null;
 
 const coordinates = {
   x: Math.floor(Math.random() * 500) + 32,
@@ -60,19 +60,34 @@ function error(error) {
   console.warn("Error occured: ", error)
 };
 
-async function getFriendsList(userID) {
-  friendsList = await $.ajax(`/users/${userID}/friends`, { method: 'GET' })
-  friendsList.forEach(friend => {
+//Will get all the friends of a given user
+async function getAllFriends(userID) {
+  offlineFriends = await $.ajax(`/users/${userID}/friends`, { method: 'GET' })
+  offlineFriends.forEach(friend => {
     $('#offline-friends ul').append(`<li>${friend}</li>`)
   })
- 
 }
-
-
+//will take care of online/offline friends
+function updateFriendsList(list){
+  $("#friends-list ul").children().remove()
+  
+  for (const friend in list) {
+    if(offlineFriends.includes(list[friend].username)){
+      $("#friends-list ul").append(`
+      <li class="friend-container" id="${list[friend].user_id}">
+        ${list[friend].username}
+        <button class="btn btn-secondary" id="start-call" style="height: auto;"><i class="fas fa-video"></i></button>
+        <button class="btn btn-secondary" id="start-chat"><i class="far fa-comments"></i></button>
+      </li>
+      `)
+    }else{
+      $('#offline-friends ul').append(`<li>${list[friend].username}</li>`)
+    }
+  }
+}
 
 //Text chat feature
 socket.on('recieve message', data => {
-  console.log("message has been received from: ", data)
   //don't add a notification button if one exists already
   if (!$(`#${data.sender.user_id}`).children('#message-recieved').length) {
     $(`#${data.sender.user_id}`).append('<button class="btn btn-secondary" id="message-recieved"><i class="fas fa-exclamation"></i></button>')
@@ -112,7 +127,6 @@ $('main').on('click', '#message-recieved', (event) => {
 //event handler for clicking on 'chat' button
 $('main').on('click', '#start-chat', (event) => {
   chatRecieverID = $(event.target).closest('li').attr('id')
-  console.log("chat receiver id is: ", chatRecieverID)
   //hide all visible chats if any
   $('#chat-side-bar').children('.chat-container').hide()
 
@@ -262,8 +276,6 @@ socket.on('connect_error', error => {
 });
 
 socket.on('updated-friends-list', usersList => {
-  const offlineFriends = [...friendsList]
-  
   Object.keys(usersList).forEach((user_id) => {
     let username = usersList[user_id].username
 
@@ -277,7 +289,7 @@ socket.on('updated-friends-list', usersList => {
       `)
     }
 
-    if (friendsList.includes(username)) {
+    if (offlineFriends.includes(username)) {
       $('#offline-friends ul').children(`li:contains("${username}")`).remove()
     }
   })
@@ -331,11 +343,11 @@ socket.on('call-declined', () => {
 socket.on('delete user', userInfo => {
   $('#friends-list').find(`#${userInfo.user_id}`).remove()
 
-  if (friendsList.includes(userInfo.username)) {
+  if (offlineFriends.includes(userInfo.username)) {
     $('#offline-friends ul').prepend(`<li>${userInfo.username}</li>`)
   }
 
 })
 
 //variables to be used by other modules
-window.allGlobalVars = { socket, coordinates, connectSocket, getFriendsList }
+window.allGlobalVars = { socket, coordinates, connectSocket, getAllFriends, updateFriendsList }

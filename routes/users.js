@@ -14,7 +14,6 @@ module.exports = () => {
     if (isEmail.test(req.body.name)) { //if user use email
       db.userLoginWithEmail(req.body.name)
       .then( result => {
-        console.log(result)
         if (!result) {//cannot find user in db
           res.json({err: 'user'})
         } else if(!bcrypt.compareSync(req.body.password, result.password)) {//passsword does not match with record
@@ -29,7 +28,6 @@ module.exports = () => {
         }
       })
     } else if (req.body.password){ //if user try to log in
-      console.log('using username')
       db.userLogin(req.body.name)
         .then( result => {
           if (!result) { //cannot find user in db
@@ -87,7 +85,6 @@ module.exports = () => {
 
   router.get("/login", (req, res) => {
     const user_ID = req.session.user_ID
-    console.log(req.session)
     if (user_ID) {
       res.json({user_ID})
     } else {
@@ -118,6 +115,7 @@ module.exports = () => {
     // console.log(req.session.user_ID) // the user id
     db.getFriends(req.session.user_ID)
       .then(result => {
+        console.log(result)
         res.json(result)
       })
   })
