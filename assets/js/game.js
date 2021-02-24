@@ -312,6 +312,9 @@ class Game extends Phaser.Scene {
       this.storeName
         ? this.playerInfo.storeName = this.storeName
         : this.playerInfo.storeName = null;
+              // added store email and number
+      this.playerInfo.storeEmail = this.storeInfo[this.storeId - 1].email;
+      this.playerInfo.storePhone = this.storeInfo[this.storeId - 1].phone;
       this.sys.game.globals.globalVars.connectionEstablished = true;
       //this.storeOtherPlayersPositions()
       this.scene.start('store', this.playerInfo);
