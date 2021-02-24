@@ -94,7 +94,15 @@ class Game extends Phaser.Scene {
     socket.on('all players', playersList => {
       Object.keys(playersList).forEach((player) => {
         this.sys.game.globals.globalVars.playersList[player] = playersList[player]
-        this.addOtherPlayers(playersList[player])
+        if(this.otherPlayers.getChildren().length === 0) {
+          this.addOtherPlayers(playersList[player])
+        }
+        for (const players of this.otherPlayers.getChildren()) {
+          if (players.list[0].player_id === playersList[player].user_id){
+          } else {
+            this.addOtherPlayers(playersList[player])
+          }
+        }
       })
     })
 
