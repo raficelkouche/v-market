@@ -110,21 +110,21 @@ class Game extends Phaser.Scene {
         this.otherPlayers.getChildren().forEach((player) => {
           if (player.list[0].player_id === data.user_id) {
             player.setPosition(data.x, data.y) // offset container
-          }
-          if(data.deltaX  > 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
-            player.list[0].play(`walk-r-${player.list[0].texture.key}`)
-          } else if (data.deltaX < 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-l-${player.list[0].texture.key}`) {
-            player.list[0].play(`walk-l-${player.list[0].texture.key}`)
-          }
-          if(data.deltaY  > 0  && player.list[0].anims.currentAnim.key != `walk-d-${player.list[0].texture.key}`) {
-            player.list[0].play(`walk-d-${player.list[0].texture.key}`)
-          } else if (data.deltaY < 0 && player.list[0].anims.currentAnim.key != `walk-u-${player.list[0].texture.key}`) {
-            player.list[0].play(`walk-u-${player.list[0].texture.key}`)
-          }
-          if (data.deltaX === 0 && data.deltaY === 0) {
-            if (!player.list[0].anims.currentAnim.key.includes('idle')) {
-              let newAnim = player.list[0].anims.currentAnim.key.split('-')
-              player.list[0].play("idle-" + newAnim[1] + `-${player.list[0].texture.key}`)
+            if(data.deltaX  > 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
+              player.list[0].play(`walk-r-${player.list[0].texture.key}`)
+            } else if (data.deltaX < 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-l-${player.list[0].texture.key}`) {
+              player.list[0].play(`walk-l-${player.list[0].texture.key}`)
+            }
+            if(data.deltaY  > 0  && player.list[0].anims.currentAnim.key != `walk-d-${player.list[0].texture.key}`) {
+              player.list[0].play(`walk-d-${player.list[0].texture.key}`)
+            } else if (data.deltaY < 0 && player.list[0].anims.currentAnim.key != `walk-u-${player.list[0].texture.key}`) {
+              player.list[0].play(`walk-u-${player.list[0].texture.key}`)
+            }
+            if (data.deltaX === 0 && data.deltaY === 0) {
+              if (!player.list[0].anims.currentAnim.key.includes('idle')) {
+                let newAnim = player.list[0].anims.currentAnim.key.split('-')
+                player.list[0].play("idle-" + newAnim[1] + `-${player.list[0].texture.key}`)
+              }
             }
           }
         })
@@ -313,8 +313,10 @@ class Game extends Phaser.Scene {
         ? this.playerInfo.storeName = this.storeName
         : this.playerInfo.storeName = null;
               // added store email and number
-      this.playerInfo.storeEmail = this.storeInfo[this.storeId - 1].email;
-      this.playerInfo.storePhone = this.storeInfo[this.storeId - 1].phone;
+      if (this.storeInfo[this.storeId - 1]) {
+        this.playerInfo.storeEmail = this.storeInfo[this.storeId - 1].email;
+        this.playerInfo.storePhone = this.storeInfo[this.storeId - 1].phone;
+      }
       this.sys.game.globals.globalVars.connectionEstablished = true;
       
       this.music.destroy();
