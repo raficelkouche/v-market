@@ -150,7 +150,7 @@ module.exports = () => {
   return router;
 }
 
-//bcrypt.compareSync(req.body.password, users[userid].password)
+
 
 
 

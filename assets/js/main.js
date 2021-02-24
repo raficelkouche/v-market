@@ -6,7 +6,7 @@ import { Global } from './global.js'
 
 const config = {
   type: Phaser.AUTO,
-  
+
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER,
@@ -36,7 +36,7 @@ class NewGame extends Phaser.Game {
   constructor() {
     super(config);
     const globalVars = new Global()
-    this.globals = {globalVars}
+    this.globals = { globalVars }
   }
 }
 

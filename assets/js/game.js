@@ -1,8 +1,10 @@
+const { socket, coordinates, connectSocket, getFriendsList } = window.allGlobalVars
+
+//The code below will handle the game scene
 class Game extends Phaser.Scene {
   constructor() {
     super('Game');
   }
-  
   game ()
   {
     //call on login/register scence to get data
@@ -12,23 +14,20 @@ class Game extends Phaser.Scene {
   {
     //pass var from login scence
     this.playerInfo = {
-      //name: data.name.replace(/%20/g, " ").trim(), 
-      //guest: data.guest || false,
-      //id: data.user_id,
       name: sessionStorage.getItem("IGN"),
       id: sessionStorage.getItem("user_id"),
       x: data.x || undefined,
       y: data.y || undefined
     }
+    
   }
 
-  static player = Phaser.Physics.Arcade.Sprite;
-  static playerName;
-  static playerNameBox;
-  static container;
+  static spriteArr;
+  static player;
+  static playerContainer;
   static overlap = true;
   static inshop = false;
-  static enterStore; //to prevent scence change fire more then once
+  static enterStore; //to prevent scene change fire more then once
   static storeInfo = [];
   static storeExistThisMap;
   static storeId;
@@ -36,10 +35,12 @@ class Game extends Phaser.Scene {
   static storeNameThisMap;
   static storeName;
   static helperMsg;
-  static user_id;
-  static username;
   static gra;
-
+  static otherPlayers;
+  static playerInfo;
+  static storesArea;
+  static storeAreaGroup;
+  
   preload() {
     //load all texture
     this.load.tilemapTiledJSON("map", "maps/vMarket4.json")
@@ -47,10 +48,12 @@ class Game extends Phaser.Scene {
     this.load.spritesheet('fm_01', 'characters/fm_01.png', { frameWidth: 32, frameHeight: 32 })
     this.load.spritesheet('fm_02', 'characters/fm_02.png', { frameWidth: 32, frameHeight: 32 })
     this.load.spritesheet('m_01', 'characters/m_01.png', { frameWidth: 32, frameHeight: 32 })
+    this.spriteArr = ['fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01', 'fm_01', 'm_01'];
     this.load.html('store_window', 'templates/store_window.html');
     this.load.audio('background', 'audio/TownTheme.mp3')
     this.key = this.input.keyboard.addKeys("W, A, S, D, LEFT, UP, RIGHT, DOWN, SPACE, SHIFT X, M") //WASD to move, M to toggle minimap
     this.storeLoadCount = 0;
+    this.player = undefined;
   }
 
   create() {
@@ -74,117 +77,85 @@ class Game extends Phaser.Scene {
       }
     })
     this.storeInfo = this.sys.game.globals.globalVars.storeData
-    
-    const socket = io('http://localhost:8000', {
-      autoConnect: false,
-      query: {
-        user_id: this.playerInfo.id,
-        username: this.playerInfo.name
-      }
+    this.otherPlayers = this.physics.add.group();
+    this.player = Phaser.Physics.Arcade.Sprite
+    this.sound.pauseOnBlur = false;
+    this.music = this.sound.add('background', {
+      loop: true,
     })
-    if (this.playerInfo.id) {
-      socket.connect();
+    // toggle music off or on
+    this.music.play();
+    this.music.setMute(this.sys.game.globals.globalVars.musicIsMute)
+
+    this.createMap()
+    this.createPlayer(coordinates)
+    this.createOverlap()
+    this.addMiniMap()
     
-    socket.on('success', () => {
-      let activeUser;
-      $("#chat-side-bar form").on('submit', (event) => {
-        event.preventDefault();
-        let message = $('#chat-message').val()
-        if ($('#chat-message').val() && activeUser) {
-          $('#messages').append(`<li>${this.username}: ${message}</li`)
-          socket.emit('send message', {
-            recipient: activeUser,
-            message
-          })
-          $('#chat-message').val('')
-          $('#messages').scrollTop($('#messages').height()); // to auto scroll down the messages
-        } else {
-          alert("select a user first and then type your message")
+    //event listeners for players joining
+    socket.on('all players', playersList => {
+      Object.keys(playersList).forEach((player) => {
+        this.sys.game.globals.globalVars.playersList[player] = playersList[player]
+        this.addOtherPlayers(playersList[player])
+      })
+    })
+
+    socket.on('new player', playerInfo => {
+      this.sys.game.globals.globalVars.playersList[playerInfo.user_id] = playerInfo
+      this.addOtherPlayers(playerInfo)
+    })
+
+    socket.on('player moved', data => {
+      if (this.otherPlayers.children) {
+        this.otherPlayers.getChildren().forEach((player) => {
+          if (player.list[0].player_id === data.user_id) {
+            player.setPosition(data.x, data.y) // offset container
+          }
+          if(data.deltaX  > 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
+            player.list[0].play(`walk-r-${player.list[0].texture.key}`)
+          } else if (data.deltaX < 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-l-${player.list[0].texture.key}`) {
+            player.list[0].play(`walk-l-${player.list[0].texture.key}`)
+          }
+          if(data.deltaY  > 0  && player.list[0].anims.currentAnim.key != `walk-d-${player.list[0].texture.key}`) {
+            player.list[0].play(`walk-d-${player.list[0].texture.key}`)
+          } else if (data.deltaY < 0 && player.list[0].anims.currentAnim.key != `walk-u-${player.list[0].texture.key}`) {
+            player.list[0].play(`walk-u-${player.list[0].texture.key}`)
+          }
+          if (data.deltaX === 0 && data.deltaY === 0) {
+            if (!player.list[0].anims.currentAnim.key.includes('idle')) {
+              let newAnim = player.list[0].anims.currentAnim.key.split('-')
+              player.list[0].play("idle-" + newAnim[1] + `-${player.list[0].texture.key}`)
+            }
+          }
+        })
+      }
+  })
+
+    socket.on('delete user', userInfo => {
+      this.otherPlayers.getChildren().forEach((player) => {
+        if (userInfo.user_id === player.list[0].player_id) {
+          player.destroy()
         }
       })
-      
-      socket.on('updated-friends-list', usersList => {
-        console.log("users List: ", usersList)
-        Object.keys(usersList).forEach((user_id) => {
-          if (!document.getElementById(user_id) && user_id !== this.user_id) {
-            $("#friends-list ul").append(`<li id="${user_id}">${usersList[user_id].username}</li>`)
-            $("#friends-list li").on("click", function (event) {
-              $('#friends-list ul').children().removeAttr('style')
-              $("#friends-list ul").children().css("color", "black")
-              // $(this).css("color", "red")
-              $(this).css("font-weight", "bold")
-              // $(this).addClass('selected-user')
-              // $(this).css("text-shadow", '#0C0 1px 0 px')
-              $(this).css("text-shadow", '0px 5px 5px #53B051')
-              activeUser = event.target.id
-            })
-            $('#chat-message').val('')
-          } else {
-            alert("select a user first and then type your message")
-          }
-        })
-
-        
-      })
-
-      
-        socket.on('receive message', data => {
-          $('#messages').append(`<li>${data.sender}: ${data.message}</li`)
-          $('#messages').scrollTop($('#messages').height()); // to auto scroll down the messages
-        })
-
-        socket.on('delete user', user_id => {
-          console.log("delete: ", user_id)
-          $(`#${user_id}`).remove()
-        })
-      
-        /* socket.on('all players', playersList => {
-          Object.keys(playersList).forEach((player) => {
-            if(player !== this.user_id) {
-              this.addOtherPlayers(playersList[player])
-              } else {
-              this.createPlayer(playersList[player])
-            }
-          })
-        })
-      */
-      })
-
-      socket.on('connect_error', (x) => {
-        console.log("server refused connection")
-      })
-
-      socket.on('disconnect', () => {
-        console.log("server shutdown")
-        socket.disconnect();
-      })
-    }
-
-    // add friends of user to list
-    $(document).ready( () => {
-      $.ajax(`/users/${this.playerInfo.id}/friends`, { method: 'GET'} )
-        .then( result => {
-          console.log('this the result from ajax call')
-          console.log(result)
-          
-          // get names of users online
-          const onlineFriends = $('#friends-list ul').children().contents()
-          console.log(onlineFriends)
-          let online = [];
-          for (let i = 0; i < onlineFriends.length; i++) {
-            online.push(onlineFriends[i].data);
-          }
-          console.log(online);
-  
-          // if user not online then add to friends list
-          for (let name of result) {
-            // need to check that player is not online by using 
-            if (!online.includes(name))
-            $('#offline-friends ul').append(`<li>${name}</li>`)
-          }
-        })
     })
 
+    connectSocket();
+    getFriendsList(this.playerInfo.id);
+    
+    socket.emit("update-user-details", {
+      username: this.playerInfo.name,
+      user_id: this.playerInfo.id
+    })
+
+    //If the player goes to the store and then comes back
+    /* if(this.sys.game.globals.globalVars.connectionEstablished){
+      const playersList = this.sys.game.globals.globalVars.playersList
+      Object.keys(playersList).forEach((player) => {
+        console.log(playersList[player])
+        this.addOtherPlayers(playersList[player])
+      })
+      
+    } */
     
    //disable key cap on all element so it would not steal the focus
     this.input.on('pointerdownoutside', () => {
@@ -193,8 +164,18 @@ class Game extends Phaser.Scene {
         this.key[k].enabled = false;
       } 
     })
-    
-    $('canvas').off().on('click', ()=>{ 
+
+    $('#music').off().on('click', () => {
+      this.music.setMute(!this.sys.game.globals.globalVars.musicIsMute);
+      this.sys.game.globals.globalVars.musicIsMute = !this.sys.game.globals.globalVars.musicIsMute;
+      if (!this.music.mute) {
+        $('#music').html('<i class="fas fa-volume-mute"></i>')
+      } else {
+        $('#music').html('<i class="fas fa-volume-up"></i>')
+      }
+    })
+
+    $('canvas').on('click', ()=>{ 
       $(document.activeElement).blur();
       this.input.keyboard.enableGlobalCapture();
       for (const k of Object.keys(this.key)) {
@@ -202,155 +183,6 @@ class Game extends Phaser.Scene {
       } 
     })
     
-
-    //draw back drop for player name, will refresh
-    this.gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
-    this.gra.alpha= .5;
-
-    this.enterStore = false;
-    this.storeNameThisMap = {};
-    let storeExist = {};
-    this.storeExistThisMap = {};
-    // get all store info to a more easy handle data type
-    for (const store of this.storeInfo) { 
-      storeExist[store.id] = store
-    }
-
-    //make the map of this scence
-    this.map = this.make.tilemap({ key: "map" });
-
-    function hashCode(str) { // java String#hashCode
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-         hash = str.charCodeAt(i) + ((hash << 5) - hash); //get Char ASCII code + hash left shift 5 bit - origin
-      }
-      return hash;
-    } 
-  
-    function intToRGB(i){
-      let c = (i & 0x00FFFFFF) //bitwise and operator to get when when both binary = 1 0x to show it is in hexdecimal
-          .toString(16)
-          .toUpperCase();
-
-      return "00000".substring(0, 6 - c.length) + c; //if not enough padding, add 0 to that place
-    }
-
-    //add object layer first. 
-    let storesArea = this.map.getObjectLayer('StoreObj')['objects'];
-    let storeAreaGroup = this.physics.add.staticGroup({});
-    storesArea.forEach(area => {
-      let a = storeAreaGroup.create(area.x, area.y);
-      a.setScale(area.width / 32, area.height / 32);
-      a.setOrigin(0); //to replace auto offset
-      a.body.width = area.width;
-      a.body.height = area.height;
-      a.name = area.properties[0].value //add store_id as name to identify which store, 
-      //please note, this store_id must be set as first custom_property in tile
-      //overlap cb does not seems to return id for some reason, so use name
-
-      if (storeExist[a.name]) {
-        this.storeExistThisMap[a.name] = storeExist[a.name]; // only get store on this map
-        this.storeNameThisMap[a.name] = {[a.name]: undefined};
-        //add Store Name and helper Msg
-        this.storeNameThisMap[a.name].storeName = this.add.text(a.x + 48, a.y - 32*3 , `${this.storeExistThisMap[a.name].name}`, { font: "bold 28px Messiri", fill: "#fff"}).setOrigin(0.5);
-        this.storeNameThisMap[a.name].storeName.setDepth(0);
-        this.storeNameThisMap[a.name].helperMsg = this.helperMsg = this.add.text(a.x + 48, a.y + 16, `Press 'Space'\nto interact`, {font: "bold", align: 'center'} ).setOrigin(0.5);
-        this.storeNameThisMap[a.name].helperMsg.setDepth(0);
-        //make graphic for this store
-        let color = '0x' + intToRGB(hashCode(`${this.storeExistThisMap[a.name].name}`));
-        this.storeNameThisMap[a.name].gra = this.add.graphics({ fillStyle: { color: `${color}` } });
-        this.storeNameThisMap[a.name].gra.alpha= .35; 
-        //Make Backdrop so text is easier to read
-        this.storeNameThisMap[a.name].storeNameBox = new Phaser.Geom.Rectangle(this.storeNameThisMap[a.name].storeName.x - 5 - this.storeNameThisMap[a.name].storeName.width / 2, this.storeNameThisMap[a.name].storeName.y - this.storeNameThisMap[a.name].storeName.height / 2, this.storeNameThisMap[a.name].storeName.width + 10 , this.storeNameThisMap[a.name].storeName.height);
-        this.storeNameThisMap[a.name].helperMsgBox = new Phaser.Geom.Rectangle(this.storeNameThisMap[a.name].helperMsg.x - 5 - this.storeNameThisMap[a.name].helperMsg.width / 2, this.storeNameThisMap[a.name].helperMsg.y - this.storeNameThisMap[a.name].helperMsg.height / 2, this.storeNameThisMap[a.name].helperMsg.width + 10, this.storeNameThisMap[a.name].helperMsg.height);
-        //fill in backdrop, and push it behide the screen
-        this.storeNameThisMap[a.name].gra.fillRectShape(this.storeNameThisMap[a.name].storeNameBox)
-        this.storeNameThisMap[a.name].gra.fillRectShape(this.storeNameThisMap[a.name].helperMsgBox).setDepth(-1)
-      }
-    });
-
-    //physics body needs to refresh
-    storeAreaGroup.refresh();
-    //console.log(storeAreaGroup.children.entries[0].name) < Example of storeArea's store_id path
-    //add other layer to overwrite obj layer
-    this.tileset = this.map.addTilesetImage('vMarketTiles', 'tile')
-    this.groundLayer = this.map.createLayer("Ground", this.tileset, 0, 0)
-    this.cityObjLayer = this.map.createLayer("CityObj", this.tileset, 0, 0)
-
-    //grab collides tile from each map. Note: collides have NOT been set yet
-    this.groundLayer.setCollisionByProperty({ collides: true });
-    this.cityObjLayer.setCollisionByProperty({ collides: true });
-
-    //rand to be del, just for showcasing
-    let rand = Math.floor(Math.random() * 3);
-    switch (rand) {
-      case 0:
-        rand = 'fm_01'
-        break;
-      case 1:
-        rand = 'fm_02'
-        break;
-      case 2:
-        rand = 'm_01'
-        break;
-    }
-
-    //add player sprite, animation and name
-    //make sprite anime for added sprite
-
-    this.createPlayer();
-    /*
-    this.createSpriteAnimation(this.player.texture.key)
-    this.player.play(`idle-d-${this.player.texture.key}`)
-    this.playerName = this.add.text(0, 32, !(this.playerInfo.id) ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
-    this.playerName.setDepth(9);
-    this.playerNameBox = new Phaser.Geom.Rectangle( -(this.playerName.width + 6) / 2 ,  32 -  this.playerName.height / 2, this.playerName.width + 6, this.playerName.height);
-    this.gra.setDepth(8);
-    
-    // put player inside a container
-    this.container = this.add.container(this.playerInfo.x ||400, this.playerInfo.y || 300);
-    this.container.setSize(32,32);
-    this.container.add(this.player)
-    this.container.add(this.gra)
-    this.container.add(this.playerName)
-    this.physics.world.enable(this.container);
-    */
-
-    
-    //add 3 camera, 1st to follow player, mini(2nd) for mini map, and 3rd for background when pause 
-    //set camera to size of map, zoom in for better view, then make this follow player
-   /*  this.cameras.main.setBounds(0, 0, 1920, 1920);
-    this.cameras.main.setZoom(3);
-    this.cameras.main.startFollow(this.player, true) */
-
-    //make 'mini map' and place to top RIGHT, set bound of map, zoom out so it is mini, and set to follow player
-    this.miniCam = this.cameras.add(1030, 0, 250, 250);
-    this.miniCam.setBounds(0, 0, 1920, 1920)
-    this.miniCam.zoom = 0.35;
-    this.miniCam.startFollow(this.player, true)
-    
-    //add overlapArea detect
-    this.physics.add.overlap(this.player, storeAreaGroup, (x, y) => { 
-      this.storeId = y.name;
-
-      //if store exist, show it name by putting the name in the front layer
-      if (this.storeExistThisMap[this.storeId] && !this.storeName) { 
-        this.storeName = `${this.storeExistThisMap[this.storeId].name}`
-        this.storeNameThisMap[this.storeId].storeName.setDepth(4)
-        this.storeNameThisMap[this.storeId].helperMsg.setDepth(4);
-        this.storeNameThisMap[this.storeId].gra.setDepth(3)
-      }
-
-      this.overlap = true;
-    }, undefined, this); //check overlap with store area, change overlap to true
-
-    //add collider with player
-    // this.physics.add.collider(this.player, this.wallLayer);
-    this.physics.add.collider(this.container, this.groundLayer)
-    this.physics.add.collider(this.container, this.cityObjLayer)
-
-    this.physics.world.bounds.width = this.map.widthInPixels;
-    this.physics.world.bounds.height = this.map.heightInPixels;
     
     // toggle mini map
     this.input.keyboard.on('keydown', function (event) {
@@ -366,9 +198,11 @@ class Game extends Phaser.Scene {
     // show nav bar after login
     $('#top-nav-bar').css('visibility', 'visible')
 
+
+    //The below code block will control what get's displayed on the side bar
     if (!this.playerInfo.id) {
       //set up shown name
-      $('#IGN').removeClass() 
+      $('#IGN').removeClass()
       $('#IGN').addClass("btn btn-outline-secondary")
       $('#IGN').attr("data-bs-toggle", '')
       document.getElementById('IGN').innerHTML = 'Guest';
@@ -398,24 +232,24 @@ class Game extends Phaser.Scene {
         e.preventDefault();
         let scene = this.scene
         let music = this.music
-        this.playerInfo.x = this.container.x
-        this.playerInfo.y = this.container.y
+        this.playerInfo.x = this.playerContainer.x
+        this.playerInfo.y = this.playerContainer.y
         let cam = this.cameras.main
         let playerInfo = this.playerInfo
         this.sys.game.globals.globalVars.login('Game')
-        .then((res) => {
-          console.log(res)
+          .then((res) => {
+            console.log(res)
             if (res === true) {
-              music.destroy(); 
+              music.destroy();
               cam.fadeOut(150, 0, 0, 0)
               cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-                  scene.start('Game', playerInfo);
-                })
+                scene.start('Game', playerInfo);
+              })
             } else if (res && res.owner) {
               window.location.href = `/users/${res.id}`;
             }
           }
-        )
+          )
       })
       $("#register-button").off().on("click", () => {
         sessionStorage.clear();
@@ -424,29 +258,27 @@ class Game extends Phaser.Scene {
         this.music.destroy();
         this.cameras.main.fadeOut(150, 0, 0, 0)
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
-            this.scene.start('register');
-          })
+          this.scene.start('register');
+        })
       })
     } else {
-      $('#IGN').removeClass() 
+      $('#IGN').removeClass()
       $('#IGN').addClass("btn btn-outline-secondary dropdown-toggle")
       $('#IGN').attr("data-bs-toggle", 'dropdown')
-      if(!$('#chat-message').length)  {
+      if (!$('#chat-message').length) {
         $('#chat-side-bar').empty()
         let chat = `
         <div id="friends-list">
-            <h3>Friends</h3>
-            <ul>
-            </ul>
-          </div>
-          <div id="messages">
-            <ul>
-            </ul>
-          </div>
-          <form>
-            <input type="text" name="chat-message" id="chat-message" autocomplete="off">
-            <button>Send</button>
-        </form>`;
+          <h3>Friends</h3>
+          <ul>
+          </ul>
+        </div>
+        <div id="offline-friends">
+          <h6><b>Offline</b></h6>
+          <ul>
+          </ul>
+        </div>`;
+        
         $('#chat-side-bar').append(chat)
       }
       document.getElementById('IGN').innerHTML = sessionStorage.getItem('IGN');
@@ -454,8 +286,8 @@ class Game extends Phaser.Scene {
       $('#user-session').off().on('click', () => {
         socket.disconnect(true)
         console.log('logout clicked')
-        $.ajax('users/logout', { method: 'POST'})
-          .then( (res) => {
+        $.ajax('users/logout', { method: 'POST' })
+          .then((res) => {
             sessionStorage.clear();
             $('#top-nav-bar').css('visibility', 'hidden')
             $('#chat-side-bar').css('visibility', 'hidden')
@@ -467,7 +299,175 @@ class Game extends Phaser.Scene {
 
     // show chat bar after login
     $('#chat-side-bar').css('visibility', 'visible')
+}
 
+  update() {
+    //take player into store if space is press when overlap
+    if (this.overlap && this.key.SPACE.isDown && !this.enterStore && this.playerInfo.id) {
+      this.enterStore = true; //prevent event fire twice
+      this.playerInfo.store_id = this.storeId;
+      coordinates.x = this.playerContainer.body.x + 16;
+      coordinates.y = this.playerContainer.body.y + 16;
+      this.playerInfo.storeInfo = this.storeInfo;
+      this.storeName
+        ? this.playerInfo.storeName = this.storeName
+        : this.playerInfo.storeName = null;
+      this.sys.game.globals.globalVars.connectionEstablished = true;
+      //this.storeOtherPlayersPositions()
+      this.scene.start('store', this.playerInfo);
+    }
+
+    this.playerContainer.body.setVelocity(0);
+
+    //update player movement
+    if (this.key.LEFT.isDown || this.key.A.isDown) {
+      this.playerContainer.body.setVelocityX(-150);
+      if (this.player.anims.currentAnim.key === `walk-l-${this.player.texture.key}`) { }
+      else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
+        this.player.play(`walk-l-${this.player.texture.key}`)
+      }
+    }
+    else if (this.key.RIGHT.isDown || this.key.D.isDown) {
+      this.playerContainer.body.setVelocityX(150);
+      if (this.player.anims.currentAnim.key === `walk-r-${this.player.texture.key}`) { }
+      else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
+        this.player.play(`walk-r-${this.player.texture.key}`)
+      }
+    }
+    if (this.key.UP.isDown || this.key.W.isDown) {
+      this.playerContainer.body.setVelocityY(-150);
+      if (this.player.anims.currentAnim.key === `walk-u-${this.player.texture.key}`) { }
+      else {
+        this.player.play(`walk-u-${this.player.texture.key}`)
+      }
+    }
+    else if (this.key.DOWN.isDown || this.key.S.isDown) {
+      this.playerContainer.body.setVelocityY(150);
+      if (this.player.anims.currentAnim.key === `walk-d-${this.player.texture.key}`) { }
+      else {
+        this.player.play(`walk-d-${this.player.texture.key}`)
+      }
+    }
+
+    //if player does not move, play idle anime
+    if (!this.key.DOWN.isDown && !this.key.UP.isDown && !this.key.RIGHT.isDown && !this.key.LEFT.isDown && !this.key.W.isDown && !this.key.A.isDown && !this.key.S.isDown && !this.key.D.isDown) {
+      if (!this.player.anims.currentAnim.key.includes('idle')) {
+        let newAnim = this.player.anims.currentAnim.key.split('-')
+        this.player.play("idle-" + newAnim[1] + `-${this.player.texture.key}`)
+      }
+    }
+
+    //if player LEFT the interactive area, remove shop name and interactible msg
+    if (!this.overlap && this.storeName) {
+      this.storeName = null;
+      this.storeNameThisMap[this.storeId].storeName.setDepth(-1);
+      this.storeNameThisMap[this.storeId].helperMsg.setDepth(-1);
+      this.storeNameThisMap[this.storeId].gra.setDepth(-1);
+    }
+    
+    //update player name's place
+    this.updatePlayerGra()
+    
+
+    //emit the player's movement to other clients
+    if (this.playerContainer.body.currentPosition) {
+      const x = this.playerContainer.body.x
+      const y = this.playerContainer.body.y
+      if (x !== this.playerContainer.body.currentPosition.x || y !== this.playerContainer.body.currentPosition.y) {
+        this.playerContainer.moving = true;
+        socket.emit('user movement', { x, y })
+      } else if (this.playerContainer.moving) {
+        this.playerContainer.moving = false;
+        socket.emit('user movement', { x, y })
+      }
+    }
+
+    //store the current player's position
+    this.playerContainer.body.currentPosition = {
+      x: this.playerContainer.body.x,
+      y: this.playerContainer.body.y
+    }
+  }
+  
+  createPlayer(playerInfo){
+    this.player = this.physics.add.sprite(0, 0, "fm_02")
+    this.createSpriteAnimation(this.player.texture.key)
+    this.player.play(`idle-d-${this.player.texture.key}`)
+    
+    const playerName = this.add.text(0, 32, !(this.playerInfo.id) ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, { font: "bold", align: 'center' }).setOrigin(0.5)
+    playerName.setDepth(9);
+    
+    const playerNameBox = new Phaser.Geom.Rectangle(-(playerName.width + 6) / 2, 32 - playerName.height / 2, playerName.width + 6, playerName.height);
+    const gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
+    gra.alpha = .5;
+    gra.setDepth(8);
+    
+    //put player inside a container
+    this.playerContainer = this.add.container(playerInfo.x, playerInfo.y);
+    this.playerContainer.setSize(32, 32);
+    this.playerContainer.add(this.player)
+    this.playerContainer.add(gra)
+    this.playerContainer.add(playerName)
+    this.playerContainer.moving = false;
+    this.physics.world.enable(this.playerContainer);
+    this.updateCamera();
+    this.playerContainer.body.setCollideWorldBounds(true);
+    gra.fillRectShape(playerNameBox);
+
+    //add collider with player
+    this.physics.add.collider(this.playerContainer, this.groundLayer)
+    this.physics.add.collider(this.playerContainer, this.cityObjLayer)
+    this.physics.add.collider(this.playerContainer, this.otherPlayers)
+    
+    this.physics.world.bounds.width = this.map.widthInPixels;
+    this.physics.world.bounds.height = this.map.heightInPixels;
+
+  }
+
+  addOtherPlayers(playerInfo) {
+    const player = this.physics.add.sprite(0, 0, this.spriteArr.shift())
+    this.createSpriteAnimation(player.texture.key)
+    player.play(`idle-d-${player.texture.key}`)
+    player.player_id = playerInfo.user_id
+    player.player_name = playerInfo.username
+
+
+    const playerName = this.add.text(0, 32, !(player.player_id) ? `GUEST\n${player.player_name}` : `${player.player_name}`, { font: "bold", align: 'center' }).setOrigin(0.5)
+    playerName.setDepth(6);
+
+    const playerNameBox = new Phaser.Geom.Rectangle(-(playerName.width + 6) / 2, 32 - playerName.height / 2, playerName.width + 6, playerName.height);
+    const gra = this.add.graphics({ fillStyle: { color: 0x000000 } });
+    gra.alpha = .5;
+    gra.setDepth(5);
+
+    const playerContainer = this.add.container(playerInfo.x, playerInfo.y);
+    playerContainer.setSize(32, 32);
+    playerContainer.add(player)
+    playerContainer.add(gra)
+    playerContainer.add(playerName)
+    gra.fillRectShape(playerNameBox);
+
+    this.otherPlayers.add(playerContainer)
+    
+    playerContainer.body.setImmovable(true);
+    
+    
+    /* const player = this.physics.add.sprite(playerInfo.x, playerInfo.y, "fm_02")
+    player.setTint(Math.random() * 0xffffff)
+    player.player_id = playerInfo.user_id
+    player.player_name = playerInfo.username
+    this.otherPlayers.add(player)
+    this.physics.add.collider(this.otherPlayers, this.cityObjLayer)
+    this.physics.add.collider(this.otherPlayers, this.groundLayer)
+    player.body.setImmovable(true);
+    player.body.setCollideWorldBounds(true) */
+  }
+
+  updateCamera(){
+    this.cameras.main.fadeIn(150, 0, 0, 0)
+    this.cameras.main.setBounds(0, 0, 1920, 1920);
+    this.cameras.main.setZoom(2);
+    this.cameras.main.startFollow(this.playerContainer.body, true)
   }
 
   createSpriteAnimation(spriteName) {
@@ -513,113 +513,118 @@ class Game extends Phaser.Scene {
     });
   }
 
-  update() {
-    
-    //take player into store if space is press when overlap
-    if (this.overlap && this.key.SPACE.isDown && !this.enterStore && this.playerInfo.id) {
-      this.enterStore = true; //prevent event fire twice
-      this.playerInfo.store_id = this.storeId;
-      this.playerInfo.x = this.container.x;
-      this.playerInfo.y = this.container.y;
-      this.playerInfo.storeInfo = this.storeInfo;
-      this.storeName
-        ? this.playerInfo.storeName = this.storeName
-        : this.playerInfo.storeName = null;
-      // added store email and number
-      this.playerInfo.storeEmail = this.storeInfo[this.storeId - 1].email;
-      this.playerInfo.storePhone = this.storeInfo[this.storeId - 1].phone;
-      this.music.destroy();
-      this.scene.start('store', this.playerInfo);
-    }
-
-    this.container.body.setVelocity(0);
-    //update player movement
-    if (this.key.LEFT.isDown || this.key.A.isDown) {
-      this.container.body.setVelocityX(-150);
-      if (this.player.anims.currentAnim.key === `walk-l-${this.player.texture.key}`) { }
-      else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
-        this.player.play(`walk-l-${this.player.texture.key}`)
-      }
-    }
-    else if (this.key.RIGHT.isDown || this.key.D.isDown) {
-      this.container.body.setVelocityX(150);
-      if (this.player.anims.currentAnim.key === `walk-r-${this.player.texture.key}`) { }
-      else if (this.key.UP.isDown || this.key.DOWN.isDown || this.key.W.isDown || this.key.S.isDown) { } else {
-        this.player.play(`walk-r-${this.player.texture.key}`)
-      }
-    }
-    if (this.key.UP.isDown || this.key.W.isDown) {
-      this.container.body.setVelocityY(-150);
-      if (this.player.anims.currentAnim.key === `walk-u-${this.player.texture.key}`) { }
-      else {
-        this.player.play(`walk-u-${this.player.texture.key}`)
-      }
-    }
-    else if (this.key.DOWN.isDown || this.key.S.isDown) {
-      this.container.body.setVelocityY(150);
-      if (this.player.anims.currentAnim.key === `walk-d-${this.player.texture.key}`) { }
-      else {
-        this.player.play(`walk-d-${this.player.texture.key}`)
-      }
-    }
-
-    //if player does not move, play idle anime
-    if (!this.key.DOWN.isDown && !this.key.UP.isDown && !this.key.RIGHT.isDown && !this.key.LEFT.isDown && !this.key.W.isDown && !this.key.A.isDown && !this.key.S.isDown && !this.key.D.isDown) {
-      if (!this.player.anims.currentAnim.key.includes('idle')) {
-        let newAnim = this.player.anims.currentAnim.key.split('-')
-        this.player.play("idle-" + newAnim[1] + `-${this.player.texture.key}`)
-      }
-    }
-
-    //if player LEFT the interactive area, remove shop name and interactible msg
-    if (!this.overlap && this.storeName) {
-      this.storeName = null;
-      this.storeNameThisMap[this.storeId].storeName.setDepth(-1);
-      this.storeNameThisMap[this.storeId].helperMsg.setDepth(-1);
-      this.storeNameThisMap[this.storeId].gra.setDepth(-1);
-    }
-    
-    //update player name's place
-    this.updatePlayerGra()
+  addMiniMap(){
+    this.miniCam = this.cameras.add(1030, 0, 250, 250);
+    this.miniCam.setBounds(0, 0, 1920, 1920)
+    this.miniCam.zoom = 0.35;
+    this.miniCam.startFollow(this.playerContainer.body, true)
   }
+
+  createMap(){
+    this.enterStore = false;
+    this.storeNameThisMap = {};
+    let storeExist = {};
+    this.storeExistThisMap = {};
+    // get all store info to a more easy handle data type
+    for (const store of this.storeInfo) {
+      storeExist[store.id] = store
+    }
+    
+    this.map = this.make.tilemap({ key: "map" });
+
+    //add object layer first. 
+    this.storesArea = this.map.getObjectLayer('StoreObj')['objects'];
+    this.storeAreaGroup = this.physics.add.staticGroup({});
+    this.storesArea.forEach(area => {
+      let a = this.storeAreaGroup.create(area.x, area.y);
+      a.setScale(area.width / 32, area.height / 32);
+      a.setOrigin(0); //to replace auto offset
+      a.body.width = area.width;
+      a.body.height = area.height;
+      a.name = area.properties[0].value //add store_id as name to do ajax call, 
+      //please note, this store_id must be set as first custom_property in tile
+      //overlap cb does not seems to return id for some reason, so use name
+
+      if (storeExist[a.name]) {
+        this.storeExistThisMap[a.name] = storeExist[a.name]; // only get store on this map
+        this.storeNameThisMap[a.name] = { [a.name]: undefined };
+        //add Store Name and helper Msg
+        this.storeNameThisMap[a.name].storeName = this.add.text(a.x + 48, a.y - 32 * 3, `${this.storeExistThisMap[a.name].name}`, { font: "bold 28px Messiri", fill: "#fff" }).setOrigin(0.5);
+        this.storeNameThisMap[a.name].storeName.setDepth(0);
+        this.storeNameThisMap[a.name].helperMsg = this.helperMsg = this.add.text(a.x + 48, a.y + 16, `Press 'Space'\nto interact`, { font: "bold", align: 'center' }).setOrigin(0.5);
+        this.storeNameThisMap[a.name].helperMsg.setDepth(0);
+        //make graphic for this store
+        let color = '0x' + this.intToRGB(this.hashCode(`${this.storeExistThisMap[a.name].name}`));
+        this.storeNameThisMap[a.name].gra = this.add.graphics({ fillStyle: { color: `${color}` } });
+        this.storeNameThisMap[a.name].gra.alpha = .35; 
+        //Make Backdrop so text is easier to read
+        this.storeNameThisMap[a.name].storeNameBox = new Phaser.Geom.Rectangle(this.storeNameThisMap[a.name].storeName.x - 5 - this.storeNameThisMap[a.name].storeName.width / 2, this.storeNameThisMap[a.name].storeName.y - this.storeNameThisMap[a.name].storeName.height / 2, this.storeNameThisMap[a.name].storeName.width + 10, this.storeNameThisMap[a.name].storeName.height);
+        this.storeNameThisMap[a.name].helperMsgBox = new Phaser.Geom.Rectangle(this.storeNameThisMap[a.name].helperMsg.x - 5 - this.storeNameThisMap[a.name].helperMsg.width / 2, this.storeNameThisMap[a.name].helperMsg.y - this.storeNameThisMap[a.name].helperMsg.height / 2, this.storeNameThisMap[a.name].helperMsg.width + 10, this.storeNameThisMap[a.name].helperMsg.height);
+        //fill in backdrop, and push it behide the screen
+        this.storeNameThisMap[a.name].gra.fillRectShape(this.storeNameThisMap[a.name].storeNameBox)
+        this.storeNameThisMap[a.name].gra.fillRectShape(this.storeNameThisMap[a.name].helperMsgBox).setDepth(-1)
+      }
+    });
+
+    //physics body needs to refresh
+    this.storeAreaGroup.refresh();
+    
+    //add other layer to overwrite obj layer
+    this.tileset = this.map.addTilesetImage('vMarketTiles', 'tile')
+    this.groundLayer = this.map.createLayer("Ground", this.tileset, 0, 0)
+    this.cityObjLayer = this.map.createLayer("CityObj", this.tileset, 0, 0)
+
+    //grab collides tile from each map. Note: collides have NOT been set yet
+    this.groundLayer.setCollisionByProperty({ collides: true });
+    this.cityObjLayer.setCollisionByProperty({ collides: true });
+
+    this.physics.world.bounds.width = this.map.widthInPixels;
+    this.physics.world.bounds.height = this.map.heightInPixels;
+  }
+
+  createOverlap(){
+    this.physics.add.overlap(this.player, this.storeAreaGroup, (x, y) => {
+      this.storeId = y.name;
+
+      //if store exist, show it name by putting the name in the front layer
+      if (this.storeExistThisMap[this.storeId] && !this.storeName) {
+        this.storeName = `${this.storeExistThisMap[this.storeId].name}`
+        this.storeNameThisMap[this.storeId].storeName.setDepth(4)
+        this.storeNameThisMap[this.storeId].helperMsg.setDepth(4);
+        this.storeNameThisMap[this.storeId].gra.setDepth(3)
+      }
+
+      this.overlap = true;
+    }, undefined, this); //check overlap with store area, change overlap to true
+  }
+
+  /* storeOtherPlayersPositions() {
+    this.otherPlayers.getChildren().forEach((player) => {
+      this.sys.game.globals.globalVars.playersList[player.list[0].player_id].x = player.x//offset since container is center in the mid
+      this.sys.game.globals.globalVars.playersList[player.list[0].player_id].y = player.y//offset since container is center in the mid
+    })
+  } */
   
+  hashCode(str) { // java String#hashCode
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash); //get Char ASCII code + hash left shift 5 bit - origin
+    }
+    return hash;
+  }
+
+  intToRGB(i) {
+    let c = (i & 0x00FFFFFF) //bitwise and operator to get when when both binary = 1 0x to show it is in hexdecimal
+    .toString(16)
+    .toUpperCase();
+
+    return "00000".substring(0, 6 - c.length) + c; //if not enough padding, add 0 to that place
+  }
+
   updatePlayerGra() {
-    //this.playerName.x = this.player.x;  
-    //this.playerName.y = !(this.playerInfo.id) ? this.player.y + 34 : this.player.y + 28; 
-    //this.playerNameBox.x = this.playerName.x - 3 - this.playerName.width / 2
-    //this.playerNameBox.y = this.playerName.y - this.playerName.height / 2
-    this.overlap = false; //update overlap check
-    //this.gra.clear() //redraw the backdrop on name
-    //this.gra.fillRectShape(this.playerNameBox);
+    this.overlap = false;
   }
 
-  createPlayer(playerInfo) {
-    this.player = this.physics.add.sprite(0, 0, "fm_02")
-    this.createSpriteAnimation(this.player.texture.key)
-    this.player.play(`idle-d-${this.player.texture.key}`)
-    this.playerName = this.add.text(0, 32, !(this.playerInfo.id) ? `GUEST\n${this.playerInfo.name}` : `${this.playerInfo.name}`, {font: "bold", align:'center'}).setOrigin(0.5)
-    this.playerName.setDepth(9);
-    this.playerNameBox = new Phaser.Geom.Rectangle( -(this.playerName.width + 6) / 2 ,  32 -  this.playerName.height / 2, this.playerName.width + 6, this.playerName.height);
-    this.gra.setDepth(8);
-    // put player inside a container
-    this.container = this.add.container(this.playerInfo.x ||400, this.playerInfo.y || 300);
-    this.container.setSize(32,32);
-    this.container.add(this.player)
-    this.container.add(this.gra)
-    this.container.add(this.playerName)
-    this.physics.world.enable(this.container);
-    this.updateCamera();
-    this.container.body.setCollideWorldBounds(true);
-    this.gra.fillRectShape(this.playerNameBox);
-  }
-
-  updateCamera(){ //setup cam to follow player
-    this.cameras.main.fadeIn(150, 0, 0, 0)
-    this.cameras.main.setBounds(0, 0, 1920, 1920);
-    this.cameras.main.setZoom(2);
-    this.cameras.main.startFollow(this.container.body, true)
-  }
-
-}
+};
 
 export { Game }

@@ -6,13 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!--scripts to load jQuery, Phaser, Stripe and Socket.io-->
+    <!--scripts to load jQuery, Phaser, Stripe,Socket.io and PeerJS-->
     <script src="//cdn.jsdelivr.net/npm/phaser@3.52.0/dist/phaser.js"></script>
     <script src="vendor/jquery-3.5.1.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script defer src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+    <script defer src="js/helper.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    
 
     <!-- font for store name -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -26,6 +27,7 @@
     <!-- for shopping cart icon -->
     <script defer src="https://kit.fontawesome.com/db457e5834.js" crossorigin="anonymous"></script>
     
+    
     <!-- custom style sheets-->
     <link rel="stylesheet" href="/css/login.css" type="text/css" />
     <link rel="stylesheet" href="/css/layout.css" type="text/css" />
@@ -33,16 +35,16 @@
     <link rel="stylesheet" href="/css/product-details.css" type="text/css" />
     <link rel="stylesheet" href="/css/checkout.css" type="text/css" />
     <link rel="stylesheet" href="/css/navbar.css" type="text/css" />
-    <link rel="stylesheet" href="/css/chat.css" type="text/css" />
     <link rel="stylesheet" href="/css/support-message.css" type="text/css" />
-
-
+    <link rel="stylesheet" href="/css/chat.css" type="text/css" />
   </head>
 
   <body>
     <main>
-      <div id="top-nav-bar"> 
-        <div><img id='logo' src="https://see.fontimg.com/api/renderfont4/8VA2/eyJyIjoiZnMiLCJoIjo0NywidyI6MTAwMCwiZnMiOjQ3LCJmZ2MiOiIjMDAwMDAwIiwiYmdjIjoiI0ZGRkZGRiIsInQiOjF9/Vi1NYXJrZXQ/quite-magical-regular.png" alt="Cute fonts"></div>
+      <div id="top-nav-bar">
+        <div><img id='logo'
+            src="https://see.fontimg.com/api/renderfont4/8VA2/eyJyIjoiZnMiLCJoIjo0NywidyI6MTAwMCwiZnMiOjQ3LCJmZ2MiOiIjMDAwMDAwIiwiYmdjIjoiI0ZGRkZGRiIsInQiOjF9/Vi1NYXJrZXQ/quite-magical-regular.png"
+            alt="Cute fonts"></div>
         <button id='user-session' class="btn btn-outline-secondary"></button>
         <div class="dropdown">
           <button id="IGN" aria-expanded="false"></button>
@@ -52,35 +54,25 @@
             <li><a class="dropdown-item" href="#">Account</a></li>
           </ul>
         </div>
-        <button type='button' id="mini-map"class="btn btn-outline-secondary"><i class="fas fa-map-marked-alt"></i> Mini-Map</button>
+        <button type='button' id="mini-map" class="btn btn-outline-secondary"><i class="fas fa-map-marked-alt"></i>
+          Mini-Map</button>
         <button type='button' id="music" class="btn btn-outline-secondary"><i class="fas fa-volume-up"></i></button>
+        </div>
       </div>
       <div id="game-chat-container">
         <div id="game-container">
           <script type="module" src="js/main.js"></script>
         </div>
         <div id="chat-side-bar">
-          <div>
-            <div id="friends-list">
-              <h3>Friends Online</h3>
-              <ul>
-              </ul>
-            </div>
-            <div id='offline-friends'>
-              <h6><b>Offline</b></h6>
-              <ul>
-              </ul>
-            </div>
+          <div id="friends-list">
+            <h3>Friends</h3>
+            <ul>
+            </ul>
           </div>
-          <div>
-            <div id="messages">
-              <ul>
-              </ul>
-            </div>
-            <form>
-              <input type="text" name="chat-message" id="chat-message" autocomplete="off">
-              <button>Send</button>
-            </form>
+          <div id="offline-friends">
+            <h6><b>Offline</b></h6>
+            <ul>
+            </ul>
           </div>
         </div>
       </div>

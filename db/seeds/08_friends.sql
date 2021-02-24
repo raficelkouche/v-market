@@ -1,4 +1,3 @@
-
 INSERT INTO friends (user_id, friend_id) VALUES (5, 6);
 INSERT INTO friends (user_id, friend_id) VALUES (5, 7);
 INSERT INTO friends (user_id, friend_id) VALUES (5, 1);
@@ -35,4 +34,8 @@ INSERT INTO friends (user_id, friend_id) VALUES (3, 2);
 INSERT INTO friends (user_id, friend_id) VALUES (3, 7);
 INSERT INTO friends (user_id, friend_id) VALUES (3, 4);
 INSERT INTO friends (user_id, friend_id) VALUES (3, 5);
+<<<<<<< HEAD
 INSERT INTO friends (user_id, friend_id) VALUES (3, 6);
+=======
+INSERT INTO friends (user_id, friend_id) VALUES (3, 6);
+>>>>>>> features/chat

@@ -21,7 +21,6 @@ const userNew = function(newUser) { //make new user
 exports.userNew = userNew;
 
 const userLogin = function(IGN) {
-  //console.log(IGN.toLowerCase())
   return pool.query(`
   select u.* , s.name as store_name
   from users u

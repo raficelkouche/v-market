@@ -35,97 +35,120 @@ app.get('/', (req, res) => {
 
 //chat testing routes and logic
 const activeConnections = {};
+let videoChatRoom = null;
 
-io.use((socket, next) => {
-  if (activeConnections[socket.handshake.query.user_id]) {
-    console.log("connection already exists")
-    return next(new Error("connection already exists"))
-  } else {
-    console.log("Adding a new connection")
-    socket.emit("success")
-    return next();
-  }
-}).on('connection', (socket) => {
+io.on('connection', (socket) => {
   const userInfo = {
     ...socket.handshake.query,
-    x: Math.floor(Math.random() * 300) + 40,
-    y: Math.floor(Math.random() * 400) + 50
   }
-
-  let my_user_id = userInfo.user_id
-
-  socket.join(my_user_id) //this is the client's id
-
-  if (!activeConnections[my_user_id]) {
-    activeConnections[my_user_id] = userInfo
-  }
-
-  const updatedList = {};
-  Object.keys(activeConnections).forEach(userID => {
-    if (userID !== my_user_id) {
-      updatedList[userID] = activeConnections[userID]
+ 
+  userInfo.x = Number(userInfo.x)
+  userInfo.y = Number(userInfo.y)
+ 
+  //this will be sent after the login is complete
+  socket.on("update-user-details", userDetails => {
+    let my_user_id = userDetails.user_id
+    userInfo.user_id = userDetails.user_id
+    userInfo.username = userDetails.username
+    
+    //add this socket to a private room under the user_id
+    socket.join(my_user_id) 
+    
+    //will be used to add this socket to another private room to talk to a seller
+    if (userDetails.callSeller === true) {
+      socket.join('vendor-room')
     }
-  })
+    
+    console.log("new user connected: ", my_user_id)
+    
+    //add the current client to the activeConnections object if non-existent
+    if (!activeConnections[my_user_id]) {
+      activeConnections[my_user_id] = userInfo
+    }
+    
+    //updated list will have all the users except the current one
+    const updatedList = {};
+    Object.keys(activeConnections).forEach(userID => {
+      if (userID !== my_user_id) {
+        updatedList[userID] = activeConnections[userID]
+      }
+    })
 
-  socket.emit('updated-friends-list', updatedList)
+    //send this to the most recent client who joined
+    socket.emit('updated-friends-list', updatedList) 
+    
+    //allows the client to display their own id
+    socket.emit('your id', userInfo.username) 
+    
+    //send this ONLY to the most recent client who joined
+    socket.emit('all players', updatedList) 
+    
+    //update all clients with the new user that just joined (for the chat feature)
+    socket.broadcast.emit('updated-friends-list', { [my_user_id]: userInfo })
+    
+    //update all clients with the new user that just joined (for spawning purposes)
+    socket.broadcast.emit('new player', { ...userInfo }) 
+    
+    //event listeners
+    socket.on('send message', ({ recipient, message }) => {
+      socket.to(recipient).emit('recieve message', {
+        message,
+        sender: userInfo
+      })
+    })
+    
+    socket.on('user movement', (movement) => {
+      let deltaX = Number(movement.x) - Number(activeConnections[my_user_id].x)
+      let deltaY = (Number(movement.y) - Number(activeConnections[my_user_id].y))
+      activeConnections[my_user_id].x = movement.x
+      activeConnections[my_user_id].y = movement.y
+      activeConnections[my_user_id].deltaX = deltaX
+      activeConnections[my_user_id].deltaY = deltaY
+      socket.broadcast.emit('player moved', activeConnections[my_user_id])
+    })
+    
+    socket.on('call-request', data => {
+      videoChatRoom = (data.callSeller === true) ? "vendor-room" : data.targetUser
+      
+      socket.join(videoChatRoom)
 
-  socket.emit('your id', userInfo.username) //allows the client to display their own id
+      socket.to(videoChatRoom).emit('call-request-recieved', {
+        ...data, 
+        username: userInfo.username 
+      })
+    })
 
-  socket.broadcast.emit('updated-friends-list', { //update all clients with the new user that just joined (for the chat feature)
-    [my_user_id]: userInfo
-  })
+    socket.on('user-accepted-call', peerID => {
+      socket.broadcast.emit('call-accepted', peerID )
+    })
 
-  socket.on('send message', ({ recipient, message }) => {
+    socket.on('user-declined-call', () => {
+      socket.broadcast.emit('call-declined')
+    })
+    
+    socket.on('call-ended', () => {
+      socket.to(videoChatRoom).emit('call-ended')
+      socket.emit('call-ended')
+    })
 
-    socket.to(recipient).emit('receive message', {
-      message,
-      sender: userInfo.username
+    socket.on('disconnect', () => {
+      delete activeConnections[my_user_id]
+      console.log(`player ${my_user_id} has left`)
+      socket.broadcast.emit("delete user", {
+        username: userInfo.username,
+        user_id: my_user_id
+      })
     })
   })
+});
 
-  socket.on('user movement', (movement) => {
-    activeConnections[my_user_id].x = movement.x
-    activeConnections[my_user_id].y = movement.y
-    socket.broadcast.emit('player moved', activeConnections[my_user_id])
-  })
-
-  socket.broadcast.emit('new player', {
-    [my_user_id]: userInfo
-  }) //update all clients with the new user that just joined (for spwaning purposes)
-
-  socket.emit('all players', updatedList)
-
-  socket.on('disconnect', () => {
-    console.log("DELETING: ", my_user_id)
-    delete activeConnections[my_user_id]
-    console.log("active connections after delete: ", activeConnections)
-    socket.broadcast.emit("delete user", my_user_id)
-  })
-})
-
-app.get("/test", (req, res) => {
-  res.json({ res: "check cookies" })
+//tester route
+app.get("/seller", (req, res) => {
+  res.render('seller')
 })
 
 
 server.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)
 })
-
-
-// stripe
-// Token is created using Stripe Checkout or Elements!
-// Get the payment token ID submitted by the form:
-
-// const customer = await stripe.customers.create({
-//   email: 'customer@example.com',
-//   source: request.body.stripeToken,
-// });
-
-// const charge = await stripe.charges.create({
-//   customer: customer.id,
-//   description: 'Custom t-shirt',
-//   amount: order.amount,
-//   currency: 'usd',
-// });
 

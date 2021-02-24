@@ -10,11 +10,9 @@ main {
   flex-direction: row;
   width: 100%;
   background-color: black;
-
 }
 
 #game-container{
-  border: 4px solid rgb(10, 10, 89);
   width: 75%;
   flex-basis: 75%;
   height: 90vh;
@@ -37,15 +35,17 @@ main {
   display:flex;
   flex-direction: column;
   flex-basis: 30%;
-  /* border-bottom: solid 2px grey; */
-  padding: 10px;
-  /* background-color: aquamarine; */
-  /* font-family: 'Didact Gothic', sans-serif; */
   font-family: 'Source Sans Pro', sans-serif;
   font-weight: medium;
+  padding: 10px;
 }
+
 #friends-list > h3 {
   font-family: 'Open Sans', sans-serif;
+}
+
+#friends-list ul li::marker{
+  content: '🌎 ';
 }
 
 #offline-friends {
@@ -53,20 +53,13 @@ main {
   padding: 10px;
   font-family: 'Source Sans Pro', sans-serif;
 }
-#chat {
-  display: flex;
-  align-self: flex-end;
-  position: relative;
-  bottom: 0em;
-  left: 0em;
-  max-height: 50%;
 
+#offline-friends ul li::marker{
+  content: '💤 ';
 }
 
-/* messages box */
-#messages{
+.message-history{
   list-style-type: none;
-  /* font-family: 'Didact Gothic', sans-serif; */
   font-family: 'Source Sans Pro', sans-serif;
   max-height: 400px;
   overflow: hidden;
@@ -74,8 +67,7 @@ main {
   margin: 2px;
 }
 
-
-#messages li{
+.message-history li{
   list-style-type: none;
   padding-left: 15px;
   color: white;
@@ -83,19 +75,18 @@ main {
   border-radius: 10px;
   max-width: 95%;
   overflow-wrap: break-word;
-  
 }
 
-#messages>li:nth-child(odd) {
+.message-history ul>li:nth-child(odd) {
   background: #FFF;
   color:rgb(10, 10, 89)
-}
+  }
 
 #chat-side-bar form{
   display: flex;
   flex-direction: row;
-  
 }
+
 #chat-side-bar form input{
   border: none;
   padding: 0 1rem;
@@ -103,6 +94,7 @@ main {
   border-radius: 2rem;
   margin: 0.25rem;
 }
+
 #chat-side-bar input:focus {
   outline: none;
 }
@@ -128,6 +120,67 @@ main {
 #messages.disable {
   height: 100%;
   display: flex;
+  border: 4px solid green;
+  align-items: center;
+}
+
+.in-game-video-call-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  
+  width: 70%;
+  height: 20vh;
+  position: absolute;
+  top: 0;
+}
+
+.in-game-local-video{
+  background: #666;
+  border: 2px solid red;
+  z-index: 100;
+  flex-basis: 30%;
+}
+
+.in-game-remote-video{
+  background: #666;
+  border: 2px solid green;
+  z-index: 100;
+  flex-basis: 30%;
+}
+
+#start-call{
+  height: 50px;
+  align-self: center;
+  background-color: green;
+}
+
+#end-call{
+  height: 50px;
+  align-self: center;
+  background-color: red;
+}
+
+.call-notification{
+  position: fixed;
+  background: #f2f2f2;
+  top: 30vh;
+  width: 30%;
+  height: 20vh;
+  left: 40%;
+  border: 2px solid red;
+}
+
+/* Login on Side Chat bar if user not logged in */
+
+#friends-list.disable{
+  height: 100%;
+  justify-content: center;
+}
+
+.message-history.disable {
+  height: 100%;
+  display: flex;
   flex-direction: column;
 }
 
@@ -143,21 +196,21 @@ main {
   justify-content: center;
 }
 
-#chat-side-bar #messages form label {
+#chat-side-bar .message-history form label {
   text-align: center;
 }
 
-#chat-side-bar #messages form #name {
+#chat-side-bar .message-history form #name {
   flex-grow: 0;
   margin-bottom: 1rem;
 }
 
-#chat-side-bar #messages form #password {
+#chat-side-bar .message-history form #password {
   flex-grow: 0;
   margin-bottom: 1rem;
 }
 
-#chat-side-bar #messages form p{
+#chat-side-bar .message-history form p{
   height: 1.5rem;
   width: 100%;
   color: rgb(141, 24, 24);
@@ -165,12 +218,12 @@ main {
   font-weight: 800;
 }
 
-#chat-side-bar #messages form div{
+#chat-side-bar .message-history form div{
   display: flex;
   justify-content: space-evenly;
 }
 
-#chat-side-bar #messages form div button {
+#chat-side-bar .message-history form div button {
   text-align: center;
   width: 30%;
 }
