@@ -3,11 +3,12 @@ class Global {
     this.storeData;
     this.connectionEstablished = false;
     this.playersList = {};
+    this.friendsList;
     this.getStoreData();
     this.musicIsMute = false;
     this.login()
   }
-  
+
   getStoreData = async () => {
     this.storeData = await $.ajax(`/stores`, { method: 'GET' })
     return Array.from(this.storeData)
