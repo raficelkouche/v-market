@@ -1,4 +1,4 @@
-const socket = io('http://localhost:3000', {
+const socket = io('/', {
   autoConnect: false,
   query: {
     x: 289, //would be replaced by x and y for seller from db
@@ -10,17 +10,15 @@ socket.connect()
 
 socket.emit("update-user-details", {
   user_id: 13,
-  username: "jacky"
+  username: "jacky",
+  seller: true
 })
 
-
-socket.on('recieve message', data => {
-  console.log(data.message)
-  console.log(data.sender)
+socket.on('receive message', data => {
+  
 })
 
 socket.on('disconnect', (user_id) => {
-  console.log("server shutdown")
   socket.disconnect();
 })
 
@@ -42,8 +40,7 @@ myPeer.on('open', id => {
 const inGameLocalVideo = document.getElementById("seller-local-video")
 const remoteVideo = document.getElementById("customer-remote-video")
 
-socket.on('call-request-recieved', data => {
-  console.log("call request recieved: ", data)
+socket.on('call-request-received', data => {
   $('.content-container').append(`
             <div class="call-notification"> 
               <div> User ${data.username} is calling ...</div>
@@ -81,8 +78,7 @@ $('#end-call').on('click', () => {
 })
 
 socket.on('call-ended', () => {
-  console.log("ending call")
-  myPeer.destroy()
+  call.close()
   inGameLocalVideo.srcObject.getTracks().forEach(track => track.stop())
   remoteVideo.srcObject.getTracks().forEach(track => track.stop())
   inGameLocalVideo.remove()
@@ -108,7 +104,7 @@ $("#start-call").on("click", (event) => {
           addVideoStream(inGameLocalVideo, stream)
 
           socket.on("call-accepted", peerID => {
-            sendRecieveStreams(peerID, stream)
+            sendReceiveStreams(peerID, stream)
           })
         })
 
@@ -123,11 +119,11 @@ $("#start-call").on("click", (event) => {
 });
 
 
-function sendRecieveStreams(remoteUserID, stream) {
+function sendReceiveStreams(remoteUserID, stream) {
   //call the other user and send the local stream
   call = myPeer.call(remoteUserID, stream)
 
-  //setup handlers to recieve the remote stream
+  //setup handlers to receive the remote stream
   const remoteVideo = document.getElementById("in-game-remote-video")
   call.on('stream', remoteUserVideoStream => {
     addVideoStream(remoteVideo, remoteUserVideoStream)

@@ -17,7 +17,7 @@ class Login extends Phaser.Scene {
       method: 'GET',
       url: '/users/login'
     }).then(res => {
-      if (res.user_ID) {
+      if (res.user_ID && sessionStorage.getItem("user_id")) {
         this.scene.start('Game', {storeInfo: this.storeInfo})
       }else{
         this.add.image(140, 0, 'background').setOrigin(0).setDepth(0);

@@ -35,16 +35,17 @@ main {
   background-color: aquamarine;
 }
 
-#messages{
+.message-history{
   list-style-type: none;
 }
-#messages li{
+
+.message-history li{
   list-style-type: none;
   color: white;
   background-color: darkslategrey;
 }
 
-#messages>li:nth-child(odd) {
+.message-history>li:nth-child(odd) {
     background: #efefef;
     color:rgb(10, 10, 89)
   }
@@ -52,8 +53,8 @@ main {
 #chat-side-bar form{
   display: flex;
   flex-direction: row;
-  
 }
+
 #chat-side-bar form input{
   border: none;
   padding: 0 1rem;
@@ -61,6 +62,7 @@ main {
   border-radius: 2rem;
   margin: 0.25rem;
 }
+
 #chat-side-bar input:focus {
   outline: none;
 }
@@ -90,7 +92,6 @@ main {
   height: 20vh;
   position: absolute;
   top: 0;
-  background-color:#f2f2f2;
 }
 
 .in-game-local-video{

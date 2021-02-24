@@ -38,7 +38,6 @@ const activeConnections = {};
 let videoChatRoom = null;
 
 io.on('connection', (socket) => {
-  
   const userInfo = {
     ...socket.handshake.query,
   }
@@ -46,46 +45,55 @@ io.on('connection', (socket) => {
   userInfo.x = Number(userInfo.x)
   userInfo.y = Number(userInfo.y)
  
+  //this will be sent after the login is complete
   socket.on("update-user-details", userDetails => {
-       
     let my_user_id = userDetails.user_id
     userInfo.user_id = userDetails.user_id
     userInfo.username = userDetails.username
     
-    socket.join(my_user_id) //this is the client's id
+    //add this socket to a private room under the user_id
+    socket.join(my_user_id) 
+    
+    //will be used to add this socket to another private room to talk to a seller
+    if (userDetails.callSeller === true) {
+      socket.join('vendor-room')
+    }
     
     console.log("new user connected: ", my_user_id)
-
+    
+    //add the current client to the activeConnections object if non-existent
     if (!activeConnections[my_user_id]) {
       activeConnections[my_user_id] = userInfo
     }
     
+    //updated list will have all the users except the current one
     const updatedList = {};
     Object.keys(activeConnections).forEach(userID => {
       if (userID !== my_user_id) {
         updatedList[userID] = activeConnections[userID]
       }
     })
+
+    //send this to the most recent client who joined
+    socket.emit('updated-friends-list', updatedList) 
     
-    socket.emit('updated-friends-list', updatedList) //send this to the most recent client who joined
+    //allows the client to display their own id
+    socket.emit('your id', userInfo.username) 
     
-    socket.emit('your id', userInfo.username) //allows the client to display their own id
+    //send this ONLY to the most recent client who joined
+    socket.emit('all players', updatedList) 
     
-    socket.emit('all players', updatedList) //send this to the most recent client who joined
+    //update all clients with the new user that just joined (for the chat feature)
+    socket.broadcast.emit('updated-friends-list', { [my_user_id]: userInfo })
     
-    socket.broadcast.emit('updated-friends-list', { //update all clients with the new user that just joined (for the chat feature)
-      [my_user_id]: userInfo
-    })
+    //update all clients with the new user that just joined (for spawning purposes)
+    socket.broadcast.emit('new player', { ...userInfo }) 
     
-    socket.broadcast.emit('new player', { //update all clients with the new user that just joined (for spawning purposes)
-      ...userInfo
-    }) 
-    
+    //event listeners
     socket.on('send message', ({ recipient, message }) => {
-      console.log("recipient: ", recipient)
       socket.to(recipient).emit('recieve message', {
         message,
-        sender: userInfo.username
+        sender: userInfo
       })
     })
     
@@ -96,11 +104,11 @@ io.on('connection', (socket) => {
     })
     
     socket.on('call-request', data => {
-      console.log("call request recieved from client")
-      videoChatRoom = data.targetUser
-      console.log("videochatroom: ", videoChatRoom)
+      videoChatRoom = (data.callSeller === true) ? "vendor-room" : data.targetUser
+      
       socket.join(videoChatRoom)
-      socket.to(videoChatRoom).broadcast.emit('call-request-recieved', {
+
+      socket.to(videoChatRoom).emit('call-request-recieved', {
         ...data, 
         username: userInfo.username 
       })
@@ -115,7 +123,6 @@ io.on('connection', (socket) => {
     })
     
     socket.on('call-ended', () => {
-      console.log("call-ended emitted: ", videoChatRoom)
       socket.to(videoChatRoom).emit('call-ended')
       socket.emit('call-ended')
     })
@@ -126,8 +133,9 @@ io.on('connection', (socket) => {
       socket.broadcast.emit("delete user", my_user_id)
     })
   })
-})
+});
 
+//tester route
 app.get("/seller", (req, res) => {
   res.render('seller')
 })
@@ -135,21 +143,4 @@ app.get("/seller", (req, res) => {
 server.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)
 })
-
-
-// stripe
-// Token is created using Stripe Checkout or Elements!
-// Get the payment token ID submitted by the form:
-
-// const customer = await stripe.customers.create({
-//   email: 'customer@example.com',
-//   source: request.body.stripeToken,
-// });
-
-// const charge = await stripe.charges.create({
-//   customer: customer.id,
-//   description: 'Custom t-shirt',
-//   amount: order.amount,
-//   currency: 'usd',
-// });
 

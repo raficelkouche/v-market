@@ -1,4 +1,3 @@
-console.log("target: ", window.globalVariables.testVariable)
 class Store extends Phaser.Scene {
   constructor() {
     super('store');

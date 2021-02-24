@@ -21,7 +21,6 @@ const userNew = function(newUser) { //make new user
 exports.userNew = userNew;
 
 const userLogin = function(IGN) {
-  //console.log(IGN.toLowerCase())
   return pool.query(`
   select * 
   from users
@@ -105,9 +104,7 @@ const orderNew = function(order) { //make new user
         returning id;
       `,[res.rows[0].order_id, order.cart[i].product_id, 1, order.cart[i].price])
         .then(res => {
-          // check if each line was entered
-          // console.log('this the result from adding lineitems')
-          // console.log(res)
+         
       })
     }
 
