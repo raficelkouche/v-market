@@ -83,7 +83,7 @@ class Game extends Phaser.Scene {
     socket.on('player moved', data => {
       this.otherPlayers.getChildren().forEach((player) => {
         if (player.list[0].player_id === data.user_id) {
-          player.setPosition(data.x + 16, data.y + 16) // offset container
+          player.setPosition(data.x, data.y) // offset container
         }
         if(data.deltaX  > 0 && data.deltaY === 0 && player.list[0].anims.currentAnim.key != `walk-r-${player.list[0].texture.key}`) {
           player.list[0].play(`walk-r-${player.list[0].texture.key}`)
@@ -234,8 +234,8 @@ class Game extends Phaser.Scene {
 
       //emit the player's movement to other clients
       if (this.playerContainer.body.currentPosition){
-        const x = this.playerContainer.body.x
-        const y = this.playerContainer.body.y
+        const x = this.playerContainer.body.x + 16
+        const y = this.playerContainer.body.y + 16
         if(x !== this.playerContainer.body.currentPosition.x || y !== this.playerContainer.body.currentPosition.y) {
           this.playerContainer.moving = true;
           socket.emit('user movement', { x,y })
