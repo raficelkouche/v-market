@@ -4,10 +4,9 @@ let peerID = null;
 let chatRecieverID = null;
 let friendsList = null;
 
-
 const coordinates = {
-  x: Math.floor(Math.random() * 500) + 40,
-  y: Math.floor(Math.random() * 600) + 50
+  x: Math.floor(Math.random() * 500) + 32,
+  y: 8 * 32 + Math.floor(Math.random() * 3.5 * 32)
 }
 
 const socket = io('/', {
@@ -160,7 +159,9 @@ $('main').on('submit', "#chat-side-bar form", (event) => {
 //Video chat feature
 $("main").on("click", "#start-call", (event) => {
   targetUser = $(event.target).closest('li').attr('id')
-  $('#music').click()
+  if( !window.mute ) {
+    $('#music').click()
+  }
   //disable the call button if in a call
   $('.friend-container').children('#start-call').attr("disabled", true)
 
@@ -193,7 +194,10 @@ $("main").on("click", "#start-call", (event) => {
 socket.on('call-request-recieved', data => {
   //disable all the call button while the notification is on
   $('.friend-container').children('#start-call').attr("disabled", true)
-  $('#music').click()
+  //mute music
+  if( !window.mute ) {
+    $('#music').click()
+  }
   //add the notification to the screen
   $('main').append(`
         <div class="call-notification">
@@ -234,7 +238,8 @@ socket.on('call-request-recieved', data => {
 
 $('main').on('click', '#decline-button', () => {
   $('.friend-container').children('#start-call').attr("disabled", false)
-  $('#music').click()
+  if( mute ) {} 
+  else { $('#music').click() }
   socket.emit('user-declined-call')
   $('.call-notification').remove()
   $('main').off('click', '#accept-button')
@@ -280,7 +285,10 @@ socket.on('updated-friends-list', usersList => {
 
 socket.on('call-ended', () => {
   //if the call was not picked up yet and user clickes on end call
-  $('#music').click()
+  if( mute ) {
+  } else {
+    $('#music').click()
+  }
   if (call) {
     call.close()
     call = null;
@@ -304,7 +312,10 @@ socket.on('call-ended', () => {
 });
 
 socket.on('call-declined', () => {
-  $('#music').click()
+  if( mute ) {}
+  else {
+    $('#music').click()
+  }
   //stop the local video stream and remove it's container
   if (inGameLocalVideo.srcObject) {
     inGameLocalVideo.srcObject.getTracks().forEach(track => track.stop())

@@ -60,30 +60,17 @@ class Game extends Phaser.Scene {
     this.sound.pauseOnBlur = false;
     this.music = this.sound.add('background', {
       loop: true,
-    })
-    // toggle music off or on
-    //this.music.play();
-    this.music.setMute(this.sys.game.globals.globalVars.musicIsMute)
-
-    $('#music').off().on('click', () => {
-      this.music.setMute(!this.sys.game.globals.globalVars.musicIsMute);
-      this.sys.game.globals.globalVars.musicIsMute = !this.sys.game.globals.globalVars.musicIsMute;
-      if (!this.music.mute) {
-        $('#music').html('<i class="fas fa-volume-mute"></i>')
-      } else {
-        $('#music').html('<i class="fas fa-volume-up"></i>')
-      }
-    })
-    this.storeInfo = this.sys.game.globals.globalVars.storeData
-    this.otherPlayers = this.physics.add.group();
-    this.player = Phaser.Physics.Arcade.Sprite
-    this.sound.pauseOnBlur = false;
-    this.music = this.sound.add('background', {
-      loop: true,
+      volume: 0.2
     })
     // toggle music off or on
     this.music.play();
     this.music.setMute(this.sys.game.globals.globalVars.musicIsMute)
+    window.mute = false
+    this.storeInfo = this.sys.game.globals.globalVars.storeData
+    this.otherPlayers = this.physics.add.group();
+    this.player = Phaser.Physics.Arcade.Sprite
+    this.sound.pauseOnBlur = false;
+    // toggle music off or on
 
     this.createMap()
     this.createPlayer(coordinates)
@@ -183,6 +170,7 @@ class Game extends Phaser.Scene {
 
     $('#music').off().on('click', () => {
       this.music.setMute(!this.sys.game.globals.globalVars.musicIsMute);
+      mute = !mute
       this.sys.game.globals.globalVars.musicIsMute = !this.sys.game.globals.globalVars.musicIsMute;
       if (!this.music.mute) {
         $('#music').html('<i class="fas fa-volume-mute"></i>')
@@ -391,8 +379,8 @@ class Game extends Phaser.Scene {
 
     //emit the player's movement to other clients
     if (this.playerContainer.body.currentPosition) {
-      const x = this.playerContainer.body.x
-      const y = this.playerContainer.body.y
+      const x = this.playerContainer.body.x + 16
+      const y = this.playerContainer.body.y + 16
       if (x !== this.playerContainer.body.currentPosition.x || y !== this.playerContainer.body.currentPosition.y) {
         this.playerContainer.moving = true;
         socket.emit('user movement', { x, y })
