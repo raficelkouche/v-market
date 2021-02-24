@@ -377,8 +377,8 @@ class Game extends Phaser.Scene {
 
     //emit the player's movement to other clients
     if (this.playerContainer.body.currentPosition) {
-      const x = this.playerContainer.body.x
-      const y = this.playerContainer.body.y
+      const x = this.playerContainer.body.x + 16
+      const y = this.playerContainer.body.y + 16
       if (x !== this.playerContainer.body.currentPosition.x || y !== this.playerContainer.body.currentPosition.y) {
         this.playerContainer.moving = true;
         socket.emit('user movement', { x, y })
