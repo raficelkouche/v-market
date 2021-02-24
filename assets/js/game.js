@@ -1,4 +1,4 @@
-const { socket, coordinates, connectSocket, getFriendsList } = window.allGlobalVars
+const { socket, coordinates, connectSocket, getAllFriends, updateFriendsList } = window.allGlobalVars
 
 //The code below will handle the game scene
 class Game extends Phaser.Scene {
@@ -55,7 +55,6 @@ class Game extends Phaser.Scene {
   }
 
   create() {
-    console.log(this.playerInfo.id)
     // works but not after a while
     this.sound.pauseOnBlur = false;
     this.music = this.sound.add('background', {
@@ -154,14 +153,25 @@ class Game extends Phaser.Scene {
       })
     })
 
-    connectSocket();
-    getFriendsList(this.playerInfo.id);
+    if (!this.sys.game.globals.globalVars.connectionEstablished) {
+      connectSocket();
+      
+      socket.emit("update-user-details", {
+        username: this.playerInfo.name,
+        user_id: this.playerInfo.id
+      })
 
-    
-    socket.emit("update-user-details", {
-      username: this.playerInfo.name,
-      user_id: this.playerInfo.id
-    })
+      getAllFriends(this.playerInfo.id);
+    } else {
+      socket.emit('request-players-list')
+      
+      socket.on('requested-list', list => {
+        updateFriendsList(list)
+        socket.off('requested-list')
+      })
+
+
+    }
 
     //If the player goes to the store and then comes back
     /* if(this.sys.game.globals.globalVars.connectionEstablished){
@@ -254,7 +264,6 @@ class Game extends Phaser.Scene {
         let playerInfo = this.playerInfo
         this.sys.game.globals.globalVars.login('Game')
           .then((res) => {
-            console.log(res)
             if (res === true) {
               music.destroy();
               cam.fadeOut(150, 0, 0, 0)
@@ -301,7 +310,6 @@ class Game extends Phaser.Scene {
       document.getElementById('user-session').innerHTML = 'Logout';
       $('#user-session').off().on('click', () => {
         socket.disconnect(true)
-        console.log('logout clicked')
         $.ajax('users/logout', { method: 'POST' })
           .then((res) => {
             sessionStorage.clear();

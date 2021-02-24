@@ -60,7 +60,6 @@ class Login extends Phaser.Scene {
     //user sub the login info
     $("#login").off().on("submit", (e) => {
       e.preventDefault();
-      console.log('login click')
       let scene = this.scene;
       let cam = this.cameras.main
       this.sys.game.globals.globalVars.login()

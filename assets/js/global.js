@@ -35,10 +35,8 @@ class Global {
       appendIfOnLogin(err);
       return;
     } else {
-      console.log($("#login").serialize())
       return ($.ajax("/users/login", { method: 'POST', data: $("#login").serialize() })
         .then((res) => {
-          console.log(res)
           if (!res.user_id && !res.err && !res.owner) {
             let confirm = `
               <div class="box confirm">
@@ -65,7 +63,6 @@ class Global {
               </div>`
             //add animation for box appear if have time
             if (!appendIfOnLogin(err)) {
-              console.log('in password')
               $('.err-msg').html('Invalid password & user combination')
             };
           } else if (res.owner) { // User name/password not match
@@ -74,7 +71,6 @@ class Global {
             //store user information in the session
             sessionStorage.setItem("IGN", res.name.replace(/%20/g, " ").trim())
             sessionStorage.setItem("user_id", res.user_id)
-            console.log('this is true')
             return true;
           }
         }))

@@ -90,6 +90,17 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('new player', { ...userInfo }) 
     
     //event listeners
+    socket.on('request-players-list', () => {
+      const tempList = {}
+      Object.keys(activeConnections).forEach(userID => {
+        if (userID !== my_user_id) {
+          tempList[userID] = activeConnections[userID]
+        }
+      })
+      socket.emit('requested-list', tempList)
+    })
+
+
     socket.on('send message', ({ recipient, message }) => {
       socket.to(recipient).emit('recieve message', {
         message,
