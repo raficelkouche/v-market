@@ -109,7 +109,7 @@
 
 2. Wilkie introduction
 
-3. My name is Tammy, and before lighthouse labs, I was a production supervisor at a food manufacturing facility. This project wouldnt be what it is without my group members, Wilkie and Rafic.
+3. My name is Tammy, and before lighthouse labs, I was a production supervisor at a food manufacturing facility. I have decided to leave my career to pursue my passion in programming. Without further ado, we would like to present our project.
 
 4. A. Rafic: We are presenting to you V-Market. A virtual marketplace that redfines online shopping. It brings buyers and sellers together on a 2D map to simulate the real-life experience. 
 
@@ -120,6 +120,9 @@
 DEMO WALKTHTHROUGH: Rafic driver, Tammy speaker
 
 5. Tammy: (Landing page -> login, -> walk around and talk about navbar features?) 
+  - First the user will log in through the landing page, the user will be spawn in the V-Market map. As a user the can use the top nav bar to view user account information, toggle the mini map and toggle background music. In this map, there are areas to explore and hang out with your friends on the side. The main feature will be marketplace in the middle.
+
+  - Your friends can join you on the same map for virtual shopping together, you can online chat or video chat with your friends.
 
 6. Tammy: (second player joins, show chat feature (text/video), 
 
