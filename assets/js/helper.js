@@ -74,7 +74,7 @@ async function getFriendsList (userID) {
 socket.on('recieve message', data => {
   //don't add a notification button if one exists already
   if(!$(`#${data.sender.user_id}`).children('#message-recieved').length){
-    $(`#${data.sender.user_id}`).append('<button id="message-recieved">New Message</button>')
+    $(`#${data.sender.user_id}`).append('<button class="btn btn-secondary" id="message-recieved"><i class="fas fa-exclamation"></i></button>')
   }
   //Add a new container only if it doesn't exist and hide it
   if (!document.getElementById(`messages-from-${data.sender.user_id}`)){
@@ -172,7 +172,7 @@ $("main").on("click", "#start-call", (event) => {
       .then(stream => {
         //add the local cam stream
         $('.in-game-video-call-container').append(inGameLocalVideo)
-        $('.in-game-video-call-container').append(`<button id="end-call">End Call</button>`)
+        $('.in-game-video-call-container').append(`<button class="btn btn-danger" id="end-call"> <i class="fas fa-phone-slash"> </i>End Call</button>`)
         addVideoStream(inGameLocalVideo, stream)
 
         //add the remote video stream
@@ -193,9 +193,9 @@ socket.on('call-request-recieved', data => {
   //add the notification to the screen
   $('main').append(`
         <div class="call-notification">
-          <div> User ${data.username} is calling ...</div>
-          <button id="accept-button">accept</button>
-          <button id="decline-button">decline</button>
+          <div> User <b>${data.username}</b> is calling ...</div>
+          <button class="btn btn-success" id="accept-button">Accept</button>
+          <button class="btn btn-danger" id="decline-button">Decline</button>
         </div>
       `)
   
@@ -207,7 +207,7 @@ socket.on('call-request-recieved', data => {
       //add the local video stream
       $('.in-game-video-call-container').append(inGameLocalVideo)
       addVideoStream(inGameLocalVideo, stream)
-      $('.in-game-video-call-container').append(`<button id="end-call">End Call</button>`)
+      $('.in-game-video-call-container').append(`<button class="btn btn-danger" id="end-call"> <i class="fas fa-phone-slash"></i> End Call</button>`)
 
       //event listener for recieving a call
       myPeer.on('call', recievedCall => {
@@ -261,8 +261,8 @@ socket.on('updated-friends-list', usersList => {
       $("#friends-list ul").append(`
       <li class="friend-container" id="${user_id}">
         ${username}
-        <button id="start-call">call</button>
-        <button id="start-chat">chat</button>
+        <button class="btn btn-secondary" id="start-call" style="height: auto;"><i class="fas fa-video"></i></button>
+        <button class="btn btn-secondary" id="start-chat"><i class="far fa-comments"></i></button>
       </li>
       `)
     }

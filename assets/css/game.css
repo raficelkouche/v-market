@@ -152,13 +152,13 @@ main {
 #start-call{
   height: 50px;
   align-self: center;
-  background-color: green;
+  /* background-color: green; */
 }
 
 #end-call{
   height: 50px;
   align-self: center;
-  background-color: red;
+  /* background-color: red; */
 }
 
 .call-notification{
@@ -168,7 +168,21 @@ main {
   width: 30%;
   height: 20vh;
   left: 40%;
-  border: 2px solid red;
+  border: 2px solid grey;
+  background-image: url('/props/navbar-bkg.jpg');
+  background-size: 400px 400px;
+  /* display: flex; */
+  /* justify-content: center; */
+  padding: 20px;
+  text-align: center;
+  vertical-align: center;
+  max-height: 300px;
+  max-width: 300px;
+  padding-top: 50px;
+}
+
+.call-notification button {
+  margin-top: 20px;
 }
 
 /* Login on Side Chat bar if user not logged in */
