@@ -159,8 +159,8 @@ class Game extends Phaser.Scene {
       if (this.overlap && this.key.SPACE.isDown && !this.enterStore) {
         this.enterStore = true; //prevent event fire twice
         this.playerInfo.store_id = this.storeId;
-        coordinates.x = this.playerContainer.body.x;
-        coordinates.y = this.playerContainer.body.y;
+        coordinates.x = this.playerContainer.body.x + 16;
+        coordinates.y = this.playerContainer.body.y + 16;
         this.playerInfo.storeInfo = this.storeInfo;
         this.storeName
           ? this.playerInfo.storeName = this.storeName
