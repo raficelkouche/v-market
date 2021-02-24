@@ -9,14 +9,14 @@ main {
   display: flex;
   flex-direction: row;
   width: 100%;
-  background-color: black;
+  /* background-color: black; */
 }
 
 #game-container{
   width: 75%;
   flex-basis: 75%;
   height: 90vh;
-  background-color: black;
+  /* background-color: black; */
 }
 #chat-side-bar{
   display:flex;

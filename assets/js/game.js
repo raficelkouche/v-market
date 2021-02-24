@@ -55,6 +55,12 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+    // after enter the game -> change background to black
+    $('#game-chat-container').css('background-color', 'black')
+    $('body').css('background-image', '')
+
+
+
     console.log(this.playerInfo.id)
     // works but not after a while
     this.sound.pauseOnBlur = false;

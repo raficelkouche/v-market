@@ -7,11 +7,14 @@ class Login extends Phaser.Scene {
 
     this.load.html('loginForm', 'templates/login.html')
     this.load.image('background', 'maps/farmersMarket.jpeg')
+    // this.load.image('background1', 'props/vmarket-landing.jpeg')
 
   }
 
   create() {
     this.cameras.main.setBounds(0, 0, 1280, 960);
+    // this.stage.backgroundColor = '#FFF'
+
     //check if a user is already logged in
     $.ajax({
       method: 'GET',
@@ -25,11 +28,16 @@ class Login extends Phaser.Scene {
           scene.start('Game')
         })
       } else {
-        this.add.image(140, 0, 'background').setOrigin(0).setDepth(0);
+        // this.add.image(140, 0, 'background1').setOrigin(0).setDepth(0);
         const form = this.add.dom(640, 480).createFromCache('loginForm')
       }
     }).catch(err => console.log(err))
 
+    $('#game-chat-container').css('background-color', '')
+    $('body').css('background-image', 'url("./props/marketthai.jpg")')
+    // $('body').css('background-image', 'url("./maps/farmersMarket.jpeg")')
+    $('body').css('background-size', '1920px 1080px')
+    $('body').css('background-repeat', 'no-repeat')
   }
 
   update() {

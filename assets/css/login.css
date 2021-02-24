@@ -181,3 +181,19 @@ input:-webkit-autofill:active  {
   from { opacity: 1; }
   to   { opacity: 0; }
 }
+
+.login-box {
+  right: 410px;
+  top: 200px;
+	position: absolute;
+  border: 2px solid grey;
+  background-image: url('/props/navbar-bkg.jpg');
+  background-size: 200px 200px;
+  border-radius: 100px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.login-title {
+  padding: 20px;
+}

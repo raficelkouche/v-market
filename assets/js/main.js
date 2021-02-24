@@ -6,6 +6,8 @@ import { Global } from './global.js'
 
 const config = {
   type: Phaser.AUTO,
+  // backgroundColor: '#FFFFFF',
+  transparent: true,
 
   scale: {
     mode: Phaser.Scale.FIT,
