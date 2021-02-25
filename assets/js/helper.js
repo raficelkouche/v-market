@@ -70,9 +70,10 @@ async function getAllFriends(userID) {
 //will take care of online/offline friends
 function updateFriendsList(list){
   $("#friends-list ul").children().remove()
-  
-  for (const friend in list) {
-    if(offlineFriends.includes(list[friend].username)){
+  $("#offline-friends ul").children().remove()
+
+  offlineFriends.forEach((friend) => {
+    if(list[friend] ){
       $("#friends-list ul").append(`
       <li class="friend-container" id="${list[friend].user_id}">
         ${list[friend].username}
@@ -81,9 +82,9 @@ function updateFriendsList(list){
       </li>
       `)
     }else{
-      $('#offline-friends ul').append(`<li>${list[friend].username}</li>`)
+      $('#offline-friends ul').append(`<li>${friend}</li>`)
     }
-  }
+  })
 }
 
 //Text chat feature
@@ -109,7 +110,7 @@ socket.on('recieve message', data => {
     $(`#messages-from-${data.sender.user_id}`).hide()
   }
 
-  $(`#messages-from-${data.sender.user_id} .message-history ul`).append(`<li class="keep-left">${data.sender.username}: ${data.message}</li`)
+  $(`#messages-from-${data.sender.user_id} .message-history ul`).append(`<li class="keep-left"><b>${data.sender.username}</b>: ${data.message}</li`)
   $('.message-history').scrollTop($('.message-history').height());
 })
 
@@ -155,7 +156,7 @@ $('main').on('submit', "#chat-side-bar form", (event) => {
   let message = $(`#messages-from-${chatRecieverID} input`).val()
 
   if (message) {
-    $(`#messages-from-${chatRecieverID} .message-history ul`).append(`<li class="keep-right">Me: ${message}</li>`)
+    $(`#messages-from-${chatRecieverID} .message-history ul`).append(`<li class="keep-right"><b>Me</b>: ${message}</li>`)
 
     socket.emit('send message', {
       recipient: chatRecieverID,
@@ -215,7 +216,7 @@ socket.on('call-request-recieved', data => {
   //add the notification to the screen
   $('main').append(`
         <div class="call-notification">
-          <div> User <b>${data.username}</b> is calling ...</div>
+          <div><b>${data.username}</b> is calling ...</div>
           <button class="btn btn-success" id="accept-button">Accept</button>
           <button class="btn btn-danger" id="decline-button">Decline</button>
         </div>

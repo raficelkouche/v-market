@@ -94,7 +94,10 @@ io.on('connection', (socket) => {
       const tempList = {}
       Object.keys(activeConnections).forEach(userID => {
         if (userID !== my_user_id) {
-          tempList[userID] = activeConnections[userID]
+          tempList[activeConnections[userID].username] = {
+            user_id: activeConnections[userID].user_id,
+            username: activeConnections[userID].username 
+          }
         }
       })
       socket.emit('requested-list', tempList)

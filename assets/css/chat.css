@@ -41,7 +41,10 @@
 
 .chat-container{
   background-color: rgb(224, 250, 250);
-  height: 200px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .message-history{
@@ -51,6 +54,7 @@
   overflow: hidden;
   overflow-y: scroll;
   margin: 2px;
+  flex-basis: 95%
 }
 
 .message-history li{
@@ -60,12 +64,12 @@
   overflow-wrap: break-word;
 }
 
-
 .message-history .keep-right {
   position: relative;
   padding-left: 10px;
   right: -10px;
   background-color: rgb(222, 250, 215);
+  margin-top: 5px;
 }
 
 .message-history .keep-left {

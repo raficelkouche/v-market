@@ -68,7 +68,7 @@ class Store extends Phaser.Scene {
           if (result[i]) { // assign product_id to td as value for later calling 
             pendingHTML += `
             <td class="single-product" value=${result[i].id}>
-              <img class="thumbnail" src="${result[i].thumbnail};"/>
+              <img class="thumbnail" src="${result[i].thumbnail}"/>
               <div class="description">
                 <div class="product-name">
                   ${result[i].name}
@@ -104,7 +104,7 @@ class Store extends Phaser.Scene {
             if (result[i + x * 4]) {
               pendingHTML += `
               <td class="single-product" value=${result[i + x * 4].id}>
-                <img class="thumbnail" src="${result[i + x * 4].thumbnail};"/>
+                <img class="thumbnail" src="${result[i + x * 4].thumbnail}"/>
                 <div class="description">
                   <div class="product-name">
                     ${result[i + x * 4].name}
@@ -316,7 +316,7 @@ class Store extends Phaser.Scene {
           let pendingHTML = `
         <div id="product-container">
           <div id='products-img'>
-            <img class="thumbnail" src=${result.thumbnail};/>
+            <img class="thumbnail" src="${result.thumbnail}"/>
           </div>
           <div id='product-des'>
             <h2>${result.name}</h2>
