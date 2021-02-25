@@ -109,7 +109,7 @@ socket.on('recieve message', data => {
     $(`#messages-from-${data.sender.user_id}`).hide()
   }
 
-  $(`#messages-from-${data.sender.user_id} .message-history ul`).append(`<li>${data.sender.username}: ${data.message}</li`)
+  $(`#messages-from-${data.sender.user_id} .message-history ul`).append(`<li class="keep-left">${data.sender.username}: ${data.message}</li`)
   $('.message-history').scrollTop($('.message-history').height());
 })
 
@@ -155,7 +155,7 @@ $('main').on('submit', "#chat-side-bar form", (event) => {
   let message = $(`#messages-from-${chatRecieverID} input`).val()
 
   if (message) {
-    $(`#messages-from-${chatRecieverID} .message-history ul`).append(`<li>${sessionStorage.getItem("IGN")}: ${message}</li`)
+    $(`#messages-from-${chatRecieverID} .message-history ul`).append(`<li class="keep-right">Me: ${message}</li>`)
 
     socket.emit('send message', {
       recipient: chatRecieverID,
