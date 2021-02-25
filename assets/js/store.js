@@ -156,7 +156,7 @@ class Store extends Phaser.Scene {
         $("#checkout-table").remove()
       }
       $("#products").html("<div id='products-grid'></div>")
-      $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
+      $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Products</button></div>")
       addMoreItem(storeProducts, true) // need to make helper to get the amount 
       for (let product of storeProducts) {
         $(`#add-to-cart${product.id}`).on('click', function () {

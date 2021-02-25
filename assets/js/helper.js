@@ -115,8 +115,8 @@ socket.on('recieve message', data => {
 
 //event handler for clicking on a 'new message' notification
 $('main').on('click', '#message-recieved', (event) => {
-  chatRecieverID = $(event.target).parent().attr("id")
-
+  chatRecieverID = $(event.target).closest('li').attr('id')
+  
   $('#chat-side-bar').children('.chat-container').hide()
 
   $('#message-recieved').remove()
@@ -127,9 +127,7 @@ $('main').on('click', '#message-recieved', (event) => {
 //event handler for clicking on 'chat' button
 $('main').on('click', '#start-chat', (event) => {
   chatRecieverID = $(event.target).closest('li').attr('id')
-  //hide all visible chats if any
-  $('#chat-side-bar').children('.chat-container').hide()
-
+  
   //add a container to hold messages and the texting-form if it doesn't exist
   if (!document.getElementById(`messages-from-${chatRecieverID}`)) {
     $('#offline-friends').after(`
@@ -143,9 +141,11 @@ $('main').on('click', '#start-chat', (event) => {
       </form>
     </div>
     `)
-  } else {
-    $(`#messages-from-${chatRecieverID}`).toggle();
-  }
+    //hide all visible chats if any
+    $('#chat-side-bar').children('.chat-container').hide()
+  } else {}
+
+  $(`#messages-from-${chatRecieverID}`).toggle();
 })
 
 //event handler for sending a new message
