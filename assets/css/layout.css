@@ -91,12 +91,6 @@
   color: #111111;
 }
 
-/* too be added
-#search-bar {
-  
-}
-*/
-
 #store-data {
   align-self: center;
   width:90%; 
@@ -129,9 +123,15 @@
   border-spacing: 1rem 2rem;
 }
 
+#products-grid .single-product{
+  transition: transform .2s;
+  transform: scale(1.1);
+}
+
 .product {
-  background-color: #f3f3f3;
+  background-color: #f5f1f1;
   height: 80px;
+  
 }
 
 td {
@@ -152,6 +152,7 @@ td {
 td:hover{
   cursor: pointer;
   box-shadow: 0 0 11px rgba(33, 33, 33, .2);
+  
 }
 
 .description{

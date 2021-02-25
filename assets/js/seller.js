@@ -9,8 +9,8 @@ const socket = io('/', {
 socket.connect()
 
 socket.emit("update-user-details", {
-  user_id: 13,
-  username: "jacky",
+  user_id: 6,
+  username: "Rafic",
   seller: true
 })
 

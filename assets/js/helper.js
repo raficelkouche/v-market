@@ -122,7 +122,10 @@ $('main').on('click', '#message-recieved', (event) => {
 
   $('#message-recieved').remove()
 
-  $(`#messages-from-${chatRecieverID}`).show()
+  $(`#messages-from-${chatRecieverID}`).slideToggle('medium', function () {
+    $(`#messages-from-${chatRecieverID} form input`).focus()
+  });
+
 })
 
 //event handler for clicking on 'chat' button
@@ -146,7 +149,10 @@ $('main').on('click', '#start-chat', (event) => {
     $('#chat-side-bar').children('.chat-container').hide()
   } else {}
 
-  $(`#messages-from-${chatRecieverID}`).toggle();
+  //$(`#messages-from-${chatRecieverID}`).toggle();
+  $(`#messages-from-${chatRecieverID}`).slideToggle('medium', function() {  
+    $(`#messages-from-${chatRecieverID} form input`).focus()
+  });
 })
 
 //event handler for sending a new message
@@ -352,3 +358,40 @@ socket.on('delete user', userInfo => {
 
 //variables to be used by other modules
 window.allGlobalVars = { socket, coordinates, connectSocket, getAllFriends, updateFriendsList }
+
+
+//testing seller video call
+$("main").on("click", "#customer-support", (event) => {
+  targetUser = $(event.target).closest('li').attr('id')
+ /*  if (!window.mute) {
+    $('#music').click()
+  } */
+  //disable the call button if in a call
+  $('.friend-container').children('#start-call').attr("disabled", true)
+
+  //avoid calling the user while a call is ongoing
+  if (!call) {
+    socket.emit('call-request', {
+      peerID,
+      targetUser: 6,
+      seller: true
+    })
+    //add a video container
+    $('#game-chat-container').prepend(`<div class="in-game-video-call-container"></div>`)
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        //add the local cam stream
+        $('.in-game-video-call-container').append(inGameLocalVideo)
+        $('.in-game-video-call-container').append(`<button class="btn btn-danger" id="end-call"> <i class="fas fa-phone-slash"> </i>End Call</button>`)
+        addVideoStream(inGameLocalVideo, stream)
+
+        //add the remote video stream
+        socket.on("call-accepted", peerID => {
+          sendrecieveStreams(peerID, stream)
+          socket.off("call-accepted")
+        })
+      })
+  } else {
+    alert("already in another call!");
+  }
+});

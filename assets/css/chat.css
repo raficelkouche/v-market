@@ -28,6 +28,10 @@
   content: '🌎 ';
 }
 
+#friends-list ul li{
+  list-style-position: outside;
+}
+
 #offline-friends {
   /* border: 2px solid yellow; */
   padding: 10px;
@@ -40,7 +44,6 @@
 }
 
 .chat-container{
-  background-color: rgb(224, 250, 250);
   height: 400px;
   display: flex;
   flex-direction: column;
