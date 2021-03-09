@@ -109,7 +109,7 @@
 
 2. Wilkie introduction
 
-3. My name is Tammy, and before lighthouse labs, I was a production supervisor at a food manufacturing facility. I have decided to leave my career to pursue my passion in programming. Without further ado, we would like to present our project.
+3. Tammy Introduction: My name is Tammy, and before lighthouse labs, I was a production supervisor at a food manufacturing facility. Today, we are excited to present to you our project, V-Market.
 
 4. A. Rafic: We are presenting to you V-Market. A virtual marketplace that redfines online shopping. It brings buyers and sellers together on a 2D map to simulate the real-life experience. 
 
@@ -120,9 +120,16 @@
 DEMO WALKTHTHROUGH: Rafic driver, Tammy speaker
 
 5. Tammy: (Landing page -> login, -> walk around and talk about navbar features?) 
-  - First the user will log in through the landing page, the user will be spawn in the V-Market map. As a user the can use the top nav bar to view user account information, toggle the mini map and toggle background music. In this map, there are areas to explore and hang out with your friends on the side. The main feature will be marketplace in the middle.
+  - First the user will log in through the landing page, then spawn in the V-Market map. $The platform was created using the Phaser 3 Library and the map was designed using Tiled map editor.$ As a user, they can use the top nav bar to view user account information, toggle the mini map and toggle background music. 
+  
+  -On the side bar, youll see a friends list and any friends that are online, You can instant message or request a video chat. A fun feature is that you can walk around and explore the V-market with your friend online. $This was made possible through Socket IO.$
+  
+  The map includes areas to explore like the beach or the park but The main feature will be marketplace in the middle. and with each booth, a vendor can place a store representative behind the counter to provide assitance in real-time.
 
-  - Your friends can join you on the same map for virtual shopping together, you can online chat or video chat with your friends.
+  Lets head over to a store. In the store you can browse at products, add to cart, and checkout using your credit card. If you need assitance you can click the customer support button. Currently there is no representative available right now, but if the vendor was online, the customer would be able to request a video chat. 
+
+  That is all for our demo. Wilkie will talk about our teamwork and challenges.
+
 
 6. Tammy: (second player joins, show chat feature (text/video), 
 
