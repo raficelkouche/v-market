@@ -9,11 +9,12 @@
   border-radius: 100px;
   position: absolute;
   top: 8px;
-  left: 20%;
+  left: 10%;
   justify-content: space-around;
-  padding-left: 10px;
-  padding-right: 10px;
+  /* padding-left: 10px;
+  padding-right: 10px; */
   visibility: hidden;
+  
 
 }
 

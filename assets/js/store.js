@@ -25,6 +25,7 @@ class Store extends Phaser.Scene {
   }
 
   static initload;
+  static seller;
 
   preload() {
     //load all texture
@@ -33,6 +34,8 @@ class Store extends Phaser.Scene {
     //load store html
     this.load.html('store_window', 'templates/store_window.html');
     this.key = this.input.keyboard.addKeys("ESC")
+
+    this.seller = true;
   }
 
   create() {  
@@ -68,7 +71,7 @@ class Store extends Phaser.Scene {
           if (result[i]) { // assign product_id to td as value for later calling 
             pendingHTML += `
             <td class="single-product" value=${result[i].id}>
-              <img class="thumbnail" src="${result[i].thumbnail};"/>
+              <img class="thumbnail" src="${result[i].thumbnail}"/>
               <div class="description">
                 <div class="product-name">
                   ${result[i].name}
@@ -104,7 +107,7 @@ class Store extends Phaser.Scene {
             if (result[i + x * 4]) {
               pendingHTML += `
               <td class="single-product" value=${result[i + x * 4].id}>
-                <img class="thumbnail" src="${result[i + x * 4].thumbnail};"/>
+                <img class="thumbnail" src="${result[i + x * 4].thumbnail}"/>
                 <div class="description">
                   <div class="product-name">
                     ${result[i + x * 4].name}
@@ -156,7 +159,7 @@ class Store extends Phaser.Scene {
         $("#checkout-table").remove()
       }
       $("#products").html("<div id='products-grid'></div>")
-      $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Product</button></div>")
+      $("#products-grid").html("<table></table><div><button id='request-data' class='btn btn-primary'>Load More Products</button></div>")
       addMoreItem(storeProducts, true) // need to make helper to get the amount 
       for (let product of storeProducts) {
         $(`#add-to-cart${product.id}`).on('click', function () {
@@ -276,37 +279,38 @@ class Store extends Phaser.Scene {
 
     //customer support button action
     $("#customer-support").on("click", () => { //need to replace
-      $('#checkout').css("visibility", "hidden");
-      $('#products').html(`
+      if(!this.seller){
+        $('#checkout').css("visibility", "hidden");
+        $('#products').html(`
         <div id='support-message'>
-          <h3> Customer Support</h3>
-          <p> Hello ${this.playerInfo.name}, </p>
-          <p> Thank you for reaching out to us. </p>
-          <p> Currently, we do not have a representative online right now. Please refer to the contact information below if you require any assistance. </p>
-          <p> <b>Email</b>: <a href="mailto:${this.storeEmail}">${this.storeEmail}</a></p>
-          <p> <b>Phone</b>: <a href="tel:${this.storePhone}">${this.storePhone}</a></p>
-          <ul id="hours-op">
-            Hours of Operation 
-            <li> Monday: 9:00 am - 5:00 pm </li>
-            <li> Tuesday: 9:00 am - 5:00 pm </li>
-            <li> Wednesday: 9:00 am - 5:00 pm </li>
-            <li> Thursday: 9:00 am - 5:00 pm </li>
-            <li> Friday: 9:00 am - 5:00 pm </li>
-            <li> Saturday: Closed </li>
-            <li> Sunday: Closed </li>
-          </ul>
-          <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
+        <h3> Customer Support</h3>
+        <p> Hello ${this.playerInfo.name}, </p>
+        <p> Thank you for reaching out to us. </p>
+        <p> Currently, we do not have a representative online right now. Please refer to the contact information below if you require any assistance. </p>
+        <p> <b>Email</b>: <a href="mailto:${this.storeEmail}">${this.storeEmail}</a></p>
+        <p> <b>Phone</b>: <a href="tel:${this.storePhone}">${this.storePhone}</a></p>
+        <ul id="hours-op">
+        Hours of Operation 
+        <li> Monday: 9:00 am - 5:00 pm </li>
+        <li> Tuesday: 9:00 am - 5:00 pm </li>
+        <li> Wednesday: 9:00 am - 5:00 pm </li>
+        <li> Thursday: 9:00 am - 5:00 pm </li>
+        <li> Friday: 9:00 am - 5:00 pm </li>
+        <li> Saturday: Closed </li>
+        <li> Sunday: Closed </li>
+        </ul>
+        <button id='back-button' class='btn btn-outline-warning'><i class="fas fa-chevron-circle-left"></i> Back </button>
         </div>
-      `)
-      $("#back-button").off().on("click", () => {
-        back();
-        $('#checkout').css("visibility", "visible");
-        $("#request-data").off().on("click", () => { //wait for helper
-          requestItemData(storeID);
+        `)
+        $("#back-button").off().on("click", () => {
+          back();
+          $('#checkout').css("visibility", "visible");
+          $("#request-data").off().on("click", () => { //wait for helper
+            requestItemData(storeID);
+          })
         })
-      })
-
-      // exit(this.cameras, this.playerInfo, this.scene);
+      }
+  
     })
 
     $(document).off().on("click", '.single-product', (x) => { // use document, so newly add item have listener
@@ -316,7 +320,7 @@ class Store extends Phaser.Scene {
           let pendingHTML = `
         <div id="product-container">
           <div id='products-img'>
-            <img class="thumbnail" src=${result.thumbnail};/>
+            <img class="thumbnail" src="${result.thumbnail}"/>
           </div>
           <div id='product-des'>
             <h2>${result.name}</h2>

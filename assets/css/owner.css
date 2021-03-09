@@ -96,6 +96,14 @@
   
 }
 */
+main{
+  background-color: #f5f0f0;
+}
+.main-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 
 #store-data {
   align-self: center;
@@ -106,20 +114,11 @@
   box-shadow: 10px 10px 10px rgba(0,0,0,0.5);
 }
 
-#products {
-  display: flex;
-  position:fixed;
-  bottom: 5%;
-  left: 5%;
-  width: 90%;
-  height: 75%;
-  overflow: auto;
-}
+
 
 #products-grid {
-  margin-left: 2%;
-  width: 68%;
   justify-content: space-between;
+  flex-basis: 65%;
 }
 
 #products-grid > table {
@@ -194,48 +193,64 @@ td {
 }
 */
 
+.call-notification{
+  position: fixed;
+  background: #f2f2f2;
+  top: 30vh;
+  width: 30%;
+  height: 20vh;
+  left: 25%;
+  border: 2px solid grey;
+  /* display: flex; */
+  /* justify-content: center; */
+  padding: 20px;
+  text-align: center;
+  vertical-align: center;
+  max-height: 300px;
+  max-width: 300px;
+  padding-top: 50px;
+}
+
 #customer {
-  position:fixed;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  top: 30%;
-  right: 8%;
-  /* need to change for responsive */
+  border-left: 2px solid black;
+  padding-left: 2rem;
+  width: 300px;
+  flex-basis:25%;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #cddfe7;
 }
 
-#customer > div {
-  align-self: center;
-  height: 3.5rem;
-  width: 3.5rem;
-  border-radius: 0.8rem;
-  background-image: url(/icon/phone.png);
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-color: #bbbbbb;
-  border: black solid 0.25rem ;
-  opacity: 0.5;
+#customer video{
+  box-shadow: #bbbbbb;
+  max-width: 300px;
+  max-height: 250px;
 }
 
-#customer > div:hover {
-  opacity: 0.75;
-  cursor: pointer;
+#seller-local-video{
+  max-height: 300px;
+  border: 1px solid #cddfe7;
+  margin-top: 1rem;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+  background-color: whitesmoke;
 }
 
-#customer > div:active {
-  opacity: 1;
-  cursor: pointer;
+#customer-remote-video{
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+  max-height: 300px;
+  border: 1px solid #cddfe7;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+  background-color: whitesmoke;
 }
 
-#customer > p {
-  margin-bottom: 0.5rem;
-  margin-top: 0.5rem;
-  white-space: pre;
-  overflow: auto;
-  text-align: center;
-  font-size: small;
-  -webkit-user-select: none; /* Safari */
-  user-select: none;
-  font-size: 0.7rem;
+#end-call{
+  width: 100px;
+}
+
+.queue-container{
+  align-self: flex-start;
+
 }

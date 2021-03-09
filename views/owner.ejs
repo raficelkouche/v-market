@@ -7,8 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!--scripts to load jQuery, Phaser, Stripe and Socket.io-->
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.52.0/dist/phaser.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     
 
@@ -40,46 +42,221 @@
         font-family: Carter One, cursive;'>
         <%= result[0].store_name%></h1>
       </div>
-      <div>
-          <div id='products-grid'>
-            <table>
-              <colgroup>
-                <col id="product-photo">
-                <col class="product-name">
-                <col class="product-price">
-                <col class="product-quan">
-                <col class="product-sold">
-              </colgroup>
+
+      <div class="main-container">
+        <div id='products-grid'>
+          <table>
+            <colgroup>
+              <col id="product-photo">
+              <col class="product-name">
+              <col class="product-price">
+              <col class="product-quan">
+              <col class="product-sold">
+            </colgroup>
+            <tr>
+              <th style='text-align: center;'>Product Picture</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Sold</th>
+            </tr>
+            <% for (const item of result) {%>
               <tr>
-                <th style='text-align: center;'>Product Pricture</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Sold</th>
+                <td style='width: 20%; height: 5rem; padding: 0;'><img style="width: 100%; height: 100%; object-fit: contain;"src='<%= item.item_photo%>'></td>
+                <td style='height: 5rem; padding: 0;'><%= item.item_name%></td>
+                <td style='height: 5rem; padding: 0;'>$<%= item.item_price%></td>
+                <td style='height: 5rem; padding: 0; text-align: center;'><%= item.item_quantity%></td>
+                <td style='height: 5rem; padding: 0; text-align: center;'><%= item.item_sold%></td>
               </tr>
-              <% for (const item of result) {%>
-                <tr>
-                  <td style='width: 20%; height: 5rem; padding: 0;'><img style="width: 100%; height: 100%; object-fit: contain;"src='<%= item.item_photo%>'></td>
-                  <td style='height: 5rem; padding: 0;'><%= item.item_name%></td>
-                  <td style='height: 5rem; padding: 0;'>$<%= item.item_price%></td>
-                  <td style='height: 5rem; padding: 0; text-align: center;'><%= item.item_quantity%></td>
-                  <td style='height: 5rem; padding: 0; text-align: center;'><%= item.item_sold%></td>
-                </tr>
               <% } %>
-            </table>
+          </table>
+        </div>
+          
+          <div id="customer">
+            <video class="seller-local-video" id="seller-local-video"></video>
+            <video class="customer-remote-video" id="customer-remote-video"></video>
+            <div class="queue-container">
+              <h3>Currently In Queue</h3>
+              <ul>
+                <li>Tara</li>
+                <li>Khalid</li>
+                <li>Aleksa</li>
+                <li>Justin</li>
+              </ul>
+            </div>
           </div>
-          <footer>
-          </footer>
       </div>
-      <div id="customer" style='right: 4%'>
-        <video class=“customer-remote-video” id=“customer-remote-video”></video>
-        <video muted class=“seller-local-video” id=“seller-local-video”></video>
-      </div>
-      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-      <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
-    </main>
+        
+    </main>   
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
   </body>
   
+  <script defer>
+    console.log("hey")
+    let call = null;
+    let myPeer = null;
+    let peerID = null;
+    let chatRecieverID = null;
+    let offlineFriends = null;
+    const socket = io('/', {
+      autoConnect: false,
+      query: {
+        x: 289, //would be replaced by x and y for seller from db
+        y: 305
+      }
+    })
+
+    socket.connect()
+
+    myPeer = new Peer(undefined, { //peer connection for video chatting, has to be after socket.connect()
+        host: '/',
+        port: '3001'
+    })
+
+    myPeer.on('open', id => {
+      peerID = id;
+    })
+
+    socket.emit("update-user-details", {
+      user_id: 6,
+      username: "Rafic",
+      seller: true
+    })
+
+    socket.on('receive message', data => {
+
+    })
+
+    const inGameLocalVideo = document.getElementById('seller-local-video')
+    inGameLocalVideo.muted = true;
+    inGameLocalVideo.autoplay = true;
+
+    const remoteVideo = document.getElementById('customer-remote-video')
+    remoteVideo.autoplay = true;
+
+    //helper functions
+    function sendrecieveStreams(remoteUserID, stream) {
+      //call the other user and send the local stream
+      call = myPeer.call(remoteUserID, stream)
+
+      //setup handlers to recieve the remote stream
+      call.on('stream', remoteUserVideoStream => {
+        call.off('stream')
+        addVideoStream(remoteVideo, remoteUserVideoStream)
+      })
+    }
+
+    function addVideoStream(video, stream) {
+      video.srcObject = stream
+    }
+
+    //Video chat feature
+    socket.on('call-request-recieved', data => {
+      //disable all the call button while the notification is on
+      //$('.friend-container').children('#start-call').attr("disabled", true)
+      //mute music
+      console.log("Received request")
+      //add the notification to the screen
+      $('main').append(`
+              <div class="call-notification">
+                <div><b>${data.username}</b> is calling ...</div>
+                <button class="btn btn-success" id="accept-button">Accept</button>
+                <button class="btn btn-danger" id="decline-button">Decline</button>
+              </div>
+            `)
+
+      $('main').on('click', '#accept-button', () => {
+        $('.call-notification').remove();
+
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+          .then(stream => {
+            //add the local video stream
+
+            addVideoStream(inGameLocalVideo, stream)
+            $('#customer-remote-video').after(`<button class="btn btn-danger" id="end-call"> <i class="fas fa-phone-slash"></i> End Call</button>`)
+
+            //event listener for recieving a call
+            myPeer.on('call', recievedCall => {
+              console.log("peer is calling")
+              call = recievedCall
+              call.answer(stream) //answer the call and send local stream
+
+              //add the remote stream to the screen
+              call.on('stream', remoteUserVideoStream => {
+                addVideoStream(remoteVideo, remoteUserVideoStream)
+                call.off('stream')
+              })
+              myPeer.off('call')
+            })
+            socket.emit('user-accepted-call', peerID)
+          })
+
+      })
+    });
+
+    $('main').on('click', '#decline-button', () => {
+      $('.friend-container').children('#start-call').attr("disabled", false)
+      if (mute) { }
+      else { $('#music').click() }
+      socket.emit('user-declined-call')
+      $('.call-notification').remove()
+      $('main').off('click', '#accept-button')
+      //$('main').off('click', '#decline-button')
+    })
+
+    $('main').on('click', '#end-call', () => {
+      socket.emit('call-ended')
+      //$('.friend-container').children('#start-call').attr("disabled", false)
+      $('#end-call').remove()
+
+    })
+
+    //socket handlers
+    socket.on('disconnect', (user_id) => {
+      socket.disconnect();
+    });
+
+    socket.on('connect_error', error => {
+    });
+
+
+
+    socket.on('call-ended', () => {
+      //if the call was not picked up yet and user clickes on end call
+      if (call) {
+        call.close()
+        call = null;
+      }
+      //enable all the call buttons
+      //$('.friend-container').children('#start-call').attr("disabled", false)
+      //remove the call notification box if the caller end's the call
+      $('.call-notification').remove();
+      //stop the video and audio streaming
+      if (inGameLocalVideo.srcObject) {
+        inGameLocalVideo.srcObject.getTracks().forEach(track => track.stop())
+      }
+      if (remoteVideo.srcObject) {
+        remoteVideo.srcObject.getTracks().forEach(track => track.stop())
+      }
+      //remove the local and remote video containers
+      //$('.in-game-video-call-container').children().remove()
+      //$('.in-game-video-call-container').remove()
+      $('main').off('click', '#accept-button')
+      $('main').off('click', '#decline-button')
+    });
+
+    socket.on('call-declined', () => {
+      //stop the local video stream and remove it's container
+      if (inGameLocalVideo.srcObject) {
+        inGameLocalVideo.srcObject.getTracks().forEach(track => track.stop())
+      }
+      //$('.in-game-video-call-container').children().remove()
+      //$('.in-game-video-call-container').remove()
+      //re-enable the call button for the caller
+      //$('.friend-container').children('#start-call').attr("disabled", false)
+      $('main').off('click', '#accept-button')
+      $('main').off('click', '#decline-button')
+    });
+  </script>
 </html>

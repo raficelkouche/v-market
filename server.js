@@ -14,12 +14,13 @@ const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc')
 
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
-app.use(express.static("assets"));
+//app.use(express.static("assets"));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieSession({ name: 'session', keys: ['key1', 'key2'] }))
 
 
+app.use(express.static(path.join(__dirname, 'assets')))
 app.set("view engine", "ejs");
 
 //define mount the routes
@@ -55,7 +56,7 @@ io.on('connection', (socket) => {
     socket.join(my_user_id) 
     
     //will be used to add this socket to another private room to talk to a seller
-    if (userDetails.callSeller === true) {
+    if (userDetails.seller === true) {
       socket.join('vendor-room')
     }
     
@@ -94,7 +95,10 @@ io.on('connection', (socket) => {
       const tempList = {}
       Object.keys(activeConnections).forEach(userID => {
         if (userID !== my_user_id) {
-          tempList[userID] = activeConnections[userID]
+          tempList[activeConnections[userID].username] = {
+            user_id: activeConnections[userID].user_id,
+            username: activeConnections[userID].username 
+          }
         }
       })
       socket.emit('requested-list', tempList)
@@ -119,10 +123,12 @@ io.on('connection', (socket) => {
     })
     
     socket.on('call-request', data => {
-      videoChatRoom = (data.callSeller === true) ? "vendor-room" : data.targetUser
-      
-      socket.join(videoChatRoom)
+      console.log("calling: ", data)
 
+      videoChatRoom = (data.seller === true) ? "vendor-room" : data.targetUser
+      console.log("room: ", videoChatRoom)
+      socket.join(videoChatRoom)
+      io.sockets.adapter.rooms.get(videoChatRoom).forEach(client => console.log("client: ", client))
       socket.to(videoChatRoom).emit('call-request-recieved', {
         ...data, 
         username: userInfo.username 

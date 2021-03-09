@@ -70,9 +70,10 @@ async function getAllFriends(userID) {
 //will take care of online/offline friends
 function updateFriendsList(list){
   $("#friends-list ul").children().remove()
-  
-  for (const friend in list) {
-    if(offlineFriends.includes(list[friend].username)){
+  $("#offline-friends ul").children().remove()
+
+  offlineFriends.forEach((friend) => {
+    if(list[friend] ){
       $("#friends-list ul").append(`
       <li class="friend-container" id="${list[friend].user_id}">
         ${list[friend].username}
@@ -81,9 +82,9 @@ function updateFriendsList(list){
       </li>
       `)
     }else{
-      $('#offline-friends ul').append(`<li>${list[friend].username}</li>`)
+      $('#offline-friends ul').append(`<li>${friend}</li>`)
     }
-  }
+  })
 }
 
 //Text chat feature
@@ -109,27 +110,28 @@ socket.on('recieve message', data => {
     $(`#messages-from-${data.sender.user_id}`).hide()
   }
 
-  $(`#messages-from-${data.sender.user_id} .message-history ul`).append(`<li>${data.sender.username}: ${data.message}</li`)
+  $(`#messages-from-${data.sender.user_id} .message-history ul`).append(`<li class="keep-left"><b>${data.sender.username}</b>: ${data.message}</li`)
   $('.message-history').scrollTop($('.message-history').height());
 })
 
 //event handler for clicking on a 'new message' notification
 $('main').on('click', '#message-recieved', (event) => {
-  chatRecieverID = $(event.target).parent().attr("id")
-
+  chatRecieverID = $(event.target).closest('li').attr('id')
+  
   $('#chat-side-bar').children('.chat-container').hide()
 
   $('#message-recieved').remove()
 
-  $(`#messages-from-${chatRecieverID}`).show()
+  $(`#messages-from-${chatRecieverID}`).slideToggle('medium', function () {
+    $(`#messages-from-${chatRecieverID} form input`).focus()
+  });
+
 })
 
 //event handler for clicking on 'chat' button
 $('main').on('click', '#start-chat', (event) => {
   chatRecieverID = $(event.target).closest('li').attr('id')
-  //hide all visible chats if any
-  $('#chat-side-bar').children('.chat-container').hide()
-
+  
   //add a container to hold messages and the texting-form if it doesn't exist
   if (!document.getElementById(`messages-from-${chatRecieverID}`)) {
     $('#offline-friends').after(`
@@ -143,9 +145,14 @@ $('main').on('click', '#start-chat', (event) => {
       </form>
     </div>
     `)
-  } else {
-    $(`#messages-from-${chatRecieverID}`).toggle();
-  }
+    //hide all visible chats if any
+    $('#chat-side-bar').children('.chat-container').hide()
+  } else {}
+
+  //$(`#messages-from-${chatRecieverID}`).toggle();
+  $(`#messages-from-${chatRecieverID}`).slideToggle('medium', function() {  
+    $(`#messages-from-${chatRecieverID} form input`).focus()
+  });
 })
 
 //event handler for sending a new message
@@ -155,7 +162,7 @@ $('main').on('submit', "#chat-side-bar form", (event) => {
   let message = $(`#messages-from-${chatRecieverID} input`).val()
 
   if (message) {
-    $(`#messages-from-${chatRecieverID} .message-history ul`).append(`<li>${sessionStorage.getItem("IGN")}: ${message}</li`)
+    $(`#messages-from-${chatRecieverID} .message-history ul`).append(`<li class="keep-right"><b>Me</b>: ${message}</li>`)
 
     socket.emit('send message', {
       recipient: chatRecieverID,
@@ -215,7 +222,7 @@ socket.on('call-request-recieved', data => {
   //add the notification to the screen
   $('main').append(`
         <div class="call-notification">
-          <div> User <b>${data.username}</b> is calling ...</div>
+          <div><b>${data.username}</b> is calling ...</div>
           <button class="btn btn-success" id="accept-button">Accept</button>
           <button class="btn btn-danger" id="decline-button">Decline</button>
         </div>
@@ -351,3 +358,40 @@ socket.on('delete user', userInfo => {
 
 //variables to be used by other modules
 window.allGlobalVars = { socket, coordinates, connectSocket, getAllFriends, updateFriendsList }
+
+
+//testing seller video call
+$("main").on("click", "#customer-support", (event) => {
+  targetUser = $(event.target).closest('li').attr('id')
+ /*  if (!window.mute) {
+    $('#music').click()
+  } */
+  //disable the call button if in a call
+  $('.friend-container').children('#start-call').attr("disabled", true)
+
+  //avoid calling the user while a call is ongoing
+  if (!call) {
+    socket.emit('call-request', {
+      peerID,
+      targetUser: 6,
+      seller: true
+    })
+    //add a video container
+    $('#game-chat-container').prepend(`<div class="in-game-video-call-container"></div>`)
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        //add the local cam stream
+        $('.in-game-video-call-container').append(inGameLocalVideo)
+        $('.in-game-video-call-container').append(`<button class="btn btn-danger" id="end-call"> <i class="fas fa-phone-slash"> </i>End Call</button>`)
+        addVideoStream(inGameLocalVideo, stream)
+
+        //add the remote video stream
+        socket.on("call-accepted", peerID => {
+          sendrecieveStreams(peerID, stream)
+          socket.off("call-accepted")
+        })
+      })
+  } else {
+    alert("already in another call!");
+  }
+});
