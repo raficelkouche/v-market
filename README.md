@@ -14,4 +14,15 @@ A virtual marketplace that redefines online shopping. Buyers and sellers get tog
 - Start the server using `npm run local`.
 - Start the PeerJS server (for the video chat feature) using `peerjs --port 3001` (if for any reason you decide to change the port, change it also in helper.js).
 
-
+## Dependencies
+- bcrypt
+- cookie-session
+- dotenv
+- ejs
+- express
+- morgan
+- pg
+- pg-native
+- phaser.io
+- socket.io
+- stripe
