@@ -1,6 +1,6 @@
 require('dotenv').config();
 const db = require('./db/helper')
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 const ENV = process.env.ENV || "development";
 const express = require('express')
 const app = express()
@@ -14,7 +14,6 @@ const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc')
 
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
-//app.use(express.static("assets"));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieSession({ name: 'session', keys: ['key1', 'key2'] }))
