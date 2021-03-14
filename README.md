@@ -3,7 +3,6 @@
 A virtual marketplace that redefines online shopping. Buyers and sellers get together on a 2D map and interact, just like they would in real-life. Some prefer to call it "Pokemon meets Amazon". The application allows users to fulfill all their shopping needs while experiencing the look and the feel of a classical RPG game. Sellers on the other side have their own view that allows them to manage inventories and video chat with potential clients.
 
 ## Video Demo
----
 [V-Market Walkthrough](https://youtu.be/0jPgsHoR6uA)
 
 ## Setup
