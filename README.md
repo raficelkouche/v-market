@@ -25,3 +25,6 @@ A virtual marketplace that redefines online shopping. Buyers and sellers get tog
 - phaser.io
 - socket.io
 - stripe
+
+## Contributors
+This project would not have been possible without the valuable contributions of [Tammy Tran](https://github.com/ohoktnt) and [Wilkie Wong](https://github.com/Wwong154)
