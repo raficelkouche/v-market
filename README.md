@@ -27,4 +27,4 @@ A virtual marketplace that redefines online shopping. Buyers and sellers get tog
 - stripe
 
 ## Contributors
-This project would not have been possible without the valuable contributions of [Tammy Tran](https://github.com/ohoktnt) and [Wilkie Wong](https://github.com/Wwong154)
+This project would not have been possible without the contributions of [Tammy Tran](https://github.com/ohoktnt) and [Wilkie Wong](https://github.com/Wwong154)
