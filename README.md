@@ -1,3 +1,6 @@
+
+*Please note that this project was part of a coding bootcamp. This is by no means production-leve code. It was something that was worked on long back to apply some of the languages/frameworks that were studied during my days at Lighthouse Labs*
+
 # V-Market
 
 A virtual marketplace that redefines online shopping. Buyers and sellers get together on a 2D map and interact, just like they would in real-life. Some prefer to call it "Pokemon meets Amazon". The application allows users to fulfill all their shopping needs while experiencing the look and the feel of a classical RPG game. Sellers on the other side have their own view that allows them to manage inventories and video chat with potential clients.
